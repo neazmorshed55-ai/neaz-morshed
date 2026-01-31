@@ -83,15 +83,12 @@ export default function SkillPortfolioPage() {
       }
 
       try {
+        // Fetch both categories and sub-skills
         const { data: catData } = await supabase
           .from('skill_categories')
           .select('*')
           .eq('is_active', true)
           .order('order_index', { ascending: true });
-
-        if (catData && catData.length > 0) {
-          setCategories(catData);
-        }
 
         const { data: skillData } = await supabase
           .from('sub_skills')
@@ -99,9 +96,13 @@ export default function SkillPortfolioPage() {
           .eq('is_active', true)
           .order('order_index', { ascending: true });
 
-        if (skillData && skillData.length > 0) {
+        // Only use Supabase data if BOTH categories AND sub_skills have data
+        // This ensures the category_id references match properly
+        if (catData && catData.length > 0 && skillData && skillData.length > 0) {
+          setCategories(catData);
           setSubSkills(skillData);
         }
+        // If only categories exist, keep using defaults for both to maintain ID consistency
 
         const { data: imgData } = supabase.storage.from('images').getPublicUrl('profile.jpg');
         if (imgData?.publicUrl) {
