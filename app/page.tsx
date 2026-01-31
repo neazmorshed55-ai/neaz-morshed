@@ -9,8 +9,10 @@ import {
   Github, Linkedin, Award, Users, Clock, 
   Zap, Globe, CheckCircle2, Video, 
   Palette, Layout, Smartphone, PenTool,
-  ChevronRight, ExternalLink
+  ChevronRight, ExternalLink, MessageSquare,
+  TrendingUp, Star
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function PortfolioPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -26,59 +28,46 @@ export default function PortfolioPage() {
   const title = "Expert Virtual Assistant & Professional Outsourcer";
 
   const stats = [
-    { label: 'Job Success', value: '100%', icon: <Award className="w-5 h-5 text-[#2ecc71]" /> },
-    { label: 'Global Clients', value: '180+', icon: <Users className="w-5 h-5 text-[#2ecc71]" /> },
-    { label: 'Hours Completed', value: '5k+', icon: <Clock className="w-5 h-5 text-[#2ecc71]" /> },
-  ];
-
-  const technicalSkills = [
-    { name: 'Video Production', level: 95 },
-    { name: 'Graphic Design', level: 95 },
-    { name: 'eBook Formatting', level: 95 },
-    { name: 'WordPress Design', level: 90 },
-  ];
-
-  const coreCompetencies = [
-    { name: 'Virtual Assistant Service', level: 95 },
-    { name: 'Social Media Marketing', level: 85 },
-    { name: 'Content Writing', level: 80 },
+    { label: 'Job Success', value: '100%', icon: <Star className="w-5 h-5" /> },
+    { label: 'Global Clients', value: '180+', icon: <Users className="w-5 h-5" /> },
+    { label: 'Hours Completed', value: '5,000+', icon: <Clock className="w-5 h-5" /> },
   ];
 
   const services = [
     {
       id: 1,
       title: 'Virtual Assistant',
-      icon: <Database className="w-10 h-10" />,
-      desc: 'Comprehensive administrative support including data entry, research, email management, and scheduling.'
+      icon: <Briefcase className="w-10 h-10" />,
+      desc: 'High-level administrative support, including email filtering, scheduling, and custom business workflows.'
     },
     {
       id: 2,
-      title: 'Video Production',
-      icon: <Video className="w-10 h-10" />,
-      desc: 'Professional video editing, YouTube management, and high-quality content creation using Adobe Premiere Pro.'
+      title: 'Data & CRM Mastery',
+      icon: <Database className="w-10 h-10" />,
+      desc: 'Expert data mining, cleaning, and management across HubSpot, Salesforce, and Zoho.'
     },
     {
       id: 3,
-      title: 'Graphic Design',
-      icon: <Palette className="w-10 h-10" />,
-      desc: 'Custom graphics, photo retouching, eBook design, and brand materials using Photoshop & Canva.'
+      title: 'Lead Generation',
+      icon: <Target className="w-10 h-10" />,
+      desc: 'B2B prospect research with verified contact details to fuel your sales pipeline.'
     },
     {
       id: 4,
-      title: 'Web Development',
+      title: 'Web & Tech Support',
       icon: <Layout className="w-10 h-10" />,
-      desc: 'WordPress & Wix website development, deep customization, and ongoing site maintenance.'
+      desc: 'WordPress customization, Wix site management, and technical troubleshooting for your digital presence.'
     }
   ];
 
-  const portfolioItems = [
-    { id: 1, title: 'Youtube Channel Manager', cat: 'Video Production', img: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=800' },
-    { id: 2, title: 'Real Estate Data Mining', cat: 'Virtual Assistant', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800' },
-    { id: 3, title: 'SaaS Outreach Program', cat: 'Marketing', img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800' }
+  const technicalExperience = [
+    { label: 'YouTube Management', years: '4+ Years', icon: <Video size={18} /> },
+    { label: 'Market Research', years: '10+ Years', icon: <Search size={18} /> },
+    { label: 'Content Operations', years: '5+ Years', icon: <PenTool size={18} /> },
   ];
 
   return (
-    <div className="bg-[#0b0f1a] text-white selection:bg-[#2ecc71] selection:text-slate-950 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="bg-[#0b0f1a] text-white">
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${isScrolled ? 'bg-[#0b0f1a]/90 backdrop-blur-2xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center max-w-7xl">
@@ -86,12 +75,12 @@ export default function PortfolioPage() {
             <div className="w-12 h-12 bg-[#2ecc71] rounded-2xl flex items-center justify-center font-black text-slate-950 group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]">NM</div>
             <div className="flex flex-col">
               <span className="text-xl font-extrabold tracking-tighter leading-none">NEAZ MORSHED</span>
-              <span className="text-[10px] text-[#2ecc71] font-bold tracking-[0.2em] mt-1 uppercase">Top Rated Professional</span>
+              <span className="text-[10px] text-[#2ecc71] font-bold tracking-[0.2em] mt-1 uppercase">Top Rated Pro</span>
             </div>
           </div>
           
           <div className="hidden lg:flex items-center gap-10">
-            {['Home', 'Skills', 'Services', 'Portfolio'].map(link => (
+            {['Home', 'Services', 'Experience', 'Contact'].map(link => (
               <a key={link} href={`#${link.toLowerCase()}`} className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">
                 {link}
               </a>
@@ -116,7 +105,7 @@ export default function PortfolioPage() {
             <button className="absolute top-8 right-8 text-[#2ecc71]" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={40} />
             </button>
-            {['Home', 'Skills', 'Services', 'Portfolio', 'Contact'].map(link => (
+            {['Home', 'Services', 'Experience', 'Contact'].map(link => (
               <a key={link} href={`#${link.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">{link}</a>
             ))}
           </motion.div>
@@ -124,29 +113,29 @@ export default function PortfolioPage() {
       </AnimatePresence>
 
       <main>
-        {/* Hero Section */}
+        {/* Hero */}
         <section id="home" className="relative min-h-screen flex items-center pt-24 overflow-hidden">
           <div className="absolute top-[10%] left-[5%] w-[600px] h-[600px] bg-[#2ecc71]/5 rounded-full blur-[180px] pointer-events-none animate-pulse"></div>
           
           <div className="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center max-w-7xl relative z-10">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#2ecc71]/10 border border-[#2ecc71]/20 text-[#2ecc71] text-[10px] font-black uppercase tracking-[0.3em] mb-10">
-                <Zap size={14} className="fill-[#2ecc71]" />
-                10+ Years of Professional Experience
+                <TrendingUp size={14} className="text-[#2ecc71]" />
+                Powering Global Business Growth
               </div>
               <h1 className="text-7xl lg:text-[100px] font-black leading-[0.85] mb-12 tracking-tighter">
-                I AM <br />
-                <span className="text-gradient">NEAZ MD.</span> <br />
-                <span className="text-gradient">MORSHED</span>
+                OPTIMIZE <br />
+                <span className="text-gradient">OPERATIONS</span> <br />
+                FOR <span className="text-[#2ecc71]">SCALE</span>
               </h1>
               <p className="text-xl text-slate-400 mb-14 max-w-lg leading-relaxed font-medium">
-                Expert <span className="text-white font-bold">{title}</span>. Delivering results through precision, data-driven efficiency, and high-impact digital solutions.
+                Professional <span className="text-white font-bold">{title}</span>. I handle the complexity so you can focus on high-level strategy and vision.
               </p>
               <div className="flex flex-wrap gap-6 items-center">
-                <a href="#portfolio" className="bg-[#2ecc71] text-slate-950 px-14 py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-[0_20px_50px_rgba(46,204,113,0.3)] uppercase tracking-widest text-sm">
-                  View Projects <ArrowRight size={20} />
+                <a href="#contact" className="bg-[#2ecc71] text-slate-950 px-14 py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-[0_20px_50px_rgba(46,204,113,0.3)] uppercase tracking-widest text-sm">
+                  Let's Collaborate <ArrowRight size={20} />
                 </a>
-                <div className="flex gap-6 items-center pl-4 border-l border-white/10">
+                <div className="flex gap-6 pl-4 border-l border-white/10">
                   {stats.map((stat, i) => (
                     <div key={i} className="flex flex-col">
                       <span className="text-2xl font-black text-white">{stat.value}</span>
@@ -158,10 +147,10 @@ export default function PortfolioPage() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }} className="relative group">
-              <div className="relative z-10 w-full aspect-[4/5] rounded-[5rem] overflow-hidden border-[16px] border-white/5 shadow-2xl">
+              <div className="relative z-10 w-full aspect-[4/5] rounded-[5rem] overflow-hidden border-[16px] border-white/5 shadow-2xl bg-slate-900">
                 <img 
-                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800" 
-                  alt="Neaz Md. Morshed Portrait" 
+                  src="https://images.unsplash.com/photo-1519085195758-2a89f9c3f732?auto=format&fit=crop&q=80&w=800" 
+                  alt="Neaz Md. Morshed" 
                   className="w-full h-full object-cover grayscale brightness-90 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-transparent opacity-60"></div>
@@ -178,78 +167,22 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* Skills Section */}
-        <section id="skills" className="py-32 bg-slate-900/10">
-          <div className="container mx-auto px-6 max-w-7xl">
-            <div className="text-center mb-24">
-              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Expertise</span>
-              <h2 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none">Professional <br /><span className="text-slate-600">Skills</span></h2>
-            </div>
-            
-            <div className="grid lg:grid-cols-2 gap-20">
-              <div className="space-y-10">
-                <h3 className="text-2xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
-                  <Layout className="text-[#2ecc71]" /> Technical Skills
-                </h3>
-                {technicalSkills.map(skill => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between mb-4">
-                      <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-slate-400">{skill.name}</span>
-                      <span className="text-[#2ecc71] font-black">{skill.level}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }} 
-                        whileInView={{ width: `${skill.level}%` }} 
-                        transition={{ duration: 1.5, ease: "circOut" }} 
-                        className="h-full bg-[#2ecc71] rounded-full shadow-[0_0_20px_rgba(46,204,113,0.5)]"
-                      ></motion.div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-10">
-                <h3 className="text-2xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
-                  <Globe className="text-[#2ecc71]" /> Core Competencies
-                </h3>
-                {coreCompetencies.map(skill => (
-                  <div key={skill.name}>
-                    <div className="flex justify-between mb-4">
-                      <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-slate-400">{skill.name}</span>
-                      <span className="text-[#2ecc71] font-black">{skill.level}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }} 
-                        whileInView={{ width: `${skill.level}%` }} 
-                        transition={{ duration: 1.5, ease: "circOut" }} 
-                        className="h-full bg-[#2ecc71] rounded-full shadow-[0_0_20px_rgba(46,204,113,0.5)]"
-                      ></motion.div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Services Section */}
+        {/* Services */}
         <section id="services" className="py-32 relative">
           <div className="container mx-auto px-6 max-w-7xl">
             <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-12">
               <div className="max-w-3xl">
-                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Our Solutions</span>
-                <h2 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none">Tailored <br /> <span className="text-slate-600">Business Services</span></h2>
+                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Capabilities</span>
+                <h2 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none">Strategic <br /> <span className="text-slate-600">Business Support</span></h2>
               </div>
               <p className="text-slate-400 max-w-sm text-sm leading-relaxed mb-6 font-medium">
-                Streamlining operations and driving growth through precision-engineered workflows and expert management.
+                Delivering high-impact assistance designed for the modern remote landscape. Built for reliability and performance.
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {services.map(service => (
-                <div key={service.id} className="p-12 bg-slate-900/40 border border-white/5 rounded-[4.5rem] hover:border-[#2ecc71]/40 hover:bg-slate-900 transition-all group relative overflow-hidden flex flex-col justify-between h-full">
+                <div key={service.id} className="p-12 bg-slate-900/40 border border-white/5 rounded-[4rem] hover:border-[#2ecc71]/40 hover:bg-slate-900 transition-all group flex flex-col justify-between h-full relative overflow-hidden">
                   <div>
                     <div className="text-[#2ecc71] mb-12 group-hover:scale-110 group-hover:rotate-6 transition-transform inline-flex p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
                       {service.icon}
@@ -266,79 +199,97 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* Portfolio Section */}
-        <section id="portfolio" className="py-32 bg-slate-900/20">
+        {/* Experience / Other Skills */}
+        <section id="experience" className="py-32 bg-slate-900/10">
           <div className="container mx-auto px-6 max-w-7xl">
-            <div className="text-center mb-24">
-              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Case Studies</span>
-              <h2 className="text-6xl lg:text-[100px] font-black uppercase tracking-tighter leading-none">Recent <br /><span className="text-slate-600">Projects</span></h2>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-12">
-              {portfolioItems.map(item => (
-                <motion.div 
-                  key={item.id} 
-                  whileHover={{ y: -20 }} 
-                  className="group bg-slate-900 rounded-[5rem] overflow-hidden border border-white/5 hover:border-[#2ecc71]/40 transition-all duration-700 shadow-2xl"
-                >
-                  <div className="aspect-square overflow-hidden relative">
-                    <img 
-                      src={item.img} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000" 
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-80"></div>
-                  </div>
-                  <div className="p-14">
-                    <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.4em]">{item.cat}</span>
-                    <h3 className="text-3xl font-black mt-4 uppercase tracking-tighter leading-tight group-hover:text-[#2ecc71] transition-colors">{item.title}</h3>
-                  </div>
-                </motion.div>
-              ))}
+            <div className="grid lg:grid-cols-2 gap-20 items-center">
+              <div>
+                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-8 block">Legacy</span>
+                <h2 className="text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-12">Years of <br /><span className="text-slate-600">Trust & Reliability</span></h2>
+                <div className="space-y-6">
+                  {technicalExperience.map((exp, i) => (
+                    <div key={i} className="flex items-center justify-between p-8 bg-slate-900 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all">
+                      <div className="flex items-center gap-5">
+                        <div className="p-3 bg-white/5 rounded-xl text-[#2ecc71]">
+                          {exp.icon}
+                        </div>
+                        <span className="text-lg font-bold uppercase tracking-tighter">{exp.label}</span>
+                      </div>
+                      <span className="text-[#2ecc71] font-black tracking-widest text-[11px] uppercase">{exp.years}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-6 mt-12">
+                   <div className="p-10 bg-[#2ecc71] rounded-[4rem] text-slate-950 flex flex-col justify-center items-center text-center aspect-square shadow-2xl">
+                      <Star className="w-12 h-12 mb-4" />
+                      <div className="text-4xl font-black mb-1">5.0</div>
+                      <div className="text-[9px] font-black uppercase tracking-[0.2em] opacity-80">Marketplace Rating</div>
+                   </div>
+                   <div className="p-10 bg-slate-900 border border-white/5 rounded-[4rem] flex flex-col justify-center items-center text-center aspect-square">
+                      <Globe className="text-[#2ecc71] w-12 h-12 mb-4" />
+                      <div className="text-3xl font-black mb-1">Global</div>
+                      <div className="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em]">Remote Presence</div>
+                   </div>
+                </div>
+                <div className="space-y-6">
+                  <div className="p-10 bg-slate-900 border border-white/5 rounded-[4rem] flex flex-col justify-center items-center text-center aspect-square">
+                      <Zap className="text-[#2ecc71] w-12 h-12 mb-4" />
+                      <div className="text-3xl font-black mb-1">Fast</div>
+                      <div className="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em]">Response Time</div>
+                   </div>
+                   <div className="p-10 bg-[#2ecc71]/10 border border-[#2ecc71]/20 rounded-[4rem] flex flex-col justify-center items-center text-center aspect-square">
+                      <CheckCircle2 className="text-white w-12 h-12 mb-4" />
+                      <div className="text-3xl font-black mb-1">Proven</div>
+                      <div className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Track Record</div>
+                   </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Contact Section */}
+        {/* Contact */}
         <section id="contact" className="py-32 bg-[#0b0f1a]">
           <div className="container mx-auto px-6 max-w-5xl">
             <div className="bg-[#0e1526] rounded-[6rem] p-16 lg:p-28 border border-white/10 relative overflow-hidden text-center shadow-2xl">
-              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2ecc71]/10 rounded-full blur-[180px] -z-10"></div>
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2ecc71]/10 rounded-full blur-[200px] -z-10"></div>
               
-              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-12 block">Get In Touch</span>
-              <h2 className="text-7xl lg:text-[120px] font-black mb-20 uppercase leading-[0.8] tracking-tighter">Ready to <br /> <span className="text-slate-600">Connect?</span></h2>
+              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-12 block">Final Step</span>
+              <h2 className="text-7xl lg:text-[120px] font-black mb-20 uppercase leading-[0.8] tracking-tighter">Let's Build <br /> <span className="text-slate-600">Something</span></h2>
               
               <div className="grid md:grid-cols-2 gap-10 mt-28 mb-24 text-left">
-                <div className="p-14 rounded-[4.5rem] bg-white/5 border border-white/10 hover:border-[#2ecc71]/40 transition-all group">
+                <div className="p-12 rounded-[4.5rem] bg-white/5 border border-white/10 hover:border-[#2ecc71]/40 transition-all group">
                   <Mail className="text-[#2ecc71] mb-10" size={64} />
-                  <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Official Email</div>
+                  <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Email</div>
                   <div className="text-2xl font-black text-white hover:text-[#2ecc71] transition-colors break-all">hello@neaz.pro</div>
                 </div>
-                <div className="p-14 rounded-[4.5rem] bg-white/5 border border-white/10 hover:border-[#2ecc71]/40 transition-all group">
-                  <Phone className="text-[#2ecc71] mb-10" size={64} />
-                  <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">WhatsApp / Call</div>
-                  <div className="text-2xl font-black text-white hover:text-[#2ecc71] transition-colors">+880 123 456 789</div>
+                <div className="p-12 rounded-[4.5rem] bg-white/5 border border-white/10 hover:border-[#2ecc71]/40 transition-all group">
+                  <MessageSquare className="text-[#2ecc71] mb-10" size={64} />
+                  <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Direct Message</div>
+                  <div className="text-2xl font-black text-white hover:text-[#2ecc71] transition-colors">via Fiverr / LinkedIn</div>
                 </div>
               </div>
 
               <a href="https://www.fiverr.com/neaz222" target="_blank" className="w-full py-14 bg-[#2ecc71] text-slate-950 font-black rounded-[4rem] text-3xl uppercase tracking-[0.1em] hover:scale-[1.02] active:scale-95 transition-all shadow-[0_30px_70px_rgba(46,204,113,0.4)] flex items-center justify-center gap-10 group">
-                Hire on Fiverr <ArrowRight size={48} className="group-hover:translate-x-3 transition-transform" />
+                Hire Neaz Morshed <ArrowRight size={48} className="group-hover:translate-x-3 transition-transform" />
               </a>
               
               <div className="mt-24 flex justify-center gap-14">
-                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Linkedin size={36} /></a>
-                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Github size={36} /></a>
-                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Globe size={36} /></a>
+                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Linkedin size={40} /></a>
+                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Github size={40} /></a>
+                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Globe size={40} /></a>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      <footer className="py-28 border-t border-white/5">
-        <div className="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-12">
+      <footer className="py-24 border-t border-white/5">
+        <div className="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
           <div className="flex items-center gap-6">
-             <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center font-black text-[#2ecc71] border border-white/10 text-xl">NM</div>
+             <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center font-black text-[#2ecc71] border border-white/10 text-xl shadow-2xl">NM</div>
              <span className="text-[12px] font-black tracking-[0.6em] uppercase text-slate-500">{name}</span>
           </div>
           <p className="text-[12px] font-black text-slate-700 uppercase tracking-[1em]">
@@ -359,13 +310,6 @@ export default function PortfolioPage() {
         }
         .animate-pulse {
           animation: subtle-pulse 8s infinite ease-in-out;
-        }
-        html {
-          scroll-behavior: smooth;
-        }
-        body {
-          background-color: #0b0f1a;
-          color: white;
         }
       `}</style>
     </div>
