@@ -524,8 +524,27 @@ export default function PortfolioPage() {
                       </motion.div>
                     </div>
 
-                    {/* Empty space for alternating layout - Desktop only */}
-                    <div className="hidden lg:block lg:w-[calc(50%-40px)]"></div>
+                    {/* Year display on opposite side - Desktop only */}
+                    <div className="hidden lg:flex lg:w-[calc(50%-40px)] items-center justify-center">
+                      <AnimatePresence>
+                        {activeExperience === exp.id && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.4 }}
+                            className="text-center"
+                          >
+                            <div className="text-8xl font-black text-[#2ecc71]/20 leading-none">
+                              {exp.startDate.split(' ')[1]}
+                            </div>
+                            <div className="text-sm font-bold text-slate-500 mt-2 uppercase tracking-widest">
+                              {exp.endDate.split(' ')[1]}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </motion.div>
                 ))}
               </div>
