@@ -242,11 +242,11 @@ export default function ReviewsPage() {
                       <img
                         src={review.client_image}
                         alt={review.client_name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/10 group-hover:border-[#2ecc71]/60 transition-all"
+                        className="w-20 h-20 rounded-full object-cover border-3 border-[#2ecc71]/40 shadow-xl shadow-[#2ecc71]/20 group-hover:border-[#2ecc71]/70 group-hover:scale-105 transition-all"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-slate-800/80 border-2 border-white/10 flex items-center justify-center group-hover:border-[#2ecc71]/30 transition-all">
-                        <User className="w-8 h-8 text-slate-600" />
+                      <div className="w-20 h-20 rounded-full bg-slate-800/80 border-2 border-white/10 flex items-center justify-center group-hover:border-[#2ecc71]/30 transition-all">
+                        <User className="w-10 h-10 text-slate-600" />
                       </div>
                     )}
                   </div>
