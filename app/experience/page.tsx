@@ -402,9 +402,21 @@ export default function ExperiencePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 border-t border-white/5">
-        <div className="container mx-auto px-6 max-w-7xl text-center">
-          <p className="text-slate-500 text-sm">&copy; 2024 Neaz Md. Morshed. All rights reserved.</p>
+      <footer className="py-8 border-t border-white/5">
+        <div className="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+          <div className="flex gap-8">
+            <a href="https://www.linkedin.com/in/neazmorshed222/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">LinkedIn</a>
+            <a href="https://www.fiverr.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Fiverr</a>
+            <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
+          </div>
+          <div className="text-center">
+            <p className="text-slate-400 text-sm font-medium">
+              Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span>
+            </p>
+            <p className="text-slate-600 text-xs mt-1">
+              Copyright © 2026
+            </p>
+          </div>
         </div>
       </footer>
     </div>
