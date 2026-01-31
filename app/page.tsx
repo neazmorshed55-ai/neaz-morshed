@@ -2,15 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import {
   Menu, X, ArrowRight, Briefcase,
-  Mail, Phone, Target,
+  Mail, Target,
   Database, Search, ShieldCheck,
-  Award, Users, Clock,
-  Zap, Globe, CheckCircle2, Video,
+  Users, Clock,
+  Globe, CheckCircle2, Video,
   Layout, PenTool,
   TrendingUp, Star, Send, Loader2,
-  Calendar, MapPin, Building2, ChevronDown
+  Calendar, Building2, ChevronDown
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -94,24 +95,28 @@ export default function PortfolioPage() {
     {
       id: 1,
       title: 'Virtual Assistant',
+      slug: 'virtual-assistant',
       icon: <Briefcase className="w-10 h-10" />,
       desc: 'High-level administrative support, including email filtering, scheduling, and custom business workflows.'
     },
     {
       id: 2,
       title: 'Data & CRM Mastery',
+      slug: 'data-crm',
       icon: <Database className="w-10 h-10" />,
       desc: 'Expert data mining, cleaning, and management across HubSpot, Salesforce, and Zoho.'
     },
     {
       id: 3,
       title: 'Lead Generation',
+      slug: 'lead-generation',
       icon: <Target className="w-10 h-10" />,
       desc: 'B2B prospect research with verified contact details to fuel your sales pipeline.'
     },
     {
       id: 4,
       title: 'Web & Tech Support',
+      slug: 'web-tech-support',
       icon: <Layout className="w-10 h-10" />,
       desc: 'WordPress customization, Wix site management, and technical troubleshooting for your digital presence.'
     }
@@ -222,11 +227,11 @@ export default function PortfolioPage() {
           </div>
           
           <div className="hidden lg:flex items-center gap-10">
-            {['Home', 'Skills', 'Services', 'Experience', 'Contact'].map(link => (
-              <a key={link} href={`#${link.toLowerCase()}`} className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">
-                {link}
-              </a>
-            ))}
+            <a href="#home" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Home</a>
+            <a href="#skills" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Skills</a>
+            <Link href="/services" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Services</Link>
+            <a href="#experience" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Experience</a>
+            <a href="#contact" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Contact</a>
             <a href="https://www.fiverr.com/neaz222" target="_blank" className="bg-[#2ecc71] text-slate-950 px-8 py-4 rounded-2xl font-black text-[11px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#2ecc71]/20 uppercase">HIRE ME</a>
           </div>
 
@@ -247,9 +252,11 @@ export default function PortfolioPage() {
             <button className="absolute top-8 right-8 text-[#2ecc71]" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={40} />
             </button>
-            {['Home', 'Skills', 'Services', 'Experience', 'Contact'].map(link => (
-              <a key={link} href={`#${link.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">{link}</a>
-            ))}
+            <a href="#home" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Home</a>
+            <a href="#skills" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Skills</a>
+            <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Services</Link>
+            <a href="#experience" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Experience</a>
+            <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Contact</a>
           </motion.div>
         )}
       </AnimatePresence>
@@ -366,18 +373,20 @@ export default function PortfolioPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {services.map(service => (
-                <div key={service.id} className="p-12 bg-slate-900/40 border border-white/5 rounded-[4rem] hover:border-[#2ecc71]/40 hover:bg-slate-900 transition-all group flex flex-col justify-between h-full relative overflow-hidden">
-                  <div>
-                    <div className="text-[#2ecc71] mb-12 group-hover:scale-110 group-hover:rotate-6 transition-transform inline-flex p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
-                      {service.icon}
+                <Link key={service.id} href={`/services/${service.slug}`}>
+                  <div className="p-12 bg-slate-900/40 border border-white/5 rounded-[4rem] hover:border-[#2ecc71]/40 hover:bg-slate-900 transition-all group flex flex-col justify-between h-full relative overflow-hidden cursor-pointer">
+                    <div>
+                      <div className="text-[#2ecc71] mb-12 group-hover:scale-110 group-hover:rotate-6 transition-transform inline-flex p-6 bg-white/5 rounded-[2.5rem] border border-white/5">
+                        {service.icon}
+                      </div>
+                      <h3 className="text-2xl font-black mb-6 uppercase tracking-tighter leading-tight group-hover:text-[#2ecc71] transition-colors">{service.title}</h3>
+                      <p className="text-slate-400 text-sm leading-relaxed font-medium">{service.desc}</p>
                     </div>
-                    <h3 className="text-2xl font-black mb-6 uppercase tracking-tighter leading-tight">{service.title}</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed font-medium">{service.desc}</p>
+                    <div className="mt-14 flex items-center gap-3 text-[#2ecc71] text-[10px] font-black uppercase tracking-widest group-hover:translate-x-2 transition-transform">
+                      View Portfolio <ArrowRight size={16} />
+                    </div>
                   </div>
-                  <div className="mt-14 flex items-center gap-3 text-[#2ecc71] text-[10px] font-black uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                    View Details <ArrowRight size={16} />
-                  </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

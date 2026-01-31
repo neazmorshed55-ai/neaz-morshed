@@ -79,3 +79,63 @@ INSERT INTO experiences (company, position, description, start_date, end_date, l
   ('HJ Visualization', 'Virtual Assistant', 'Remote and Part time Job', 'January 2019', 'December 2023', 'Remote', ARRAY['Virtual Assistance', 'Remote Work'], false, 5),
   ('Tritech Building Services Ltd.', 'Team Leader - Brand & Communication', 'Brand Promotion', 'January 2020', 'October 2022', 'Bangladesh', ARRAY['Brand Promotion', 'Team Leadership', 'Communication'], false, 6),
   ('The Global Council for Anthropological Linguistics - GLOCAL', 'Media and Web Design Coordinator', 'Remote and Full time job. Web development and design for GLOCAL website and three other websites like CALA, COMELA, AFALA, JALA, JOMELA. Skill: Responsive Web Design - Excel - Graphic Design - Problem Solving - WordPress - WordPress Design', 'January 2021', 'December 2022', 'Remote', ARRAY['Responsive Web Design', 'Excel', 'Graphic Design', 'Problem Solving', 'WordPress', 'WordPress Design'], false, 7);
+
+-- ============================================
+-- SERVICES TABLE - Service Categories
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS services (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  icon TEXT,
+  cover_image TEXT,
+  order_index INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true
+);
+
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read services" ON services
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow authenticated manage services" ON services
+  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+-- Insert default services
+INSERT INTO services (title, slug, description, icon, order_index) VALUES
+  ('Virtual Assistant', 'virtual-assistant', 'High-level administrative support, including email filtering, scheduling, and custom business workflows.', 'Briefcase', 1),
+  ('Data & CRM Mastery', 'data-crm', 'Expert data mining, cleaning, and management across HubSpot, Salesforce, and Zoho.', 'Database', 2),
+  ('Lead Generation', 'lead-generation', 'B2B prospect research with verified contact details to fuel your sales pipeline.', 'Target', 3),
+  ('Web & Tech Support', 'web-tech-support', 'WordPress customization, Wix site management, and technical troubleshooting.', 'Layout', 4),
+  ('Video Production', 'video-production', 'Professional video editing, YouTube management, and content creation.', 'Video', 5),
+  ('Market Research', 'market-research', 'In-depth market analysis, competitor research, and industry insights.', 'Search', 6);
+
+-- ============================================
+-- PORTFOLIO ITEMS TABLE - Work Samples
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS portfolio_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  service_id UUID REFERENCES services(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  image_url TEXT,
+  project_url TEXT,
+  client_name TEXT,
+  completion_date TEXT,
+  tags TEXT[],
+  is_featured BOOLEAN DEFAULT false,
+  order_index INTEGER DEFAULT 0
+);
+
+ALTER TABLE portfolio_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read portfolio" ON portfolio_items
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow authenticated manage portfolio" ON portfolio_items
+  FOR ALL TO authenticated USING (true) WITH CHECK (true);
