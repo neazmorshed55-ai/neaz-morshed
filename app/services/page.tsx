@@ -62,7 +62,7 @@ export default function ServicesPage() {
 
       {/* Hero Section */}
       <section className="pt-40 pb-20 relative overflow-hidden">
-        <VideoBackground type="services" opacity={0.4} />
+        <VideoBackground type="services" opacity={0.5} />
 
         {/* Additional decorative elements */}
         <div className="absolute top-[10%] left-[5%] w-[600px] h-[600px] bg-[#2ecc71]/5 rounded-full blur-[180px] pointer-events-none"></div>

@@ -560,7 +560,7 @@ export default function ExperiencePage() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 relative overflow-hidden">
-        <VideoBackground type="experience" opacity={0.4} />
+        <VideoBackground type="experience" opacity={0.5} />
 
         {/* Additional decorative elements */}
         <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#2ecc71]/5 rounded-full blur-[150px] pointer-events-none"></div>
@@ -629,8 +629,8 @@ export default function ExperiencePage() {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as typeof activeTab)}
                 className={`px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === tab.key
-                    ? 'bg-[#2ecc71] text-slate-900'
-                    : 'bg-slate-900/60 border border-white/10 text-slate-400 hover:border-[#2ecc71]/30 hover:text-white'
+                  ? 'bg-[#2ecc71] text-slate-900'
+                  : 'bg-slate-900/60 border border-white/10 text-slate-400 hover:border-[#2ecc71]/30 hover:text-white'
                   }`}
               >
                 {tab.label}
@@ -673,8 +673,8 @@ export default function ExperiencePage() {
                       {exp.start_date.split(' ').pop()}
                     </div>
                     <div className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider mt-2 ${exp.type === 'full-time' ? 'bg-[#2ecc71]/20 text-[#2ecc71]' :
-                        exp.type === 'part-time' ? 'bg-blue-500/20 text-blue-400' :
-                          'bg-purple-500/20 text-purple-400'
+                      exp.type === 'part-time' ? 'bg-blue-500/20 text-blue-400' :
+                        'bg-purple-500/20 text-purple-400'
                       }`}>
                       {exp.type}
                     </div>
@@ -685,16 +685,16 @@ export default function ExperiencePage() {
                 <div className={`md:w-1/2 pl-8 md:pl-0 ${index % 2 === 0 ? 'md:pl-12' : 'md:pr-12'}`}>
                   <div
                     className={`p-6 rounded-3xl border transition-all duration-300 cursor-pointer ${expandedId === exp.id
-                        ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/10'
-                        : 'bg-slate-900/40 border-white/5 hover:border-white/10'
+                      ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/10'
+                      : 'bg-slate-900/40 border-white/5 hover:border-white/10'
                       }`}
                     onClick={() => setExpandedId(expandedId === exp.id ? null : exp.id)}
                   >
                     {/* Mobile Type Badge & Year */}
                     <div className="md:hidden flex items-center gap-3 mb-3">
                       <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${exp.type === 'full-time' ? 'bg-[#2ecc71]/20 text-[#2ecc71]' :
-                          exp.type === 'part-time' ? 'bg-blue-500/20 text-blue-400' :
-                            'bg-purple-500/20 text-purple-400'
+                        exp.type === 'part-time' ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-purple-500/20 text-purple-400'
                         }`}>
                         {exp.type}
                       </span>

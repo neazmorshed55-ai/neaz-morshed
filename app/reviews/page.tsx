@@ -178,7 +178,7 @@ export default function ReviewsPage() {
               <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
                 Client <span className="text-gradient">Reviews</span>
               </h1>
-              <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+              <p className="text-slate-200 text-lg max-w-2xl mx-auto">
                 Don't just take my word for it. Here's what my clients from around the world have to say about working with me.
               </p>
             </motion.div>
@@ -256,7 +256,7 @@ export default function ReviewsPage() {
                   <Quote className="w-10 h-10 text-[#2ecc71]/30 mb-6" />
 
                   {/* Review Text */}
-                  <p className="text-slate-300 leading-relaxed mb-8 text-sm">
+                  <p className="text-slate-200 leading-relaxed mb-8 text-sm">
                     "{review.review_text}"
                   </p>
 
