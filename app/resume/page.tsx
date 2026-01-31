@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowLeft, Download, Mail, Phone, MapPin, Globe,
   Briefcase, GraduationCap, Award, Code, Calendar,
-  Linkedin, ExternalLink, FileText, BookOpen, Cpu
+  Linkedin, ExternalLink, Cpu, ChevronDown, CheckCircle2,
+  Sparkles, Zap
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -551,6 +552,9 @@ export default function ResumePage() {
   const [education, setEducation] = useState<Education[]>(defaultEducation);
   const [certifications, setCertifications] = useState<Certification[]>(defaultCertifications);
   const [activeTab, setActiveTab] = useState<'full-time' | 'part-time' | 'project'>('full-time');
+  const [expandedExp, setExpandedExp] = useState<string | null>(null);
+  const [expandedEdu, setExpandedEdu] = useState<string | null>(null);
+  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
   const personalInfo = {
     name: "NEAZ MD. MORSHED",
@@ -569,21 +573,18 @@ export default function ResumePage() {
       if (!supabase) return;
 
       try {
-        // Fetch experiences
         const { data: expData } = await supabase
           .from('resume_experiences')
           .select('*')
           .order('order_index', { ascending: true });
         if (expData && expData.length > 0) setExperiences(expData);
 
-        // Fetch education
         const { data: eduData } = await supabase
           .from('resume_education')
           .select('*')
           .order('order_index', { ascending: true });
         if (eduData && eduData.length > 0) setEducation(eduData);
 
-        // Fetch certifications
         const { data: certData } = await supabase
           .from('resume_certifications')
           .select('*')
@@ -600,10 +601,10 @@ export default function ResumePage() {
   const filteredExperiences = experiences.filter(exp => exp.type === activeTab);
 
   const achievements = [
-    { label: 'Job Success', value: '100%' },
-    { label: 'Hours Completed', value: '5,000+' },
-    { label: 'Global Clients', value: '180+' },
-    { label: 'Years Experience', value: '12+' }
+    { label: 'Job Success', value: '100%', icon: <Zap size={20} /> },
+    { label: 'Hours Completed', value: '5,000+', icon: <Sparkles size={20} /> },
+    { label: 'Global Clients', value: '180+', icon: <Globe size={20} /> },
+    { label: 'Years Experience', value: '12+', icon: <Briefcase size={20} /> }
   ];
 
   return (
@@ -645,23 +646,41 @@ export default function ResumePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="bg-gradient-to-r from-[#2ecc71]/20 to-transparent p-8 lg:p-12 rounded-[3rem] border border-white/10 mb-12"
+            className="relative bg-gradient-to-r from-[#2ecc71]/20 via-[#2ecc71]/10 to-transparent p-8 lg:p-12 rounded-[3rem] border border-white/10 mb-12 overflow-hidden"
           >
+            {/* Animated Background */}
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2ecc71]/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
+
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
               <div>
-                <h1 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-2">
+                <motion.h1
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-2"
+                >
                   {personalInfo.name}
-                </h1>
-                <p className="text-[#2ecc71] text-lg font-bold mb-4">
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-[#2ecc71] text-lg font-bold mb-4"
+                >
                   {personalInfo.title}
-                </p>
+                </motion.p>
                 {/* Contact Info */}
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2 text-slate-300">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex flex-wrap gap-4 text-sm"
+                >
+                  <div className="flex items-center gap-2 text-slate-300 hover:text-[#2ecc71] transition-colors cursor-pointer">
                     <Mail size={14} className="text-[#2ecc71]" />
                     <span>{personalInfo.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
+                  <div className="flex items-center gap-2 text-slate-300 hover:text-[#2ecc71] transition-colors cursor-pointer">
                     <Phone size={14} className="text-[#2ecc71]" />
                     <span>{personalInfo.phone}</span>
                   </div>
@@ -669,33 +688,35 @@ export default function ResumePage() {
                     <MapPin size={14} className="text-[#2ecc71]" />
                     <span>{personalInfo.location}</span>
                   </div>
-                </div>
+                </motion.div>
                 <div className="flex flex-wrap gap-4 mt-3">
-                  <a href={`https://www.${personalInfo.linkedin}`} target="_blank" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm">
+                  <a href={`https://www.${personalInfo.linkedin}`} target="_blank" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
                     <Linkedin size={14} />
                     <span>LinkedIn</span>
-                    <ExternalLink size={10} />
+                    <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
-                  <a href={`https://${personalInfo.portfolio}`} target="_blank" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm">
+                  <a href={`https://${personalInfo.portfolio}`} target="_blank" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
                     <Globe size={14} />
                     <span>Portfolio</span>
-                    <ExternalLink size={10} />
+                    <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                 </div>
               </div>
-              <a
+              <motion.a
                 href={pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-950 font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#2ecc71]/20 uppercase tracking-wider text-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-950 font-black rounded-2xl shadow-lg shadow-[#2ecc71]/20 uppercase tracking-wider text-sm"
               >
                 <Download size={18} />
                 Download PDF
-              </a>
+              </motion.a>
             </div>
           </motion.div>
 
-          {/* Stats */}
+          {/* Stats with Icons */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
             {achievements.map((stat, i) => (
               <motion.div
@@ -703,171 +724,355 @@ export default function ResumePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className="p-4 bg-slate-900/60 rounded-2xl text-center border border-white/5"
+                whileHover={{ scale: 1.05, y: -5 }}
+                className="p-5 bg-slate-900/60 rounded-2xl text-center border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
               >
+                <div className="flex justify-center mb-2 text-[#2ecc71] group-hover:scale-110 transition-transform">
+                  {stat.icon}
+                </div>
                 <div className="text-2xl font-black text-[#2ecc71]">{stat.value}</div>
                 <div className="text-xs text-slate-400 uppercase tracking-wider mt-1">{stat.label}</div>
               </motion.div>
             ))}
           </div>
 
-          {/* Skills Section */}
-          <section className="mb-12">
-            <h2 className="flex items-center gap-3 text-xl font-black uppercase tracking-tight mb-6">
-              <Code className="text-[#2ecc71]" size={24} />
+          {/* ========== SECTION 1: WORK EXPERIENCE ========== */}
+          <section className="mb-16">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+            >
+              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
+                <Briefcase className="text-[#2ecc71]" size={28} />
+              </div>
+              Work Experience
+              <span className="text-sm text-slate-500 font-normal ml-2">({experiences.length} positions)</span>
+            </motion.h2>
+
+            {/* Experience Tabs */}
+            <div className="flex flex-wrap gap-3 mb-8">
+              {[
+                { key: 'full-time', label: 'Full-Time', color: 'bg-[#2ecc71]' },
+                { key: 'part-time', label: 'Part-Time', color: 'bg-blue-500' },
+                { key: 'project', label: 'Project-Based', color: 'bg-purple-500' }
+              ].map((tab) => (
+                <motion.button
+                  key={tab.key}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                  className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+                    activeTab === tab.key
+                      ? `${tab.color} text-slate-900 shadow-lg`
+                      : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  {tab.label}
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${
+                    activeTab === tab.key ? 'bg-slate-900/20' : 'bg-white/10'
+                  }`}>
+                    {experiences.filter(e => e.type === tab.key).length}
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              <AnimatePresence mode="wait">
+                {filteredExperiences.map((exp, i) => (
+                  <motion.div
+                    key={exp.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ delay: i * 0.05 }}
+                    className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+                      expandedExp === exp.id
+                        ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/5'
+                        : 'bg-slate-900/60 border-white/5 hover:border-white/10'
+                    }`}
+                  >
+                    <div
+                      onClick={() => setExpandedExp(expandedExp === exp.id ? null : exp.id)}
+                      className="p-5 cursor-pointer"
+                    >
+                      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-2 mb-2">
+                        <div className="flex-1">
+                          <h3 className={`text-lg font-bold transition-colors ${
+                            expandedExp === exp.id ? 'text-[#2ecc71]' : 'text-white'
+                          }`}>{exp.position}</h3>
+                          <p className="text-[#2ecc71] font-semibold text-sm">{exp.company}</p>
+                          <p className="text-slate-500 text-xs mt-1">{exp.location}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg">
+                            <Calendar size={12} />
+                            <span>{exp.start_date} - {exp.end_date}</span>
+                          </div>
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-400 transition-transform duration-300 ${
+                              expandedExp === exp.id ? 'rotate-180 text-[#2ecc71]' : ''
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <AnimatePresence>
+                      {expandedExp === exp.id && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-5 pb-5 pt-2 border-t border-white/5">
+                            <ul className="space-y-2">
+                              {exp.description.map((desc, j) => (
+                                <motion.li
+                                  key={j}
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: j * 0.1 }}
+                                  className="text-slate-300 text-sm flex items-start gap-2"
+                                >
+                                  <CheckCircle2 size={14} className="text-[#2ecc71] mt-0.5 flex-shrink-0" />
+                                  <span>{desc}</span>
+                                </motion.li>
+                              ))}
+                            </ul>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </section>
+
+          {/* ========== SECTION 2: EDUCATION ========== */}
+          <section className="mb-16">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+            >
+              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
+                <GraduationCap className="text-[#2ecc71]" size={28} />
+              </div>
+              Education
+            </motion.h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {education.map((edu, i) => (
+                <motion.div
+                  key={edu.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ scale: 1.02, y: -3 }}
+                  onClick={() => setExpandedEdu(expandedEdu === edu.id ? null : edu.id)}
+                  className={`p-6 rounded-2xl border transition-all cursor-pointer ${
+                    expandedEdu === edu.id
+                      ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg'
+                      : 'bg-slate-900/60 border-white/5 hover:border-[#2ecc71]/20'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className={`p-2 rounded-lg transition-colors ${
+                      expandedEdu === edu.id ? 'bg-[#2ecc71] text-slate-900' : 'bg-[#2ecc71]/10 text-[#2ecc71]'
+                    }`}>
+                      <GraduationCap size={20} />
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <Calendar size={12} />
+                      <span>{edu.end_date.split(' ').pop()}</span>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-1">{edu.degree} in {edu.field}</h3>
+                  <p className="text-[#2ecc71] font-semibold text-sm">{edu.institution}</p>
+
+                  <AnimatePresence>
+                    {expandedEdu === edu.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-4 mt-4 border-t border-white/10">
+                          <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+                            <MapPin size={14} />
+                            <span>{edu.location}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-slate-400 text-sm">
+                            <Calendar size={14} />
+                            <span>{edu.start_date} - {edu.end_date}</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* ========== SECTION 3: CAPSTONE PROJECT ========== */}
+          <section className="mb-16">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+            >
+              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
+                <Cpu className="text-[#2ecc71]" size={28} />
+              </div>
+              Capstone Project
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.01 }}
+              className="p-8 bg-gradient-to-br from-slate-900/80 to-slate-900/40 rounded-3xl border border-white/10 hover:border-[#2ecc71]/30 transition-all relative overflow-hidden group"
+            >
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#2ecc71]/5 rounded-full blur-[80px] group-hover:bg-[#2ecc71]/10 transition-all"></div>
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="px-3 py-1 bg-[#2ecc71]/20 text-[#2ecc71] text-xs font-bold rounded-full uppercase tracking-wider">
+                    IEEE Published
+                  </span>
+                  <span className="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase tracking-wider">
+                    2015
+                  </span>
+                </div>
+
+                <h3 className="text-xl font-bold text-white mb-4 leading-tight">
+                  Microcontroller Based Home Automation System Using Bluetooth, GSM, Wi-Fi and DTMF
+                </h3>
+
+                <p className="text-slate-400 text-sm mb-4 leading-relaxed">
+                  Neaz Md. Morshed, G M Muid Ur Rahman, Md. Rezaul Karim and Hasan U. Zaman, Proc. 3rd Intl. Conference on Advances in Electrical Engineering (ICAEE'15), pp. 101-104, Dhaka, Bangladesh, December 17-19, 2015
+                </p>
+
+                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                  <span className="text-slate-500 text-xs font-mono">DOI: 10.1109/ICAEE.2015.7506806</span>
+                  <a
+                    href="https://doi.org/10.1109/ICAEE.2015.7506806"
+                    target="_blank"
+                    className="flex items-center gap-1 text-[#2ecc71] text-xs font-bold hover:underline"
+                  >
+                    View Publication <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </section>
+
+          {/* ========== SECTION 4: CERTIFICATIONS ========== */}
+          <section className="mb-16">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+            >
+              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
+                <Award className="text-[#2ecc71]" size={28} />
+              </div>
+              Certifications
+              <span className="text-sm text-slate-500 font-normal ml-2">({certifications.length})</span>
+            </motion.h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {certifications.map((cert, i) => (
+                <motion.div
+                  key={cert.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ scale: 1.03, y: -5 }}
+                  className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="p-2 bg-[#2ecc71]/10 rounded-lg text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-slate-900 transition-all">
+                      <Award size={18} />
+                    </div>
+                    {cert.expiry && (
+                      <span className="text-[10px] px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full font-bold">
+                        Valid till {cert.expiry}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-1 group-hover:text-[#2ecc71] transition-colors">{cert.title}</h3>
+                  <p className="text-slate-400 text-sm font-medium">{cert.issuer}</p>
+                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-3">
+                    <Calendar size={12} />
+                    <span>Issued {cert.date}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* ========== SECTION 5: SKILLS & EXPERTISE ========== */}
+          <section className="mb-16">
+            <motion.h2
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+            >
+              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
+                <Code className="text-[#2ecc71]" size={28} />
+              </div>
               Skills & Expertise
-            </h2>
+            </motion.h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.entries(skills).map(([category, skillList], i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                   transition={{ delay: i * 0.05 }}
-                  className="p-5 bg-slate-900/60 rounded-2xl border border-white/5"
-                >
-                  <h3 className="text-sm font-bold text-[#2ecc71] uppercase tracking-wider mb-3">{category}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {skillList.map((skill, j) => (
-                      <span key={j} className="px-2 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          {/* Experience Section */}
-          <section className="mb-12">
-            <h2 className="flex items-center gap-3 text-xl font-black uppercase tracking-tight mb-6">
-              <Briefcase className="text-[#2ecc71]" size={24} />
-              Work Experience
-            </h2>
-
-            {/* Experience Tabs */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              {[
-                { key: 'full-time', label: 'Full-Time' },
-                { key: 'part-time', label: 'Part-Time' },
-                { key: 'project', label: 'Project-Based' }
-              ].map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                  className={`px-5 py-2 rounded-xl font-bold text-sm transition-all ${
-                    activeTab === tab.key
-                      ? 'bg-[#2ecc71] text-slate-900'
-                      : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/10'
+                  onMouseEnter={() => setHoveredSkill(category)}
+                  onMouseLeave={() => setHoveredSkill(null)}
+                  className={`p-5 rounded-2xl border transition-all duration-300 ${
+                    hoveredSkill === category
+                      ? 'bg-[#1a1f2e] border-[#2ecc71]/40 shadow-lg shadow-[#2ecc71]/10 scale-[1.02]'
+                      : 'bg-slate-900/60 border-white/5'
                   }`}
                 >
-                  {tab.label} ({experiences.filter(e => e.type === tab.key).length})
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-4">
-              {filteredExperiences.map((exp, i) => (
-                <motion.div
-                  key={exp.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 hover:border-[#2ecc71]/30 transition-all"
-                >
-                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-2 mb-2">
-                    <div>
-                      <h3 className="text-lg font-bold text-white">{exp.position}</h3>
-                      <p className="text-[#2ecc71] font-semibold text-sm">{exp.company}</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <Calendar size={12} />
-                      <span>{exp.start_date} - {exp.end_date}</span>
-                    </div>
-                  </div>
-                  <ul className="space-y-1 mt-3">
-                    {exp.description.map((desc, j) => (
-                      <li key={j} className="text-slate-400 text-sm flex items-start gap-2">
-                        <span className="text-[#2ecc71] mt-1">•</span>
-                        <span>{desc}</span>
-                      </li>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 transition-colors ${
+                    hoveredSkill === category ? 'text-[#2ecc71]' : 'text-slate-400'
+                  }`}>{category}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skillList.map((skill, j) => (
+                      <motion.span
+                        key={j}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: j * 0.03 }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          hoveredSkill === category
+                            ? 'bg-[#2ecc71]/20 text-[#2ecc71] border border-[#2ecc71]/30'
+                            : 'bg-slate-800 text-slate-300'
+                        }`}
+                      >
+                        {skill}
+                      </motion.span>
                     ))}
-                  </ul>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          {/* Education Section */}
-          <section className="mb-12">
-            <h2 className="flex items-center gap-3 text-xl font-black uppercase tracking-tight mb-6">
-              <GraduationCap className="text-[#2ecc71]" size={24} />
-              Education
-            </h2>
-            <div className="space-y-4">
-              {education.map((edu, i) => (
-                <motion.div
-                  key={edu.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="p-5 bg-slate-900/60 rounded-2xl border border-white/5"
-                >
-                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-2">
-                    <div>
-                      <h3 className="text-lg font-bold text-white">{edu.degree} in {edu.field}</h3>
-                      <p className="text-[#2ecc71] font-semibold text-sm">{edu.institution}</p>
-                      <p className="text-slate-500 text-xs mt-1">{edu.location}</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <Calendar size={12} />
-                      <span>{edu.start_date} - {edu.end_date}</span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          {/* Capstone Project */}
-          <section className="mb-12">
-            <h2 className="flex items-center gap-3 text-xl font-black uppercase tracking-tight mb-6">
-              <Cpu className="text-[#2ecc71]" size={24} />
-              Capstone Project
-            </h2>
-            <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5">
-              <h3 className="text-lg font-bold text-white mb-2">
-                Microcontroller Based Home Automation System Using Bluetooth, GSM, Wi-Fi and DTMF
-              </h3>
-              <p className="text-[#2ecc71] font-semibold text-sm mb-2">Published on IEEE</p>
-              <p className="text-slate-400 text-sm">
-                Neaz Md. Morshed, G M Muid Ur Rahman, Md. Rezaul Karim and Hasan U. Zaman, Proc. 3rd Intl. Conference on Advances in Electrical Engineering (ICAEE'15), pp. 101-104, Dhaka, Bangladesh, December 17-19, 2015
-              </p>
-              <p className="text-slate-500 text-xs mt-2">DOI: 10.1109/ICAEE.2015.7506806</p>
-            </div>
-          </section>
-
-          {/* Certifications Section */}
-          <section className="mb-12">
-            <h2 className="flex items-center gap-3 text-xl font-black uppercase tracking-tight mb-6">
-              <Award className="text-[#2ecc71]" size={24} />
-              Certifications
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {certifications.map((cert, i) => (
-                <motion.div
-                  key={cert.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="p-5 bg-slate-900/60 rounded-2xl border border-white/5"
-                >
-                  <h3 className="text-base font-bold text-white mb-1">{cert.title}</h3>
-                  <p className="text-[#2ecc71] text-sm font-semibold">{cert.issuer}</p>
-                  <div className="flex items-center gap-2 text-xs text-slate-400 mt-2">
-                    <Calendar size={12} />
-                    <span>{cert.date}{cert.expiry ? ` - ${cert.expiry}` : ''}</span>
                   </div>
                 </motion.div>
               ))}
@@ -875,18 +1080,25 @@ export default function ResumePage() {
           </section>
 
           {/* Download CTA */}
-          <div className="text-center pt-8 border-t border-white/10">
-            <p className="text-slate-400 mb-6">Get a copy of my complete resume</p>
-            <a
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center pt-12 border-t border-white/10"
+          >
+            <p className="text-slate-400 mb-6 text-lg">Get a copy of my complete resume</p>
+            <motion.a
               href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-12 py-5 bg-[#2ecc71] text-slate-950 font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#2ecc71]/20 uppercase tracking-wider"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-3 px-12 py-5 bg-[#2ecc71] text-slate-950 font-black rounded-2xl shadow-xl shadow-[#2ecc71]/30 uppercase tracking-wider group"
             >
-              <Download size={20} />
+              <Download size={20} className="group-hover:animate-bounce" />
               Download PDF Resume
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
         </div>
       </main>
 

@@ -460,15 +460,43 @@ const defaultExperiences: Experience[] = [
   }
 ];
 
+// Helper function to parse date string and return sortable value
+const parseDate = (dateStr: string): number => {
+  if (dateStr === 'Present') return Date.now();
+
+  const months: { [key: string]: number } = {
+    'January': 0, 'February': 1, 'March': 2, 'April': 3,
+    'May': 4, 'June': 5, 'July': 6, 'August': 7,
+    'September': 8, 'October': 9, 'November': 10, 'December': 11
+  };
+
+  const parts = dateStr.split(' ');
+  if (parts.length === 2) {
+    const month = months[parts[0]] || 0;
+    const year = parseInt(parts[1]) || 2000;
+    return new Date(year, month).getTime();
+  }
+  return 0;
+};
+
+// Sort experiences by start date (newest first)
+const sortByDate = (exps: Experience[]): Experience[] => {
+  return [...exps].sort((a, b) => parseDate(b.start_date) - parseDate(a.start_date));
+};
+
 export default function ExperiencePage() {
   const [experiences, setExperiences] = useState<Experience[]>(defaultExperiences);
   const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<string | null>('1');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'full-time' | 'part-time' | 'project'>('all');
 
   useEffect(() => {
     async function fetchData() {
       if (!supabase) {
+        // Sort default experiences by date
+        const sorted = sortByDate(defaultExperiences);
+        setExperiences(sorted);
+        setExpandedId(sorted[0]?.id || null);
         setLoading(false);
         return;
       }
@@ -476,16 +504,24 @@ export default function ExperiencePage() {
       try {
         const { data } = await supabase
           .from('experiences')
-          .select('*')
-          .order('type', { ascending: true })
-          .order('order_index', { ascending: true });
+          .select('*');
 
         if (data && data.length > 0) {
-          setExperiences(data);
-          setExpandedId(data[0].id);
+          const sorted = sortByDate(data);
+          setExperiences(sorted);
+          setExpandedId(sorted[0]?.id || null);
+        } else {
+          // Use default experiences if no data from Supabase
+          const sorted = sortByDate(defaultExperiences);
+          setExperiences(sorted);
+          setExpandedId(sorted[0]?.id || null);
         }
       } catch (error) {
         console.error('Error fetching experiences:', error);
+        // On error, use default experiences
+        const sorted = sortByDate(defaultExperiences);
+        setExperiences(sorted);
+        setExpandedId(sorted[0]?.id || null);
       }
 
       setLoading(false);
@@ -494,9 +530,12 @@ export default function ExperiencePage() {
     fetchData();
   }, []);
 
-  const filteredExperiences = activeTab === 'all'
-    ? experiences
-    : experiences.filter(exp => exp.type === activeTab);
+  // Filter and sort experiences
+  const filteredExperiences = sortByDate(
+    activeTab === 'all'
+      ? experiences
+      : experiences.filter(exp => exp.type === activeTab)
+  );
 
   const stats = {
     fullTime: experiences.filter(e => e.type === 'full-time').length,
