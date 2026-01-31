@@ -8,9 +8,9 @@ import {
   Mail, Target,
   Database, Search, ShieldCheck,
   Users, Clock,
-  Globe, CheckCircle2, Video,
+  Globe, Video,
   Layout, PenTool,
-  TrendingUp, Star, Send, Loader2,
+  TrendingUp, Star,
   Calendar, Building2, ChevronDown
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -18,8 +18,6 @@ import { supabase } from '../lib/supabase';
 export default function PortfolioPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1519085195758-2a89f9c3f732?auto=format&fit=crop&q=80&w=800');
 
   // Fetch profile image from Supabase Storage
@@ -40,47 +38,6 @@ export default function PortfolioPage() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormStatus('loading');
-
-    try {
-      // Input validation
-      if (!formData.name || !formData.email || !formData.message) {
-        throw new Error('All fields are required.');
-      }
-
-      // Safe check for Supabase initialization
-      if (!supabase) {
-        console.error('Supabase client is null. Check environment variables.');
-        setFormStatus('error');
-        alert('Form submission is currently unavailable (Database connection error). Please contact hello@neaz.pro directly.');
-        return;
-      }
-
-      const { error } = await supabase
-        .from('contacts')
-        .insert([
-          { 
-            name: formData.name, 
-            email: formData.email, 
-            message: formData.message,
-            status: 'new' 
-          }
-        ]);
-
-      if (error) throw error;
-
-      setFormStatus('success');
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setFormStatus('idle'), 5000);
-    } catch (err) {
-      console.error('Error submitting form:', err);
-      setFormStatus('error');
-      setTimeout(() => setFormStatus('idle'), 5000);
-    }
-  };
 
   const name = "NEAZ MD. MORSHED";
   const title = "Expert Virtual Assistant & Professional Outsourcer";
@@ -231,7 +188,8 @@ export default function PortfolioPage() {
             <Link href="/skills" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Skills</Link>
             <Link href="/services" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Services</Link>
             <Link href="/experience" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Experience</Link>
-            <a href="#contact" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Contact</a>
+            <Link href="/reviews" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Reviews</Link>
+            <Link href="/contact" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Contact</Link>
             <a href="https://www.fiverr.com/neaz222" target="_blank" className="bg-[#2ecc71] text-slate-950 px-8 py-4 rounded-2xl font-black text-[11px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#2ecc71]/20 uppercase">HIRE ME</a>
           </div>
 
@@ -256,7 +214,8 @@ export default function PortfolioPage() {
             <Link href="/skills" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Skills</Link>
             <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Services</Link>
             <Link href="/experience" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Experience</Link>
-            <a href="#contact" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Contact</a>
+            <Link href="/reviews" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Reviews</Link>
+            <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">Contact</Link>
           </motion.div>
         )}
       </AnimatePresence>
@@ -584,86 +543,36 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* Contact Form Section */}
+        {/* Contact CTA Section */}
         <section id="contact" className="py-32 bg-[#0b0f1a]">
           <div className="container mx-auto px-6 max-w-7xl">
-            <div className="bg-[#0e1526] rounded-[6rem] p-12 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl">
+            <div className="bg-[#0e1526] rounded-[6rem] p-12 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl text-center">
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2ecc71]/5 rounded-full blur-[200px] -z-10 animate-subtle-pulse"></div>
-              
-              <div className="grid lg:grid-cols-2 gap-20">
-                <div className="text-left">
-                  <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-12 block">Inquiry</span>
-                  <h2 className="text-6xl lg:text-8xl font-black mb-12 uppercase leading-[0.9] tracking-tighter">Ready to <br /> <span className="text-slate-600">Connect?</span></h2>
-                  <p className="text-slate-400 text-lg mb-12 max-w-md">
-                    Send a message to discuss your project requirements or hiring inquiries. I respond within 12 hours.
-                  </p>
-                  
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-6 p-6 rounded-3xl bg-white/5 border border-white/5">
-                      <Mail className="text-[#2ecc71]" />
-                      <span className="text-lg font-bold">hello@neaz.pro</span>
-                    </div>
-                    <div className="flex items-center gap-6 p-6 rounded-3xl bg-white/5 border border-white/5">
-                      <Globe className="text-[#2ecc71]" />
-                      <span className="text-lg font-bold">Available Globally (Remote)</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#2ecc71]/5 rounded-full blur-[200px] -z-10 animate-subtle-pulse"></div>
 
-                <div className="bg-[#0b0f1a] p-10 lg:p-14 rounded-[4rem] border border-white/5">
-                  <form onSubmit={handleSubmit} className="space-y-8">
-                    <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Full Name</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="John Doe"
-                        className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Email Address</label>
-                      <input 
-                        type="email" 
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@example.com"
-                        className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Your Message</label>
-                      <textarea 
-                        rows={4}
-                        required
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        placeholder="Tell me about your project..."
-                        className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold resize-none"
-                      />
-                    </div>
-                    
-                    <button 
-                      type="submit" 
-                      disabled={formStatus === 'loading'}
-                      className="w-full py-6 bg-[#2ecc71] text-slate-900 font-black rounded-2xl text-lg uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-[#2ecc71]/20 flex items-center justify-center gap-4 group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {formStatus === 'loading' ? (
-                        <>Processing... <Loader2 className="animate-spin" /></>
-                      ) : formStatus === 'success' ? (
-                        <>Message Sent! <CheckCircle2 /></>
-                      ) : formStatus === 'error' ? (
-                        <>Error Occurred</>
-                      ) : (
-                        <>Send Message <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
-                      )}
-                    </button>
-                  </form>
+              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-8 block">Get In Touch</span>
+              <h2 className="text-5xl lg:text-7xl font-black mb-8 uppercase leading-[0.9] tracking-tighter">Ready to <br /> <span className="text-slate-600">Connect?</span></h2>
+              <p className="text-slate-400 text-lg mb-12 max-w-2xl mx-auto">
+                Have a project in mind or want to discuss collaboration opportunities? Let's turn your ideas into reality. I respond within 12 hours.
+              </p>
+
+              <div className="flex flex-wrap justify-center gap-6 mb-12">
+                <div className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/5">
+                  <Mail className="text-[#2ecc71]" />
+                  <span className="font-bold">hello@neaz.pro</span>
+                </div>
+                <div className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/5">
+                  <Globe className="text-[#2ecc71]" />
+                  <span className="font-bold">Available Globally</span>
                 </div>
               </div>
+
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-4 px-14 py-6 bg-[#2ecc71] text-slate-950 font-black rounded-2xl text-lg uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#2ecc71]/20 group"
+              >
+                Contact Me <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
           </div>
         </section>
