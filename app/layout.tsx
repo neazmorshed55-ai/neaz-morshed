@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 /**
@@ -7,7 +8,8 @@ import React from 'react';
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  // Make children optional to resolve TypeScript property missing errors in standard React entry points.
+  children?: React.ReactNode;
 }) {
   return (
     <html lang="en" className="scroll-smooth">
