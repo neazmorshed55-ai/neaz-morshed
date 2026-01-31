@@ -1,6 +1,6 @@
 {
   "name": "Neaz Md. Morshed Portfolio",
-  "description": "Professional Virtual Assistant & Outsourcing Expert Portfolio featuring a high-end dark theme.",
+  "description": "Professional Virtual Assistant & Outsourcing Expert Portfolio. A high-end Next.js application with dark theme and neon green accents.",
   "requestFramePermissions": [
     "camera",
     "microphone"
