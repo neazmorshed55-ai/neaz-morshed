@@ -1,6 +1,6 @@
 {
-  "name": "Maya Nelson Portfolio Clone",
-  "description": "A high-end, responsive portfolio site inspired by the Maya Nelson Wix template, featuring clean typography, professional project showcases, and a resume timeline.",
+  "name": "Neaz Md. Morshed Portfolio",
+  "description": "Professional Virtual Assistant & Outsourcing Expert Portfolio. Built with Next.js App Router structure, Tailwind CSS, and Framer Motion.",
   "requestFramePermissions": [
     "camera",
     "microphone"

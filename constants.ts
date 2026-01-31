@@ -1,64 +1,53 @@
 
-import { Project, Experience, Skill } from './types';
+/**
+ * Data constants used by the Maya Nelson portfolio components.
+ * Restored to fix compilation errors.
+ */
 
-export const COLORS = {
-  primary: '#0050FF',
-  secondary: '#FFC800',
-  lightGray: '#F3F3F3',
-  dark: '#222222',
-};
-
-export const PROJECTS: Project[] = [
-  {
-    id: 1,
-    title: 'Project Name 01',
-    category: 'UI/UX Design',
-    image: 'https://picsum.photos/seed/p1/800/600',
-    description: 'I\'m a paragraph. Click here to add your own text and edit me.'
-  },
-  {
-    id: 2,
-    title: 'Project Name 02',
-    category: 'Branding',
-    image: 'https://picsum.photos/seed/p2/800/600',
-    description: 'I\'m a paragraph. Click here to add your own text and edit me.'
-  },
-  {
-    id: 3,
-    title: 'Project Name 03',
-    category: 'Web Design',
-    image: 'https://picsum.photos/seed/p3/800/600',
-    description: 'I\'m a paragraph. Click here to add your own text and edit me.'
-  }
+export const SKILLS = [
+  { name: 'UI Design', level: 95 },
+  { name: 'UX Research', level: 90 },
+  { name: 'Visual Identity', level: 85 },
+  { name: 'Interaction Design', level: 88 }
 ];
 
-export const RESUME_EXPERIENCE: Experience[] = [
+export const RESUME_EXPERIENCE = [
   {
     id: 1,
-    year: '2023 - Present',
-    company: 'Tech Solutions Inc.',
+    year: '2022 - Present',
     role: 'Lead UI/UX Designer',
-    description: 'Developed user-centric designs for complex SaaS applications, leading a team of 5 designers.'
+    company: 'Innovation Labs',
+    description: 'Directing user experience strategy and visual design for enterprise-level applications.'
   },
   {
     id: 2,
-    year: '2020 - 2023',
-    company: 'Creative Agency',
-    role: 'Senior Designer',
-    description: 'Spearheaded branding and web design projects for Fortune 500 clients.'
-  },
-  {
-    id: 3,
-    year: '2018 - 2020',
-    company: 'Startup Hub',
-    role: 'Junior UI Designer',
-    description: 'Collaborated with cross-functional teams to build intuitive mobile interfaces.'
+    year: '2019 - 2022',
+    role: 'Senior Product Designer',
+    company: 'Digital Pulse Agency',
+    description: 'Crafted intuitive interfaces and seamless user journeys for various high-profile clients.'
   }
 ];
 
-export const SKILLS: Skill[] = [
-  { name: 'UI/UX Design', level: 95 },
-  { name: 'Visual Branding', level: 85 },
-  { name: 'Wireframing', level: 90 },
-  { name: 'Product Strategy', level: 80 }
+export const PROJECTS = [
+  {
+    id: 1,
+    image: 'https://picsum.photos/seed/p1/800/600',
+    title: 'FinTech Dashboard',
+    category: 'Web Application',
+    description: 'A comprehensive financial analytics platform for institutional investors.'
+  },
+  {
+    id: 2,
+    image: 'https://picsum.photos/seed/p2/800/600',
+    title: 'HealthLink Mobile',
+    category: 'Mobile App',
+    description: 'A patient-centric mobile application for managing healthcare records and appointments.'
+  },
+  {
+    id: 3,
+    image: 'https://picsum.photos/seed/p3/800/600',
+    title: 'EcoVibe Branding',
+    category: 'Branding',
+    description: 'Complete visual identity system for a sustainable lifestyle brand.'
+  }
 ];
