@@ -1,69 +1,69 @@
 
 import React from 'react';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
 
 const Contact: React.FC = () => {
   return (
-    <section id="contact" className="py-24 bg-[#1e293b]">
-      <div className="container mx-auto px-6 max-w-7xl">
-        <div className="bg-[#0f172a] rounded-[3rem] overflow-hidden border border-white/5 shadow-2xl">
-          <div className="flex flex-col lg:flex-row">
-            {/* Sidebar Info */}
-            <div className="lg:w-2/5 bg-[#2ecc71] p-12 lg:p-16 flex flex-col">
-              <h3 className="text-slate-900 text-4xl font-black mb-8 leading-tight">Let's work <br /> together</h3>
-              <p className="text-slate-800 font-medium mb-12 text-lg">
-                Tell me about your project and let's find the best solution for your business growth.
-              </p>
-              
-              <div className="space-y-8 mt-auto">
-                <div className="flex items-center gap-6 group">
-                  <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-[#2ecc71] group-hover:scale-110 transition-transform">
-                    <Mail size={24} />
-                  </div>
-                  <div>
-                    <p className="text-slate-900 font-black text-sm uppercase tracking-widest opacity-60">Email me</p>
-                    <p className="text-slate-900 font-black text-xl">hello@neaz.pro</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6 group">
-                  <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-[#2ecc71] group-hover:scale-110 transition-transform">
-                    <Phone size={24} />
-                  </div>
-                  <div>
-                    <p className="text-slate-900 font-black text-sm uppercase tracking-widest opacity-60">Call me</p>
-                    <p className="text-slate-900 font-black text-xl">+880 123 456 789</p>
-                  </div>
+    <section id="contact" className="py-24 bg-white">
+      <div className="container mx-auto px-6 max-w-6xl">
+        <div className="flex flex-col lg:flex-row gap-20">
+          <div className="lg:w-1/3">
+            <h2 className="text-3xl font-bold mb-8 relative inline-block">
+              CONTACT
+              <span className="absolute -bottom-2 left-0 w-12 h-1 bg-blue-600"></span>
+            </h2>
+            <p className="text-gray-600 mb-12">
+              Looking for a creative partner for your next project? Let's talk about how we can work together.
+            </p>
+            
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-bold text-sm uppercase tracking-widest text-gray-400 mb-2">Phone</h4>
+                <p className="text-lg">123-456-7890</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm uppercase tracking-widest text-gray-400 mb-2">Email</h4>
+                <p className="text-lg">hello@mayanelson.com</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm uppercase tracking-widest text-gray-400 mb-2">Follow Me</h4>
+                <div className="flex gap-4 mt-2">
+                  {['Facebook', 'Twitter', 'LinkedIn', 'Instagram'].map(social => (
+                    <a key={social} href="#" className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all">
+                      <span className="sr-only">{social}</span>
+                      <div className="w-2 h-2 bg-current rounded-full"></div>
+                    </a>
+                  ))}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Form */}
-            <div className="lg:w-3/5 p-12 lg:p-16">
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-8" onSubmit={(e) => e.preventDefault()}>
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Full Name</label>
-                  <input type="text" placeholder="John Doe" className="w-full bg-slate-800/50 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#2ecc71]/50 transition-all" />
+          <div className="lg:w-2/3">
+            <div className="bg-gray-50 p-8 md:p-12 rounded-3xl border border-gray-100 shadow-sm">
+              <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={(e) => e.preventDefault()}>
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">First Name *</label>
+                  <input type="text" className="w-full bg-white border-b-2 border-gray-200 focus:border-blue-600 outline-none px-0 py-3 transition-colors" required />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Email Address</label>
-                  <input type="email" placeholder="john@example.com" className="w-full bg-slate-800/50 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#2ecc71]/50 transition-all" />
-                </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Subject</label>
-                  <select className="w-full bg-slate-800/50 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#2ecc71]/50 transition-all appearance-none">
-                    <option>B2B Lead Generation</option>
-                    <option>Virtual Assistant Services</option>
-                    <option>Data Mining Project</option>
-                    <option>Store Management</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Your Message</label>
-                  <textarea rows={4} placeholder="How can I help you?" className="w-full bg-slate-800/50 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#2ecc71]/50 transition-all resize-none"></textarea>
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">Last Name *</label>
+                  <input type="text" className="w-full bg-white border-b-2 border-gray-200 focus:border-blue-600 outline-none px-0 py-3 transition-colors" required />
                 </div>
                 <div className="md:col-span-2">
-                  <button className="w-full py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl shadow-[#2ecc71]/20">
-                    SEND INQUIRY <Send size={20} />
+                  <label className="block text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">Email *</label>
+                  <input type="email" className="w-full bg-white border-b-2 border-gray-200 focus:border-blue-600 outline-none px-0 py-3 transition-colors" required />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">Subject</label>
+                  <input type="text" className="w-full bg-white border-b-2 border-gray-200 focus:border-blue-600 outline-none px-0 py-3 transition-colors" />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold uppercase tracking-widest text-gray-500 mb-2">Message</label>
+                  <textarea rows={4} className="w-full bg-white border-b-2 border-gray-200 focus:border-blue-600 outline-none px-0 py-3 transition-colors resize-none"></textarea>
+                </div>
+                <div className="md:col-span-2 flex justify-end">
+                  <button className="bg-blue-600 text-white px-12 py-4 rounded-full font-bold hover:bg-black transition-all shadow-xl">
+                    SEND MESSAGE
                   </button>
                 </div>
               </form>
