@@ -13,81 +13,82 @@ import VideoBackground from '../../components/VideoBackground';
 
 interface Review {
   id: string | number;
-  name: string;
-  position: string;
-  company: string;
-  review: string;
+  client_name: string;
+  client_title: string;
+  client_company: string;
+  review_text: string;
   rating: number;
-  source: 'facebook' | 'linkedin' | 'fiverr' | 'upwork' | 'direct';
-  image?: string;
+  platform: string;
+  client_image?: string;
   date: string;
   is_featured?: boolean;
+  order_index?: number;
 }
 
 export default function ReviewsPage() {
-  const [activeFilter, setActiveFilter] = useState<'all' | 'facebook' | 'linkedin' | 'fiverr'>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
   const [reviews, setReviews] = useState<Review[]>([]);
 
   // Default reviews data (will be replaced with Supabase data if available)
   const defaultReviews: Review[] = [
     {
       id: 1,
-      name: "Sarah Johnson",
-      position: "Marketing Director",
-      company: "TechStart Inc.",
-      review: "Neaz is an exceptional virtual assistant. His attention to detail and proactive approach made our collaboration seamless. He managed our CRM data flawlessly and always delivered ahead of schedule.",
+      client_name: "Sarah Johnson",
+      client_title: "Marketing Director",
+      client_company: "TechStart Inc.",
+      review_text: "Neaz is an exceptional virtual assistant. His attention to detail and proactive approach made our collaboration seamless. He managed our CRM data flawlessly and always delivered ahead of schedule.",
       rating: 5,
-      source: 'linkedin',
+      platform: 'LinkedIn',
       date: "January 2024"
     },
     {
       id: 2,
-      name: "Michael Chen",
-      position: "Founder & CEO",
-      company: "GrowthLabs",
-      review: "Outstanding lead generation work! Neaz provided highly accurate B2B data that significantly improved our outreach campaigns. His research skills are top-notch.",
+      client_name: "Michael Chen",
+      client_title: "Founder & CEO",
+      client_company: "GrowthLabs",
+      review_text: "Outstanding lead generation work! Neaz provided highly accurate B2B data that significantly improved our outreach campaigns. His research skills are top-notch.",
       rating: 5,
-      source: 'fiverr',
+      platform: 'Fiverr',
       date: "December 2023"
     },
     {
       id: 3,
-      name: "Emily Rodriguez",
-      position: "Operations Manager",
-      company: "Digital Solutions Co.",
-      review: "Working with Neaz has been a game-changer for our business operations. His expertise in data management and administrative support is unmatched. Highly recommended!",
+      client_name: "Emily Rodriguez",
+      client_title: "Operations Manager",
+      client_company: "Digital Solutions Co.",
+      review_text: "Working with Neaz has been a game-changer for our business operations. His expertise in data management and administrative support is unmatched. Highly recommended!",
       rating: 5,
-      source: 'facebook',
+      platform: 'Direct',
       date: "November 2023"
     },
     {
       id: 4,
-      name: "David Thompson",
-      position: "Sales Director",
-      company: "Enterprise Global",
-      review: "Neaz's CRM management skills helped us streamline our entire sales process. He understands business needs and delivers quality work consistently.",
+      client_name: "David Thompson",
+      client_title: "Sales Director",
+      client_company: "Enterprise Global",
+      review_text: "Neaz's CRM management skills helped us streamline our entire sales process. He understands business needs and delivers quality work consistently.",
       rating: 5,
-      source: 'linkedin',
+      platform: 'LinkedIn',
       date: "October 2023"
     },
     {
       id: 5,
-      name: "Amanda Foster",
-      position: "Project Manager",
-      company: "Creative Agency",
-      review: "Excellent communication and work ethic. Neaz handled our video editing and content management with professionalism. Will definitely work with him again!",
+      client_name: "Amanda Foster",
+      client_title: "Project Manager",
+      client_company: "Creative Agency",
+      review_text: "Excellent communication and work ethic. Neaz handled our video editing and content management with professionalism. Will definitely work with him again!",
       rating: 5,
-      source: 'fiverr',
+      platform: 'Fiverr',
       date: "September 2023"
     },
     {
       id: 6,
-      name: "Robert Kim",
-      position: "Business Owner",
-      company: "Kim Consulting",
-      review: "Very professional and reliable. Neaz helped us with web development and data entry tasks. His quick turnaround time and accuracy are impressive.",
+      client_name: "Robert Kim",
+      client_title: "Business Owner",
+      client_company: "Kim Consulting",
+      review_text: "Very professional and reliable. Neaz helped us with web development and data entry tasks. His quick turnaround time and accuracy are impressive.",
       rating: 5,
-      source: 'facebook',
+      platform: 'Upwork',
       date: "August 2023"
     }
   ];
@@ -100,7 +101,6 @@ export default function ReviewsPage() {
           const { data, error } = await supabase
             .from('reviews')
             .select('*')
-            .eq('is_active', true)
             .order('order_index', { ascending: true });
 
           if (error) throw error;
@@ -123,7 +123,7 @@ export default function ReviewsPage() {
 
   const filteredReviews = activeFilter === 'all'
     ? reviews
-    : reviews.filter(review => review.source === activeFilter);
+    : reviews.filter(review => review.platform.toLowerCase() === activeFilter);
 
   const stats = [
     { label: 'Happy Clients', value: '180+', icon: <Users className="w-6 h-6" /> },
@@ -131,8 +131,9 @@ export default function ReviewsPage() {
     { label: 'Repeat Clients', value: '85%', icon: <ThumbsUp className="w-6 h-6" /> },
   ];
 
-  const getSourceIcon = (source: string) => {
-    switch (source) {
+  const getPlatformIcon = (platform: string) => {
+    const p = platform.toLowerCase();
+    switch (p) {
       case 'facebook':
         return <Facebook className="w-4 h-4" />;
       case 'linkedin':
@@ -142,14 +143,17 @@ export default function ReviewsPage() {
     }
   };
 
-  const getSourceColor = (source: string) => {
-    switch (source) {
+  const getPlatformColor = (platform: string) => {
+    const p = platform.toLowerCase();
+    switch (p) {
       case 'facebook':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       case 'linkedin':
         return 'bg-sky-500/20 text-sky-400 border-sky-500/30';
       case 'fiverr':
         return 'bg-[#2ecc71]/20 text-[#2ecc71] border-[#2ecc71]/30';
+      case 'upwork':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
       default:
         return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
     }
@@ -203,7 +207,7 @@ export default function ReviewsPage() {
         {/* Filter Tabs */}
         <section className="container mx-auto px-6 max-w-7xl mb-12">
           <div className="flex flex-wrap justify-center gap-4">
-            {['all', 'linkedin', 'facebook', 'fiverr'].map((filter) => (
+            {['all', 'fiverr', 'upwork', 'linkedin', 'direct'].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter as typeof activeFilter)}
@@ -237,7 +241,7 @@ export default function ReviewsPage() {
 
                   {/* Review Text */}
                   <p className="text-slate-300 leading-relaxed mb-8 text-sm">
-                    "{review.review}"
+                    "{review.review_text}"
                   </p>
 
                   {/* Rating */}
@@ -253,14 +257,14 @@ export default function ReviewsPage() {
                   {/* Author Info */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-black text-white mb-1">{review.name}</h4>
+                      <h4 className="font-black text-white mb-1">{review.client_name}</h4>
                       <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                        {review.position} • {review.company}
+                        {review.client_title} • {review.client_company}
                       </p>
                     </div>
-                    <div className={`px-3 py-2 rounded-xl border flex items-center gap-2 ${getSourceColor(review.source)}`}>
-                      {getSourceIcon(review.source)}
-                      <span className="text-[9px] font-black uppercase tracking-wider">{review.source}</span>
+                    <div className={`px-3 py-2 rounded-xl border flex items-center gap-2 ${getPlatformColor(review.platform)}`}>
+                      {getPlatformIcon(review.platform)}
+                      <span className="text-[9px] font-black uppercase tracking-wider">{review.platform}</span>
                     </div>
                   </div>
 
