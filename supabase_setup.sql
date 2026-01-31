@@ -148,6 +148,11 @@ CREATE TABLE IF NOT EXISTS skill_categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT now(),
   title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  long_description TEXT,
+  cover_image TEXT,
+  icon TEXT,
   order_index INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true
 );
@@ -169,6 +174,14 @@ CREATE TABLE IF NOT EXISTS sub_skills (
   created_at TIMESTAMPTZ DEFAULT now(),
   category_id UUID REFERENCES skill_categories(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  long_description TEXT,
+  cover_image TEXT,
+  gallery_images TEXT[],
+  tools_used TEXT[],
+  experience_years TEXT,
+  project_count INTEGER DEFAULT 0,
   link TEXT,
   order_index INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true
@@ -182,41 +195,38 @@ CREATE POLICY "Allow public read sub_skills" ON sub_skills
 CREATE POLICY "Allow authenticated manage sub_skills" ON sub_skills
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- Insert default skill categories
-INSERT INTO skill_categories (title, order_index) VALUES
-  ('Video Production', 1),
-  ('Graphic Design', 2),
-  ('Content Writing', 3),
-  ('eBook Formatting', 4),
-  ('Virtual Assistant Service', 5),
-  ('Social Media Marketing', 6),
-  ('WordPress Design', 7);
+-- Insert default skill categories with slugs
+INSERT INTO skill_categories (title, slug, description, icon, order_index) VALUES
+  ('Video Production', 'video-production', 'Professional video editing and production services including podcasts, subtitles, and more.', 'Video', 1),
+  ('Graphic Design', 'graphic-design', 'Creative graphic design solutions for branding, marketing, and digital presence.', 'Palette', 2),
+  ('Content Writing', 'content-writing', 'Engaging content creation for blogs, articles, social media, and eBooks.', 'PenTool', 3),
+  ('eBook Formatting', 'ebook-formatting', 'Professional eBook design and formatting for all major platforms.', 'BookOpen', 4),
+  ('Virtual Assistant Service', 'virtual-assistant-service', 'Comprehensive virtual assistance for lead generation, research, and data management.', 'Briefcase', 5),
+  ('Social Media Marketing', 'social-media-marketing', 'Strategic social media management and organic growth services.', 'Share2', 6),
+  ('WordPress Design', 'wordpress-design', 'Custom WordPress website design and development solutions.', 'Globe', 7);
 
--- Insert sub skills (you'll need to get the category IDs after inserting categories)
--- This is a template - run separately after categories are created:
-/*
-INSERT INTO sub_skills (category_id, title, link, order_index) VALUES
+-- Insert sub skills with slugs (run after categories are created)
+INSERT INTO sub_skills (category_id, title, slug, description, experience_years, order_index) VALUES
   -- Video Production
-  ((SELECT id FROM skill_categories WHERE title = 'Video Production'), 'Podcast Creation', NULL, 1),
-  ((SELECT id FROM skill_categories WHERE title = 'Video Production'), 'Subtitle Adding in a Video', NULL, 2),
+  ((SELECT id FROM skill_categories WHERE slug = 'video-production'), 'Podcast Creation', 'podcast-creation', 'Professional podcast production including recording, editing, and publishing.', '4+ Years', 1),
+  ((SELECT id FROM skill_categories WHERE slug = 'video-production'), 'Subtitle Adding in a Video', 'subtitle-adding', 'Accurate subtitle creation and synchronization for videos in multiple languages.', '4+ Years', 2),
   -- Graphic Design
-  ((SELECT id FROM skill_categories WHERE title = 'Graphic Design'), 'Brochure design', NULL, 1),
-  ((SELECT id FROM skill_categories WHERE title = 'Graphic Design'), 'YouTube Thumbnail Design', NULL, 2),
-  ((SELECT id FROM skill_categories WHERE title = 'Graphic Design'), 'Canva Design', NULL, 3),
-  ((SELECT id FROM skill_categories WHERE title = 'Graphic Design'), 'Tshirt and Cup Design', NULL, 4),
+  ((SELECT id FROM skill_categories WHERE slug = 'graphic-design'), 'Brochure Design', 'brochure-design', 'Eye-catching brochure designs for marketing and promotional materials.', '5+ Years', 1),
+  ((SELECT id FROM skill_categories WHERE slug = 'graphic-design'), 'YouTube Thumbnail Design', 'youtube-thumbnail-design', 'Click-worthy YouTube thumbnails that increase video engagement.', '4+ Years', 2),
+  ((SELECT id FROM skill_categories WHERE slug = 'graphic-design'), 'Canva Design', 'canva-design', 'Professional designs using Canva for social media, presentations, and more.', '5+ Years', 3),
+  ((SELECT id FROM skill_categories WHERE slug = 'graphic-design'), 'T-shirt and Cup Design', 'tshirt-cup-design', 'Creative merchandise designs for t-shirts, mugs, and promotional items.', '3+ Years', 4),
   -- Content Writing
-  ((SELECT id FROM skill_categories WHERE title = 'Content Writing'), 'Article, blog, SMM post writing', NULL, 1),
-  ((SELECT id FROM skill_categories WHERE title = 'Content Writing'), 'eBook writing', NULL, 2),
+  ((SELECT id FROM skill_categories WHERE slug = 'content-writing'), 'Article, Blog, SMM Post Writing', 'article-blog-writing', 'Engaging articles, blog posts, and social media content that drives traffic.', '10+ Years', 1),
+  ((SELECT id FROM skill_categories WHERE slug = 'content-writing'), 'eBook Writing', 'ebook-writing', 'Comprehensive eBook writing services from concept to completion.', '5+ Years', 2),
   -- eBook Formatting
-  ((SELECT id FROM skill_categories WHERE title = 'eBook Formatting'), 'eBook Design', NULL, 1),
+  ((SELECT id FROM skill_categories WHERE slug = 'ebook-formatting'), 'eBook Design', 'ebook-design', 'Professional eBook formatting and design for Kindle, ePub, and PDF.', '5+ Years', 1),
   -- Virtual Assistant Service
-  ((SELECT id FROM skill_categories WHERE title = 'Virtual Assistant Service'), 'Lead Generation VA', NULL, 1),
-  ((SELECT id FROM skill_categories WHERE title = 'Virtual Assistant Service'), 'Web Research VA', NULL, 2),
-  ((SELECT id FROM skill_categories WHERE title = 'Virtual Assistant Service'), 'Job Search VA', NULL, 3),
-  ((SELECT id FROM skill_categories WHERE title = 'Virtual Assistant Service'), 'Data Entry', NULL, 4),
+  ((SELECT id FROM skill_categories WHERE slug = 'virtual-assistant-service'), 'Lead Generation VA', 'lead-generation-va', 'B2B lead research and generation with verified contact information.', '10+ Years', 1),
+  ((SELECT id FROM skill_categories WHERE slug = 'virtual-assistant-service'), 'Web Research VA', 'web-research-va', 'Comprehensive web research and data compilation services.', '10+ Years', 2),
+  ((SELECT id FROM skill_categories WHERE slug = 'virtual-assistant-service'), 'Job Search VA', 'job-search-va', 'Job search assistance including application tracking and research.', '5+ Years', 3),
+  ((SELECT id FROM skill_categories WHERE slug = 'virtual-assistant-service'), 'Data Entry', 'data-entry', 'Accurate and efficient data entry services with quality assurance.', '10+ Years', 4),
   -- Social Media Marketing
-  ((SELECT id FROM skill_categories WHERE title = 'Social Media Marketing'), 'Social media management', NULL, 1),
-  ((SELECT id FROM skill_categories WHERE title = 'Social Media Marketing'), 'Organic Reach and Daily Post', NULL, 2),
+  ((SELECT id FROM skill_categories WHERE slug = 'social-media-marketing'), 'Social Media Management', 'social-media-management', 'Complete social media account management and content scheduling.', '5+ Years', 1),
+  ((SELECT id FROM skill_categories WHERE slug = 'social-media-marketing'), 'Organic Reach and Daily Post', 'organic-reach-daily-post', 'Organic growth strategies and daily content posting for engagement.', '5+ Years', 2),
   -- WordPress Design
-  ((SELECT id FROM skill_categories WHERE title = 'WordPress Design'), 'Web Design', NULL, 1);
-*/
+  ((SELECT id FROM skill_categories WHERE slug = 'wordpress-design'), 'Web Design', 'web-design', 'Custom WordPress website design with responsive layouts and modern aesthetics.', '5+ Years', 1);
