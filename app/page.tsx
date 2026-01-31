@@ -15,10 +15,62 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+// Typewriter Effect Component
+const TypewriterEffect = ({ texts, speed = 100, deleteSpeed = 50, pauseTime = 2000 }: {
+  texts: string[],
+  speed?: number,
+  deleteSpeed?: number,
+  pauseTime?: number
+}) => {
+  const [displayText, setDisplayText] = useState('');
+  const [textIndex, setTextIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentText = texts[textIndex];
+
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        if (displayText.length < currentText.length) {
+          setDisplayText(currentText.slice(0, displayText.length + 1));
+        } else {
+          setTimeout(() => setIsDeleting(true), pauseTime);
+        }
+      } else {
+        if (displayText.length > 0) {
+          setDisplayText(displayText.slice(0, -1));
+        } else {
+          setIsDeleting(false);
+          setTextIndex((prev) => (prev + 1) % texts.length);
+        }
+      }
+    }, isDeleting ? deleteSpeed : speed);
+
+    return () => clearTimeout(timeout);
+  }, [displayText, isDeleting, textIndex, texts, speed, deleteSpeed, pauseTime]);
+
+  return (
+    <span className="text-gradient">
+      {displayText}
+      <span className="animate-blink">|</span>
+    </span>
+  );
+};
+
 export default function PortfolioPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1519085195758-2a89f9c3f732?auto=format&fit=crop&q=80&w=800');
+
+  // Typewriter texts
+  const typewriterTexts = [
+    "Virtual Assistant Expert",
+    "Lead Generation Specialist",
+    "CRM & Data Management Pro",
+    "Next.js & Supabase Developer",
+    "Business Process Optimizer",
+    "Top Rated Freelancer"
+  ];
 
   // Fetch profile image from Supabase Storage
   useEffect(() => {
@@ -231,13 +283,16 @@ export default function PortfolioPage() {
                 <TrendingUp size={14} className="text-[#2ecc71]" />
                 Powering Global Business Growth Since 2014
               </div>
-              <h1 className="text-7xl lg:text-[100px] font-black leading-[0.85] mb-12 tracking-tighter">
+              <h1 className="text-6xl lg:text-[90px] font-black leading-[0.9] mb-8 tracking-tighter">
                 I AM <br />
                 <span className="text-gradient">NEAZ MD.</span> <br />
                 <span className="text-gradient">MORSHED</span>
               </h1>
-              <p className="text-xl text-slate-400 mb-14 max-w-lg leading-relaxed font-medium">
-                Professional <span className="text-white font-bold">{title}</span>. I handle the heavy lifting of business operations so you can focus on scale.
+              <div className="text-2xl lg:text-4xl font-bold mb-10 h-[50px] lg:h-[60px]">
+                <TypewriterEffect texts={typewriterTexts} speed={80} deleteSpeed={40} pauseTime={1500} />
+              </div>
+              <p className="text-lg text-slate-400 mb-12 max-w-lg leading-relaxed font-medium">
+                I handle the heavy lifting of business operations so you can focus on scale. Powered by modern tech stack.
               </p>
               <div className="flex flex-wrap gap-6 items-center">
                 <a href="#contact" className="bg-[#2ecc71] text-slate-950 px-14 py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-[0_20px_50px_rgba(46,204,113,0.3)] uppercase tracking-widest text-sm">
@@ -607,6 +662,14 @@ export default function PortfolioPage() {
         }
         .animate-subtle-pulse {
           animation: subtle-pulse 8s infinite ease-in-out;
+        }
+        @keyframes blink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        .animate-blink {
+          animation: blink 0.8s infinite;
+          color: #2ecc71;
         }
         html {
           scroll-behavior: smooth;
