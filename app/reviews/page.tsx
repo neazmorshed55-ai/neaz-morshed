@@ -10,15 +10,16 @@ import {
 import { supabase } from '../../lib/supabase';
 
 interface Review {
-  id: number;
+  id: string | number;
   name: string;
   position: string;
   company: string;
   review: string;
   rating: number;
-  source: 'facebook' | 'linkedin' | 'fiverr' | 'direct';
+  source: 'facebook' | 'linkedin' | 'fiverr' | 'upwork' | 'direct';
   image?: string;
   date: string;
+  is_featured?: boolean;
 }
 
 export default function ReviewsPage() {
@@ -105,7 +106,8 @@ export default function ReviewsPage() {
           const { data, error } = await supabase
             .from('reviews')
             .select('*')
-            .order('created_at', { ascending: false });
+            .eq('is_active', true)
+            .order('order_index', { ascending: true });
 
           if (error) throw error;
           if (data && data.length > 0) {
@@ -334,7 +336,7 @@ export default function ReviewsPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <a
-                href="https://www.linkedin.com/in/neazmorshed/"
+                href="https://www.linkedin.com/in/neazmorshed222/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-8 py-4 bg-sky-500/20 border border-sky-500/30 rounded-2xl text-sky-400 hover:bg-sky-500/30 transition-all font-bold"
@@ -344,7 +346,7 @@ export default function ReviewsPage() {
                 <ExternalLink className="w-4 h-4" />
               </a>
               <a
-                href="https://www.facebook.com/neaz222/reviews"
+                href="https://www.facebook.com/neazmorshed001/reviews"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-8 py-4 bg-blue-500/20 border border-blue-500/30 rounded-2xl text-blue-400 hover:bg-blue-500/30 transition-all font-bold"
@@ -400,9 +402,9 @@ export default function ReviewsPage() {
             <span className="text-[12px] font-black tracking-[0.6em] uppercase text-slate-500">NEAZ MD. MORSHED</span>
           </div>
           <div className="flex gap-10">
-            <a href="https://www.linkedin.com/in/neazmorshed/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/neazmorshed222/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
             <a href="https://www.fiverr.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Fiverr</a>
-            <a href="https://www.facebook.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Facebook</a>
+            <a href="https://www.facebook.com/neazmorshed001" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Facebook</a>
           </div>
           <p className="text-[12px] font-black text-slate-700 uppercase tracking-[1em]">
             © 2024 • THE PRECISION OUTSOURCER

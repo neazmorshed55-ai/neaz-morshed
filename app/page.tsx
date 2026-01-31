@@ -585,9 +585,9 @@ export default function PortfolioPage() {
              <span className="text-[12px] font-black tracking-[0.6em] uppercase text-slate-500">{name}</span>
           </div>
           <div className="flex gap-10">
-            <a href="https://www.linkedin.com" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
-            <a href="https://www.fiverr.com/neaz222" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Fiverr</a>
-            <a href="https://github.com" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">GitHub</a>
+            <a href="https://www.linkedin.com/in/neazmorshed222/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
+            <a href="https://www.fiverr.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Fiverr</a>
+            <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Facebook</a>
           </div>
           <p className="text-[12px] font-black text-slate-700 uppercase tracking-[1em]">
             © 2024 • THE PRECISION OUTSOURCER

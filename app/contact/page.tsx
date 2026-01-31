@@ -68,8 +68,8 @@ export default function ContactPage() {
   ];
 
   const socialLinks = [
-    { icon: <Linkedin className="w-5 h-5" />, label: 'LinkedIn', href: 'https://www.linkedin.com/in/neazmorshed/' },
-    { icon: <Facebook className="w-5 h-5" />, label: 'Facebook', href: 'https://www.facebook.com/neaz222' },
+    { icon: <Linkedin className="w-5 h-5" />, label: 'LinkedIn', href: 'https://www.linkedin.com/in/neazmorshed222/' },
+    { icon: <Facebook className="w-5 h-5" />, label: 'Facebook', href: 'https://www.facebook.com/neazmorshed001' },
   ];
 
   return (
@@ -277,9 +277,9 @@ export default function ContactPage() {
             <span className="text-[12px] font-black tracking-[0.6em] uppercase text-slate-500">NEAZ MD. MORSHED</span>
           </div>
           <div className="flex gap-10">
-            <a href="https://www.linkedin.com/in/neazmorshed/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/neazmorshed222/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
             <a href="https://www.fiverr.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Fiverr</a>
-            <a href="https://www.facebook.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Facebook</a>
+            <a href="https://www.facebook.com/neazmorshed001" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Facebook</a>
           </div>
           <p className="text-[12px] font-black text-slate-700 uppercase tracking-[1em]">
             © 2024 • THE PRECISION OUTSOURCER

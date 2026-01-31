@@ -230,3 +230,55 @@ INSERT INTO sub_skills (category_id, title, slug, description, experience_years,
   ((SELECT id FROM skill_categories WHERE slug = 'social-media-marketing'), 'Organic Reach and Daily Post', 'organic-reach-daily-post', 'Organic growth strategies and daily content posting for engagement.', '5+ Years', 2),
   -- WordPress Design
   ((SELECT id FROM skill_categories WHERE slug = 'wordpress-design'), 'Web Design', 'web-design', 'Custom WordPress website design with responsive layouts and modern aesthetics.', '5+ Years', 1);
+
+-- ============================================
+-- REVIEWS TABLE - Client Testimonials
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  name TEXT NOT NULL,
+  position TEXT,
+  company TEXT,
+  review TEXT NOT NULL,
+  rating INTEGER DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
+  source TEXT DEFAULT 'direct' CHECK (source IN ('facebook', 'linkedin', 'fiverr', 'upwork', 'direct')),
+  image TEXT,
+  date TEXT,
+  is_featured BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  order_index INTEGER DEFAULT 0
+);
+
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Allow public read access (for displaying on website)
+CREATE POLICY "Allow public read reviews" ON reviews
+  FOR SELECT
+  USING (is_active = true);
+
+-- Policy: Only authenticated admins can manage reviews
+CREATE POLICY "Allow authenticated insert reviews" ON reviews
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated update reviews" ON reviews
+  FOR UPDATE
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Allow authenticated delete reviews" ON reviews
+  FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- Insert sample reviews (you can replace these with real ones from Facebook/LinkedIn)
+INSERT INTO reviews (name, position, company, review, rating, source, date, is_featured, order_index) VALUES
+  ('Sarah Johnson', 'Marketing Director', 'TechStart Inc.', 'Neaz is an exceptional virtual assistant. His attention to detail and proactive approach made our collaboration seamless. He managed our CRM data flawlessly and always delivered ahead of schedule.', 5, 'linkedin', 'January 2024', true, 1),
+  ('Michael Chen', 'Founder & CEO', 'GrowthLabs', 'Outstanding lead generation work! Neaz provided highly accurate B2B data that significantly improved our outreach campaigns. His research skills are top-notch.', 5, 'fiverr', 'December 2023', true, 2),
+  ('Emily Rodriguez', 'Operations Manager', 'Digital Solutions Co.', 'Working with Neaz has been a game-changer for our business operations. His expertise in data management and administrative support is unmatched. Highly recommended!', 5, 'facebook', 'November 2023', true, 3),
+  ('David Thompson', 'Sales Director', 'Enterprise Global', 'Neaz''s CRM management skills helped us streamline our entire sales process. He understands business needs and delivers quality work consistently.', 5, 'linkedin', 'October 2023', false, 4),
+  ('Amanda Foster', 'Project Manager', 'Creative Agency', 'Excellent communication and work ethic. Neaz handled our video editing and content management with professionalism. Will definitely work with him again!', 5, 'fiverr', 'September 2023', false, 5),
+  ('Robert Kim', 'Business Owner', 'Kim Consulting', 'Very professional and reliable. Neaz helped us with web development and data entry tasks. His quick turnaround time and accuracy are impressive.', 5, 'facebook', 'August 2023', false, 6);
