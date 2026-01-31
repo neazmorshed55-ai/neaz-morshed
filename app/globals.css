@@ -33,18 +33,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #27ae60;
 }
-
-.text-gradient {
-  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-@keyframes subtle-pulse {
-  0%, 100% { opacity: 0.05; transform: scale(1); }
-  50% { opacity: 0.15; transform: scale(1.05); }
-}
-
-.animate-subtle-pulse {
-  animation: subtle-pulse 8s infinite ease-in-out;
-}

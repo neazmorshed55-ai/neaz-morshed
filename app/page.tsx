@@ -6,23 +6,52 @@ import {
   Menu, X, ArrowRight, Briefcase, 
   Mail, Phone, Target, 
   Database, Search, ShieldCheck,
-  Github, Linkedin, Award, Users, Clock, 
+  Award, Users, Clock, 
   Zap, Globe, CheckCircle2, Video, 
-  Palette, Layout, Smartphone, PenTool,
-  ChevronRight, ExternalLink, MessageSquare,
-  TrendingUp, Star
+  Palette, Layout, PenTool,
+  TrendingUp, Star, Send, Loader2
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function PortfolioPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('loading');
+
+    try {
+      const { error } = await supabase
+        .from('contacts')
+        .insert([
+          { 
+            name: formData.name, 
+            email: formData.email, 
+            message: formData.message,
+            created_at: new Date().toISOString()
+          }
+        ]);
+
+      if (error) throw error;
+
+      setFormStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setFormStatus('idle'), 5000);
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setFormStatus('error');
+      setTimeout(() => setFormStatus('idle'), 5000);
+    }
+  };
 
   const name = "NEAZ MD. MORSHED";
   const title = "Expert Virtual Assistant & Professional Outsourcer";
@@ -76,7 +105,7 @@ export default function PortfolioPage() {
   ];
 
   return (
-    <div className="bg-[#0b0f1a] text-white">
+    <div className="bg-[#0b0f1a] text-white selection:bg-[#2ecc71] selection:text-slate-900">
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${isScrolled ? 'bg-[#0b0f1a]/90 backdrop-blur-2xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center max-w-7xl">
@@ -138,7 +167,7 @@ export default function PortfolioPage() {
                 <span className="text-gradient">MORSHED</span>
               </h1>
               <p className="text-xl text-slate-400 mb-14 max-w-lg leading-relaxed font-medium">
-                Professional <span className="text-white font-bold">{title}</span>. I bridge the gap between complexity and clarity, ensuring your business runs like clockwork.
+                Professional <span className="text-white font-bold">{title}</span>. I handle the heavy lifting of business operations so you can focus on scale.
               </p>
               <div className="flex flex-wrap gap-6 items-center">
                 <a href="#contact" className="bg-[#2ecc71] text-slate-950 px-14 py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-[0_20px_50px_rgba(46,204,113,0.3)] uppercase tracking-widest text-sm">
@@ -159,7 +188,7 @@ export default function PortfolioPage() {
               <div className="relative z-10 w-full aspect-[4/5] rounded-[5rem] overflow-hidden border-[16px] border-white/5 shadow-2xl bg-slate-900">
                 <img 
                   src="https://images.unsplash.com/photo-1519085195758-2a89f9c3f732?auto=format&fit=crop&q=80&w=800" 
-                  alt="Neaz Md. Morshed Portrait" 
+                  alt="Neaz Md. Morshed Portfolio" 
                   className="w-full h-full object-cover grayscale brightness-90 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-transparent opacity-60"></div>
@@ -227,7 +256,7 @@ export default function PortfolioPage() {
                 <h2 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none">High-Impact <br /> <span className="text-slate-600">Business Services</span></h2>
               </div>
               <p className="text-slate-400 max-w-sm text-sm leading-relaxed mb-6 font-medium">
-                Streamlining operations and driving growth through precision-engineered digital workflows.
+                Custom-tailored outsourcing strategies for modern startups and established enterprises.
               </p>
             </div>
             
@@ -242,7 +271,7 @@ export default function PortfolioPage() {
                     <p className="text-slate-400 text-sm leading-relaxed font-medium">{service.desc}</p>
                   </div>
                   <div className="mt-14 flex items-center gap-3 text-[#2ecc71] text-[10px] font-black uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                    Learn More <ArrowRight size={16} />
+                    View Details <ArrowRight size={16} />
                   </div>
                 </div>
               ))}
@@ -255,8 +284,8 @@ export default function PortfolioPage() {
           <div className="container mx-auto px-6 max-w-7xl">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               <div>
-                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-8 block">Legacy</span>
-                <h2 className="text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-12">Proven <br /><span className="text-slate-600">Industry Tenure</span></h2>
+                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-8 block">Career Path</span>
+                <h2 className="text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-12">Proven <br /><span className="text-slate-600">Global Expertise</span></h2>
                 <div className="space-y-6">
                   {technicalExperience.map((exp, i) => (
                     <div key={i} className="flex items-center justify-between p-8 bg-slate-900 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all">
@@ -271,31 +300,32 @@ export default function PortfolioPage() {
                   ))}
                 </div>
               </div>
-              <div className="bg-slate-900/50 p-12 rounded-[5rem] border border-white/5">
-                <h3 className="text-3xl font-black uppercase tracking-tighter mb-8">Selected Engagements</h3>
+              <div className="bg-slate-900/50 p-12 rounded-[5rem] border border-white/5 relative">
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#2ecc71]/10 rounded-full blur-3xl"></div>
+                <h3 className="text-3xl font-black uppercase tracking-tighter mb-8">Selected Clients</h3>
                 <div className="space-y-8">
                   <div className="flex gap-6">
                     <div className="w-1 bg-[#2ecc71] rounded-full"></div>
                     <div>
-                      <div className="text-[#2ecc71] font-black uppercase tracking-widest text-[10px] mb-1">Aura Relax (2021-Present)</div>
-                      <h4 className="text-xl font-bold uppercase mb-2">YouTube Manager</h4>
-                      <p className="text-slate-400 text-sm">Managing relaxing content operations and audience growth.</p>
+                      <div className="text-[#2ecc71] font-black uppercase tracking-widest text-[10px] mb-1">Aura Relax (Current)</div>
+                      <h4 className="text-xl font-bold uppercase mb-2">Video Production Lead</h4>
+                      <p className="text-slate-400 text-sm">Managing YouTube content and relaxation video operations.</p>
                     </div>
                   </div>
                   <div className="flex gap-6">
                     <div className="w-1 bg-slate-800 rounded-full"></div>
                     <div>
-                      <div className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-1">Release Media Inc. (2022-Present)</div>
-                      <h4 className="text-xl font-bold uppercase mb-2">Virtual Assistant</h4>
-                      <p className="text-slate-400 text-sm">Strategic administrative and content operations lead.</p>
+                      <div className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-1">Release Media Inc.</div>
+                      <h4 className="text-xl font-bold uppercase mb-2">Primary VA</h4>
+                      <p className="text-slate-400 text-sm">Orchestrating administrative workflows and digital content.</p>
                     </div>
                   </div>
                   <div className="flex gap-6">
                     <div className="w-1 bg-slate-800 rounded-full"></div>
                     <div>
-                      <div className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-1">GLOCAL (2021-2022)</div>
+                      <div className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-1">GLOCAL Org.</div>
                       <h4 className="text-xl font-bold uppercase mb-2">Web Design Coordinator</h4>
-                      <p className="text-slate-400 text-sm">Orchestrating digital infrastructure for anthropological linguistics.</p>
+                      <p className="text-slate-400 text-sm">Leading development for international organizational sites.</p>
                     </div>
                   </div>
                 </div>
@@ -304,36 +334,85 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* Contact */}
+        {/* Contact Form Section */}
         <section id="contact" className="py-32 bg-[#0b0f1a]">
-          <div className="container mx-auto px-6 max-w-5xl">
-            <div className="bg-[#0e1526] rounded-[6rem] p-16 lg:p-28 border border-white/10 relative overflow-hidden text-center shadow-2xl">
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2ecc71]/10 rounded-full blur-[200px] -z-10 animate-subtle-pulse"></div>
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="bg-[#0e1526] rounded-[6rem] p-12 lg:p-24 border border-white/10 relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#2ecc71]/5 rounded-full blur-[200px] -z-10 animate-subtle-pulse"></div>
               
-              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-12 block">Connect</span>
-              <h2 className="text-7xl lg:text-[120px] font-black mb-20 uppercase leading-[0.8] tracking-tighter">Start Your <br /> <span className="text-slate-600">Project</span></h2>
-              
-              <div className="grid md:grid-cols-2 gap-10 mt-28 mb-24 text-left">
-                <div className="p-12 rounded-[4.5rem] bg-white/5 border border-white/10 hover:border-[#2ecc71]/40 transition-all group">
-                  <Mail className="text-[#2ecc71] mb-10" size={64} />
-                  <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Official Email</div>
-                  <div className="text-2xl font-black text-white hover:text-[#2ecc71] transition-colors break-all">hello@neaz.pro</div>
+              <div className="grid lg:grid-cols-2 gap-20">
+                <div className="text-left">
+                  <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-12 block">Inquiry</span>
+                  <h2 className="text-6xl lg:text-8xl font-black mb-12 uppercase leading-[0.9] tracking-tighter">Ready to <br /> <span className="text-slate-600">Connect?</span></h2>
+                  <p className="text-slate-400 text-lg mb-12 max-w-md">
+                    Send a message to discuss your project requirements or hiring inquiries. I respond within 12 hours.
+                  </p>
+                  
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-6 p-6 rounded-3xl bg-white/5 border border-white/5">
+                      <Mail className="text-[#2ecc71]" />
+                      <span className="text-lg font-bold">hello@neaz.pro</span>
+                    </div>
+                    <div className="flex items-center gap-6 p-6 rounded-3xl bg-white/5 border border-white/5">
+                      <Globe className="text-[#2ecc71]" />
+                      <span className="text-lg font-bold">Available Globally (Remote)</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="p-12 rounded-[4.5rem] bg-white/5 border border-white/10 hover:border-[#2ecc71]/40 transition-all group">
-                  <MessageSquare className="text-[#2ecc71] mb-10" size={64} />
-                  <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Marketplace</div>
-                  <div className="text-2xl font-black text-white hover:text-[#2ecc71] transition-colors">Fiverr / LinkedIn</div>
-                </div>
-              </div>
 
-              <a href="https://www.fiverr.com/neaz222" target="_blank" className="w-full py-14 bg-[#2ecc71] text-slate-950 font-black rounded-[4rem] text-3xl uppercase tracking-[0.1em] hover:scale-[1.02] active:scale-95 transition-all shadow-[0_30px_70px_rgba(46,204,113,0.4)] flex items-center justify-center gap-10 group">
-                Hire Neaz Morshed <ArrowRight size={48} className="group-hover:translate-x-3 transition-transform" />
-              </a>
-              
-              <div className="mt-24 flex justify-center gap-14">
-                <a href="https://www.linkedin.com" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Linkedin size={40} /></a>
-                <a href="https://github.com" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Github size={40} /></a>
-                <a href="#" className="text-slate-500 hover:text-[#2ecc71] transition-all transform hover:scale-125"><Globe size={40} /></a>
+                <div className="bg-[#0b0f1a] p-10 lg:p-14 rounded-[4rem] border border-white/5">
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Full Name</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="John Doe"
+                        className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Email Address</label>
+                      <input 
+                        type="email" 
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="john@example.com"
+                        className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Your Message</label>
+                      <textarea 
+                        rows={4}
+                        required
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        placeholder="Tell me about your project..."
+                        className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold resize-none"
+                      />
+                    </div>
+                    
+                    <button 
+                      type="submit" 
+                      disabled={formStatus === 'loading'}
+                      className="w-full py-6 bg-[#2ecc71] text-slate-900 font-black rounded-2xl text-lg uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-[#2ecc71]/20 flex items-center justify-center gap-4 group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {formStatus === 'loading' ? (
+                        <>Processing... <Loader2 className="animate-spin" /></>
+                      ) : formStatus === 'success' ? (
+                        <>Message Sent! <CheckCircle2 /></>
+                      ) : formStatus === 'error' ? (
+                        <>Error Occurred</>
+                      ) : (
+                        <>Send Message <Send size={20} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
+                      )}
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -346,11 +425,38 @@ export default function PortfolioPage() {
              <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center font-black text-[#2ecc71] border border-white/10 text-xl shadow-2xl">NM</div>
              <span className="text-[12px] font-black tracking-[0.6em] uppercase text-slate-500">{name}</span>
           </div>
+          <div className="flex gap-10">
+            <a href="https://www.linkedin.com" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">LinkedIn</a>
+            <a href="https://www.fiverr.com/neaz222" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">Fiverr</a>
+            <a href="https://github.com" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-black tracking-widest">GitHub</a>
+          </div>
           <p className="text-[12px] font-black text-slate-700 uppercase tracking-[1em]">
             © 2024 • THE PRECISION OUTSOURCER
           </p>
         </div>
       </footer>
+
+      <style jsx global>{`
+        .text-gradient {
+          background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        @keyframes subtle-pulse {
+          0%, 100% { opacity: 0.05; transform: scale(1); }
+          50% { opacity: 0.15; transform: scale(1.05); }
+        }
+        .animate-subtle-pulse {
+          animation: subtle-pulse 8s infinite ease-in-out;
+        }
+        html {
+          scroll-behavior: smooth;
+        }
+        body {
+          background-color: #0b0f1a;
+          color: white;
+        }
+      `}</style>
     </div>
   );
 }
