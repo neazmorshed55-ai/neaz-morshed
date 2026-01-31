@@ -12,6 +12,10 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
+const isVideoFile = (url: string) => {
+  return url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
+};
+
 interface Service {
   id: string;
   title: string;
@@ -1237,12 +1241,21 @@ export default function PortfolioCollectionPage() {
               {/* Image/Video */}
               {selectedItem.video_url ? (
                 <div className="aspect-video relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem] bg-black">
-                  <iframe
-                    src={selectedItem.video_url}
-                    className="w-full h-full"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+                  {isVideoFile(selectedItem.video_url) ? (
+                    <video
+                      src={selectedItem.video_url}
+                      className="w-full h-full object-cover"
+                      controls
+                      playsInline
+                    />
+                  ) : (
+                    <iframe
+                      src={selectedItem.video_url}
+                      className="w-full h-full"
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  )}
                 </div>
               ) : (selectedItem.image_url || selectedItem.thumbnail_url) && (
                 <div className="aspect-video relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem]">
@@ -1304,12 +1317,21 @@ export default function PortfolioCollectionPage() {
                         <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
                           {item.type === 'video' ? (
                             <div className="aspect-video relative">
-                              <iframe
-                                src={item.url}
-                                className="w-full h-full"
-                                allowFullScreen
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              />
+                              {isVideoFile(item.url) ? (
+                                <video
+                                  src={item.url}
+                                  className="w-full h-full object-cover"
+                                  controls
+                                  playsInline
+                                />
+                              ) : (
+                                <iframe
+                                  src={item.url}
+                                  className="w-full h-full"
+                                  allowFullScreen
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                />
+                              )}
                             </div>
                           ) : (
                             <img

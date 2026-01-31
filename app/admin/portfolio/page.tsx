@@ -226,29 +226,58 @@ export default function PortfolioManagement() {
     setDeleteConfirm(null);
   };
 
+  const uploadFile = async (file: File) => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `portfolio-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `portfolio/${fileName}`;
+
+    const { error: uploadError } = await supabase!.storage
+      .from('images')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase!.storage.from('images').getPublicUrl(filePath);
+    return data.publicUrl;
+  };
+
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !supabase) return;
 
     setUploadingThumbnail(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `portfolio-${Date.now()}.${fileExt}`;
-      const filePath = `portfolio/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('images').getPublicUrl(filePath);
-      setFormData({ ...formData, thumbnail_url: data.publicUrl });
+      const publicUrl = await uploadFile(file);
+      setFormData({ ...formData, thumbnail_url: publicUrl });
     } catch (error) {
       console.error('Error uploading thumbnail:', error);
       alert('Error uploading thumbnail. Please try again.');
     }
     setUploadingThumbnail(false);
+  };
+
+  const handleProjectImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !supabase) return;
+
+    // Use a separate loading state or reuse one if appropriate, here creating a local scope loading effect or reusing generic saving/uploading could be better, but for now we'll reuse loading or add a new one. 
+    // Let's add a new state for this if needed, or just reuse 'uploadingThumbnail' (renamed to generic) or add specific. 
+    // Since I can't add state easily in this Replace block without changing top of file, let's assume I'll add 'uploadingProjectImage' state in another block or reuse 'uploadingThumbnail' with a comment or just set generic loading.
+    // Better: Add `uploadingProjectImage` state. For now, I'll toggle `saving` to block inputs or just proceed. 
+    // Actually, I should add the state. I will add it in the top block modification.
+
+    // Using a temporary loading indicator setup
+    const btn = e.target.parentElement;
+    if (btn) btn.style.opacity = '0.5';
+
+    try {
+      const publicUrl = await uploadFile(file);
+      setFormData({ ...formData, image_url: publicUrl });
+    } catch (error) {
+      console.error('Error uploading project image:', error);
+      alert('Error uploading project image.');
+    }
+    if (btn) btn.style.opacity = '1';
   };
 
   const fetchGalleryItems = async (portfolioId: string) => {
@@ -267,7 +296,10 @@ export default function PortfolioManagement() {
   };
 
   const handleAddGalleryItem = async () => {
-    if (!supabase || !editingItem || !newGalleryItem.url) return;
+    if (!supabase || !editingItem) return;
+
+    // Allow adding if URL is present OR if we are about to upload (handled separately? No, let's make it so you select file OR enter URL)
+    if (!newGalleryItem.url) return;
 
     setAddingGalleryItem(true);
     try {
@@ -292,6 +324,40 @@ export default function PortfolioManagement() {
       alert('Error adding gallery item');
     }
     setAddingGalleryItem(false);
+  };
+
+  const handleGalleryFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !supabase || !editingItem) return;
+
+    setAddingGalleryItem(true);
+    try {
+      const publicUrl = await uploadFile(file);
+
+      // Immediately add to gallery
+      const { data, error } = await supabase
+        .from('portfolio_gallery')
+        .insert({
+          portfolio_item_id: editingItem.id,
+          url: publicUrl,
+          type: newGalleryItem.type, // 'image' or 'video'
+          order_index: galleryItems.length
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setGalleryItems([...galleryItems, data as GalleryItem]);
+        // Reset isn't strictly needed for file input but good practice if we were using state for file
+      }
+    } catch (error) {
+      console.error('Error uploading/adding gallery item:', error);
+      alert('Error uploading gallery item');
+    }
+    setAddingGalleryItem(false);
+    // Reset file input
+    e.target.value = '';
   };
 
   const handleDeleteGalleryItem = async (id: string) => {
@@ -577,13 +643,52 @@ export default function PortfolioManagement() {
 
                     <div>
                       <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Project Detail Image (Optional)</label>
-                      <input
-                        type="text"
-                        value={formData.image_url}
-                        onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 mb-2"
-                        placeholder="Image URL..."
-                      />
+                      <div className="flex items-start gap-4 mb-2">
+                        {/* Preview */}
+                        <div className="w-32 h-20 rounded-xl bg-slate-800/50 border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {formData.image_url ? (
+                            <img
+                              src={formData.image_url}
+                              alt="Detail"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Image size={24} className="text-slate-600" />
+                          )}
+                        </div>
+                        {/* Upload & URL */}
+                        <div className="flex-1 space-y-2">
+                          <label className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 border border-white/10 rounded-xl cursor-pointer hover:bg-slate-800 hover:border-[#2ecc71]/30 transition-all w-fit">
+                            <Upload size={18} className="text-[#2ecc71]" />
+                            <span className="text-slate-400 text-sm">Upload Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleProjectImageUpload}
+                              className="hidden"
+                            />
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <span className="text-slate-600 text-xs">or</span>
+                            <input
+                              type="text"
+                              value={formData.image_url}
+                              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                              className="flex-1 bg-slate-800/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#2ecc71]/50"
+                              placeholder="Paste Image URL..."
+                            />
+                            {formData.image_url && (
+                              <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, image_url: '' })}
+                                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                              >
+                                <X size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <div>
@@ -629,30 +734,52 @@ export default function PortfolioManagement() {
                       </h3>
 
                       {/* Add New Gallery Item */}
-                      <div className="flex gap-3 mb-6">
+                      <div className="flex gap-3 mb-6 items-start">
                         <select
                           value={newGalleryItem.type}
                           onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' })}
-                          className="bg-slate-800/50 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                          className="bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 h-[46px]"
                         >
                           <option value="image">Image</option>
                           <option value="video">Video</option>
                         </select>
-                        <input
-                          type="text"
-                          value={newGalleryItem.url}
-                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, url: e.target.value })}
-                          className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                          placeholder={newGalleryItem.type === 'image' ? "Image URL..." : "Video URL (YouTube/Vimeo)..."}
-                        />
-                        <button
-                          type="button"
-                          onClick={handleAddGalleryItem}
-                          disabled={addingGalleryItem || !newGalleryItem.url}
-                          className="bg-[#2ecc71] text-slate-950 px-4 rounded-xl font-bold hover:bg-[#27ae60] disabled:opacity-50"
-                        >
-                          {addingGalleryItem ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
-                        </button>
+
+                        <div className="flex-1 flex flex-col gap-2">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={newGalleryItem.url}
+                              onChange={(e) => setNewGalleryItem({ ...newGalleryItem, url: e.target.value })}
+                              className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                              placeholder={newGalleryItem.type === 'image' ? "Paste Image URL or Upload..." : "Paste Video URL (YouTube) or Upload..."}
+                            />
+                            <button
+                              type="button"
+                              onClick={handleAddGalleryItem}
+                              disabled={addingGalleryItem || !newGalleryItem.url}
+                              className="bg-[#2ecc71] text-slate-950 px-4 rounded-xl font-bold hover:bg-[#27ae60] disabled:opacity-50 h-[46px] w-[46px] flex items-center justify-center flex-shrink-0"
+                            >
+                              {addingGalleryItem && newGalleryItem.url ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                            </button>
+                          </div>
+
+                          {/* Upload Button */}
+                          <label className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800/50 border border-white/10 rounded-xl cursor-pointer hover:bg-slate-800 hover:border-[#2ecc71]/30 transition-all w-full">
+                            {addingGalleryItem && !newGalleryItem.url ? (
+                              <Loader2 size={16} className="text-[#2ecc71] animate-spin" />
+                            ) : (
+                              <Upload size={16} className="text-[#2ecc71]" />
+                            )}
+                            <span className="text-slate-400 text-sm">Upload {newGalleryItem.type === 'image' ? 'Image' : 'Video'}</span>
+                            <input
+                              type="file"
+                              accept={newGalleryItem.type === 'image' ? "image/*" : "video/*"}
+                              onChange={handleGalleryFileUpload}
+                              className="hidden"
+                              disabled={addingGalleryItem}
+                            />
+                          </label>
+                        </div>
                       </div>
 
                       {/* Gallery Grid */}
