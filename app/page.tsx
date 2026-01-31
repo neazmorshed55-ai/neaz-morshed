@@ -1,7 +1,7 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, CheckCircle2, ArrowRight, Briefcase, 
@@ -9,6 +9,7 @@ import {
   Database, Search, ShieldCheck,
   Github, Linkedin
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function PortfolioPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -82,7 +83,7 @@ export default function PortfolioPage() {
   ];
 
   return (
-    <div className="bg-[#0b0f1a] text-white font-sans">
+    <div className="bg-[#0b0f1a] text-white font-sans selection:bg-[#2ecc71] selection:text-slate-950">
       {/* Navbar */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'glass-nav py-4 shadow-xl' : 'bg-transparent py-8'}`}>
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center max-w-7xl">
