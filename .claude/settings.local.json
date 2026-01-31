@@ -4,7 +4,8 @@
       "WebFetch(domain:neazoutsource.wixsite.com)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(tree:*)"
     ]
   }
 }

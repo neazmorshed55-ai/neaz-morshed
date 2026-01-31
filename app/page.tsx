@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Menu, X, ArrowRight, Briefcase, 
-  Mail, Phone, Target, 
+import {
+  Menu, X, ArrowRight, Briefcase,
+  Mail, Phone, Target,
   Database, Search, ShieldCheck,
-  Award, Users, Clock, 
-  Zap, Globe, CheckCircle2, Video, 
+  Award, Users, Clock,
+  Zap, Globe, CheckCircle2, Video,
   Layout, PenTool,
-  TrendingUp, Star, Send, Loader2
+  TrendingUp, Star, Send, Loader2,
+  Calendar, MapPin, Building2, ChevronDown
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
@@ -108,6 +109,82 @@ export default function PortfolioPage() {
     { label: 'Content Operations', years: '5+ Years', icon: <PenTool size={18} /> },
   ];
 
+  // Hard-coded experience data for timeline
+  const experienceData = [
+    {
+      id: 1,
+      company: 'Berger Paints Bangladesh Limited',
+      position: 'Project Support Engineer',
+      description: 'Contractual Job. Project Documentation and IT Infrastructure.',
+      startDate: 'August 2015',
+      endDate: 'December 2015',
+      skills: ['Project Documentation', 'IT Infrastructure'],
+      isCurrent: false,
+    },
+    {
+      id: 2,
+      company: 'Cityscape International Limited',
+      position: 'IT Associate Engineer',
+      description: 'Network Administration',
+      startDate: 'January 2016',
+      endDate: 'December 2016',
+      skills: ['Network Administration', 'IT Support'],
+      isCurrent: false,
+    },
+    {
+      id: 3,
+      company: 'Power Sonic Transformar and Switchgear Co. Ltd.',
+      position: 'Assistant Engineer',
+      description: 'Project Survey, Layout design of substation following DESCO and DPDC rules, LT HT meter cable Measurement, Consult with clients about everything before and after getting any substation project.',
+      startDate: 'January 2017',
+      endDate: 'May 2018',
+      skills: ['Project Survey', 'Layout Design', 'Client Consultation'],
+      isCurrent: false,
+    },
+    {
+      id: 4,
+      company: 'Tritech Building Services Ltd.',
+      position: 'Client Relationship Manager',
+      description: 'Project Survey and Reports',
+      startDate: 'May 2018',
+      endDate: 'January 2020',
+      skills: ['Project Survey', 'Client Relations', 'Reports'],
+      isCurrent: false,
+    },
+    {
+      id: 5,
+      company: 'HJ Visualization',
+      position: 'Virtual Assistant',
+      description: 'Remote and Part time Job',
+      startDate: 'January 2019',
+      endDate: 'December 2023',
+      skills: ['Virtual Assistance', 'Remote Work'],
+      isCurrent: false,
+    },
+    {
+      id: 6,
+      company: 'Tritech Building Services Ltd.',
+      position: 'Team Leader - Brand & Communication',
+      description: 'Brand Promotion',
+      startDate: 'January 2020',
+      endDate: 'October 2022',
+      skills: ['Brand Promotion', 'Team Leadership', 'Communication'],
+      isCurrent: false,
+    },
+    {
+      id: 7,
+      company: 'The Global Council for Anthropological Linguistics - GLOCAL',
+      position: 'Media and Web Design Coordinator',
+      description: 'Remote and Full time job. Web development and design for GLOCAL website and three other websites like CALA, COMELA, AFALA, JALA, JOMELA.',
+      startDate: 'January 2021',
+      endDate: 'December 2022',
+      skills: ['Responsive Web Design', 'Excel', 'Graphic Design', 'Problem Solving', 'WordPress'],
+      isCurrent: false,
+    },
+  ];
+
+  const [activeExperience, setActiveExperience] = useState<number | null>(null);
+
   const skills = [
     { name: 'Lead Research', level: 98 },
     { name: 'CRM Management', level: 95 },
@@ -131,7 +208,7 @@ export default function PortfolioPage() {
           </div>
           
           <div className="hidden lg:flex items-center gap-10">
-            {['Home', 'Skills', 'Services', 'Contact'].map(link => (
+            {['Home', 'Skills', 'Services', 'Experience', 'Contact'].map(link => (
               <a key={link} href={`#${link.toLowerCase()}`} className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">
                 {link}
               </a>
@@ -156,7 +233,7 @@ export default function PortfolioPage() {
             <button className="absolute top-8 right-8 text-[#2ecc71]" onClick={() => setIsMobileMenuOpen(false)}>
               <X size={40} />
             </button>
-            {['Home', 'Skills', 'Services', 'Contact'].map(link => (
+            {['Home', 'Skills', 'Services', 'Experience', 'Contact'].map(link => (
               <a key={link} href={`#${link.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)} className="text-5xl font-black text-white hover:text-[#2ecc71] transition-colors uppercase tracking-tighter">{link}</a>
             ))}
           </motion.div>
@@ -292,57 +369,175 @@ export default function PortfolioPage() {
           </div>
         </section>
 
-        {/* Experience Section */}
-        <section id="experience" className="py-32 bg-slate-900/10">
-          <div className="container mx-auto px-6 max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div>
-                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-8 block">Career Path</span>
-                <h2 className="text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-12">Proven <br /><span className="text-slate-600">Global Expertise</span></h2>
-                <div className="space-y-6">
-                  {technicalExperience.map((exp, i) => (
-                    <div key={i} className="flex items-center justify-between p-8 bg-slate-900 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all">
-                      <div className="flex items-center gap-5">
-                        <div className="p-3 bg-white/5 rounded-xl text-[#2ecc71]">
-                          {exp.icon}
+        {/* Experience Timeline Section */}
+        <section id="experience" className="py-32 bg-slate-900/10 relative overflow-hidden">
+          {/* Background decorations */}
+          <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-[#2ecc71]/5 rounded-full blur-[200px] pointer-events-none"></div>
+          <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] bg-[#2ecc71]/3 rounded-full blur-[150px] pointer-events-none"></div>
+
+          <div className="container mx-auto px-6 max-w-7xl relative z-10">
+            {/* Section Header */}
+            <div className="text-center mb-20">
+              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Career Journey</span>
+              <h2 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none">
+                E X P E R I E N C E
+              </h2>
+              <p className="text-slate-400 mt-6 max-w-2xl mx-auto">
+                A decade of professional growth across engineering, IT, and digital services
+              </p>
+            </div>
+
+            {/* Timeline */}
+            <div className="relative">
+              {/* Center Timeline Line */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[#2ecc71] via-[#2ecc71]/50 to-[#2ecc71]/20 rounded-full hidden lg:block"></div>
+
+              {/* Mobile Timeline Line */}
+              <div className="absolute left-8 w-1 h-full bg-gradient-to-b from-[#2ecc71] via-[#2ecc71]/50 to-[#2ecc71]/20 rounded-full lg:hidden"></div>
+
+              <div className="space-y-12 lg:space-y-0">
+                {experienceData.map((exp, index) => (
+                  <motion.div
+                    key={exp.id}
+                    initial={{ opacity: 0, y: 50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className={`relative flex items-center lg:items-stretch ${
+                      index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
+                    } flex-row`}
+                  >
+                    {/* Timeline Dot - Desktop */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2 hidden lg:flex items-center justify-center z-20">
+                      <motion.div
+                        whileHover={{ scale: 1.3 }}
+                        className={`w-6 h-6 rounded-full border-4 border-[#0b0f1a] cursor-pointer transition-all duration-300 ${
+                          activeExperience === exp.id
+                            ? 'bg-[#2ecc71] shadow-[0_0_20px_rgba(46,204,113,0.6)]'
+                            : 'bg-[#2ecc71]/60 hover:bg-[#2ecc71]'
+                        }`}
+                        onClick={() => setActiveExperience(activeExperience === exp.id ? null : exp.id)}
+                      />
+                    </div>
+
+                    {/* Timeline Dot - Mobile */}
+                    <div className="absolute left-8 transform -translate-x-1/2 lg:hidden flex items-center justify-center z-20">
+                      <motion.div
+                        whileHover={{ scale: 1.3 }}
+                        className={`w-5 h-5 rounded-full border-4 border-[#0b0f1a] cursor-pointer transition-all duration-300 ${
+                          activeExperience === exp.id
+                            ? 'bg-[#2ecc71] shadow-[0_0_20px_rgba(46,204,113,0.6)]'
+                            : 'bg-[#2ecc71]/60 hover:bg-[#2ecc71]'
+                        }`}
+                        onClick={() => setActiveExperience(activeExperience === exp.id ? null : exp.id)}
+                      />
+                    </div>
+
+                    {/* Content Card */}
+                    <div className={`w-full lg:w-[calc(50%-40px)] ${index % 2 === 0 ? 'lg:pr-0' : 'lg:pl-0'} pl-16 lg:pl-0`}>
+                      <motion.div
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        onClick={() => setActiveExperience(activeExperience === exp.id ? null : exp.id)}
+                        className={`p-8 rounded-3xl border cursor-pointer transition-all duration-500 ${
+                          activeExperience === exp.id
+                            ? 'bg-[#2ecc71]/10 border-[#2ecc71]/50 shadow-[0_0_40px_rgba(46,204,113,0.2)]'
+                            : 'bg-slate-900/60 border-white/5 hover:border-[#2ecc71]/30 hover:bg-slate-900/80'
+                        }`}
+                      >
+                        {/* Date Badge */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <Calendar size={14} className="text-[#2ecc71]" />
+                          <span className="text-[#2ecc71] text-[11px] font-black tracking-wider">
+                            {exp.startDate} - {exp.endDate}
+                          </span>
+                          {exp.isCurrent && (
+                            <span className="ml-2 px-2 py-1 bg-[#2ecc71] text-slate-900 text-[9px] font-black rounded-full uppercase">
+                              Current
+                            </span>
+                          )}
                         </div>
-                        <span className="text-lg font-bold uppercase tracking-tighter">{exp.label}</span>
-                      </div>
-                      <span className="text-[#2ecc71] font-black tracking-widest text-[11px] uppercase">{exp.years}</span>
+
+                        {/* Position & Company */}
+                        <h3 className="text-xl lg:text-2xl font-black uppercase tracking-tight mb-2 leading-tight">
+                          {exp.position}
+                        </h3>
+                        <div className="flex items-center gap-2 mb-4">
+                          <Building2 size={14} className="text-slate-500" />
+                          <span className="text-slate-400 text-sm font-semibold">{exp.company}</span>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                          {exp.description}
+                        </p>
+
+                        {/* Skills - Expandable */}
+                        <AnimatePresence>
+                          {activeExperience === exp.id && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-4 border-t border-white/10">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 block">Skills</span>
+                                <div className="flex flex-wrap gap-2">
+                                  {exp.skills.map((skill, i) => (
+                                    <span
+                                      key={i}
+                                      className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold text-slate-300 uppercase tracking-wider hover:bg-[#2ecc71]/10 hover:border-[#2ecc71]/30 transition-all"
+                                    >
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {/* Expand Indicator */}
+                        <div className="flex items-center justify-center mt-4">
+                          <ChevronDown
+                            size={18}
+                            className={`text-slate-500 transition-transform duration-300 ${
+                              activeExperience === exp.id ? 'rotate-180 text-[#2ecc71]' : ''
+                            }`}
+                          />
+                        </div>
+                      </motion.div>
                     </div>
-                  ))}
-                </div>
+
+                    {/* Empty space for alternating layout - Desktop only */}
+                    <div className="hidden lg:block lg:w-[calc(50%-40px)]"></div>
+                  </motion.div>
+                ))}
               </div>
-              <div className="bg-slate-900/50 p-12 rounded-[5rem] border border-white/5 relative">
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#2ecc71]/10 rounded-full blur-3xl"></div>
-                <h3 className="text-3xl font-black uppercase tracking-tighter mb-8">Selected Clients</h3>
-                <div className="space-y-8">
-                  <div className="flex gap-6">
-                    <div className="w-1 bg-[#2ecc71] rounded-full"></div>
-                    <div>
-                      <div className="text-[#2ecc71] font-black uppercase tracking-widest text-[10px] mb-1">Aura Relax (Current)</div>
-                      <h4 className="text-xl font-bold uppercase mb-2">Video Production Lead</h4>
-                      <p className="text-slate-400 text-sm">Managing YouTube content and relaxation video operations.</p>
+            </div>
+
+            {/* Technical Experience Summary */}
+            <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6">
+              {technicalExperience.map((exp, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  className="flex items-center justify-between p-8 bg-slate-900 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="p-4 bg-[#2ecc71]/10 rounded-2xl text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-slate-900 transition-all">
+                      {exp.icon}
                     </div>
+                    <span className="text-lg font-bold uppercase tracking-tighter">{exp.label}</span>
                   </div>
-                  <div className="flex gap-6">
-                    <div className="w-1 bg-slate-800 rounded-full"></div>
-                    <div>
-                      <div className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-1">Release Media Inc.</div>
-                      <h4 className="text-xl font-bold uppercase mb-2">Primary VA</h4>
-                      <p className="text-slate-400 text-sm">Orchestrating administrative workflows and digital content.</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-6">
-                    <div className="w-1 bg-slate-800 rounded-full"></div>
-                    <div>
-                      <div className="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-1">GLOCAL Org.</div>
-                      <h4 className="text-xl font-bold uppercase mb-2">Web Design Coordinator</h4>
-                      <p className="text-slate-400 text-sm">Leading development for international organizational sites.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  <span className="text-[#2ecc71] font-black tracking-widest text-[11px] uppercase">{exp.years}</span>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
