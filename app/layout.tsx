@@ -1,21 +1,14 @@
 
 import React from 'react';
 
-/**
- * Root Layout for Next.js App Router.
- * This file defines the shell of the application.
- */
 export default function RootLayout({
   children,
 }: {
-  // Make children optional to resolve TypeScript property missing errors in standard React entry points.
   children?: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="bg-[#0b0f1a] text-white antialiased overflow-x-hidden">
-        {children}
-      </body>
-    </html>
+    <div className="min-h-screen bg-[#0b0f1a]">
+      {children}
+    </div>
   );
 }
