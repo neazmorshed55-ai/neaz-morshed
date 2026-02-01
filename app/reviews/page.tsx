@@ -361,7 +361,7 @@ export default function ReviewsPage() {
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <a
-                href="https://www.linkedin.com/in/neazmorshed222/"
+                href="https://www.linkedin.com/in/neazmorshed222/details/recommendations/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-8 py-4 bg-sky-500/20 border border-sky-500/30 rounded-2xl text-sky-400 hover:bg-sky-500/30 transition-all font-bold"
@@ -388,6 +388,16 @@ export default function ReviewsPage() {
               >
                 <Star className="w-5 h-5" />
                 Fiverr Reviews
+                <ExternalLink className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.freelancer.com/u/tamim70"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-8 py-4 bg-cyan-500/20 border border-cyan-500/30 rounded-2xl text-cyan-400 hover:bg-cyan-500/30 transition-all font-bold"
+              >
+                <Star className="w-5 h-5" />
+                Freelancer Reviews
                 <ExternalLink className="w-4 h-4" />
               </a>
             </div>
