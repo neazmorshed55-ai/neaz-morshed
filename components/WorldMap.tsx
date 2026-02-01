@@ -153,33 +153,39 @@ export default function WorldMap() {
 
   return (
     <section className="container mx-auto px-6 max-w-7xl py-16">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-10"
-      >
-        <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-4 block">
-          International Presence
-        </span>
-        <div className="text-6xl lg:text-8xl font-black text-gradient mb-4">
-          {presencePercentage}%
-        </div>
-        <h2 className="text-2xl lg:text-3xl font-black uppercase tracking-tight">
-          My Clients <span className="text-slate-500">Around the Globe</span>
-        </h2>
-      </motion.div>
-
       {/* Map Container */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        transition={{ duration: 0.8 }}
         className="relative bg-slate-900/40 border border-white/5 rounded-[2rem] lg:rounded-[3rem] p-4 lg:p-8 overflow-hidden"
       >
+        {/* Top Left - International Presence */}
+        <div className="absolute top-4 left-4 lg:top-8 lg:left-8 z-10">
+          <div className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            International Presence
+          </div>
+          <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">
+            {presencePercentage}%
+          </div>
+        </div>
+
+        {/* Bottom Left - Countries */}
+        <div className="absolute bottom-4 left-4 lg:bottom-8 lg:left-8 z-10">
+          <div className="text-2xl lg:text-3xl font-black text-white">{countryStats.length}</div>
+          <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            Countries
+          </div>
+        </div>
+
+        {/* Bottom Right - Total Sales */}
+        <div className="absolute bottom-4 right-4 lg:bottom-8 lg:right-8 z-10 text-right">
+          <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">{totalSales}</div>
+          <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-500">
+            Total Sales
+          </div>
+        </div>
         {isLoading ? (
           <div className="flex items-center justify-center h-[300px] lg:h-[450px]">
             <div className="w-12 h-12 border-4 border-[#2ecc71]/20 border-t-[#2ecc71] rounded-full animate-spin" />
@@ -287,29 +293,6 @@ export default function WorldMap() {
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
-
-      {/* Stats Footer */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="flex justify-center gap-12 mt-8"
-      >
-        <div className="text-center">
-          <div className="text-3xl font-black text-white">{countryStats.length}</div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">
-            Countries
-          </div>
-        </div>
-        <div className="w-px bg-white/10" />
-        <div className="text-center">
-          <div className="text-3xl font-black text-[#2ecc71]">{totalSales}</div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">
-            Total Sales
-          </div>
-        </div>
       </motion.div>
     </section>
   );
