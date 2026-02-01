@@ -255,8 +255,23 @@ export default function ContactPage() {
           className="py-12 container mx-auto px-6 max-w-7xl relative rounded-[3rem] overflow-hidden"
           style={{ minHeight: '700px' }}
         >
-          {/* Animated Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0b0f1a] via-[#0d1424] to-[#0b0f1a]" />
+          {/* Video Background - Always visible */}
+          <div className="absolute inset-0 rounded-[3rem] overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="https://videos.pexels.com/video-files/6774133/6774133-uhd_2732_1440_25fps.mp4" type="video/mp4" />
+            </video>
+            {/* Dark Overlay */}
+            <div className="absolute inset-0 bg-[#0b0f1a]/85" />
+            {/* Gradient Overlays for depth */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-[#0b0f1a]/60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a]/40 via-transparent to-[#0b0f1a]" />
+          </div>
 
           {/* Animated Gradient Orbs */}
           <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#2ecc71]/10 rounded-full blur-[150px] animate-pulse" />
@@ -285,26 +300,11 @@ export default function ContactPage() {
             </h2>
           </motion.div>
 
-          {/* Loading Placeholder with Video Background */}
+          {/* Loading Placeholder */}
           {!isCalendlyLoaded && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[3rem] overflow-hidden z-10">
-              {/* Video Background */}
-              <div className="absolute inset-0">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover opacity-30"
-                >
-                  <source src="https://videos.pexels.com/video-files/6774133/6774133-uhd_2732_1440_25fps.mp4" type="video/mp4" />
-                </video>
-                {/* Video Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-[#0b0f1a]/70 to-[#0b0f1a]/90" />
-              </div>
-
+            <div className="flex flex-col items-center justify-center relative z-10 py-20">
               {/* Loading Animation */}
-              <div className="relative z-10 flex flex-col items-center">
+              <div className="relative flex flex-col items-center">
                 {/* Calendar Icon Animation */}
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
@@ -381,12 +381,15 @@ export default function ContactPage() {
             </div>
           )}
 
-          {/* Calendly Widget - Only renders when visible */}
+          {/* Calendly Widget - Slides down from top when loaded */}
           {isCalendlyVisible && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: isCalendlyLoaded ? 1 : 0, scale: isCalendlyLoaded ? 1 : 0.98 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, y: -100 }}
+              animate={{
+                opacity: isCalendlyLoaded ? 1 : 0,
+                y: isCalendlyLoaded ? 0 : -100
+              }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
               className="w-full relative z-20"
               style={{ height: '650px' }}
             >
