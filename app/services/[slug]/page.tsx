@@ -16,6 +16,44 @@ const isVideoFile = (url: string) => {
   return url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
 };
 
+// Convert YouTube URLs to embed format
+const getYouTubeEmbedUrl = (url: string) => {
+  // Handle different YouTube URL formats
+  // youtube.com/watch?v=VIDEO_ID
+  // youtu.be/VIDEO_ID
+  // youtube.com/embed/VIDEO_ID (already embed format)
+
+  if (url.includes('youtube.com/embed/')) {
+    return url; // Already in embed format
+  }
+
+  let videoId = '';
+
+  // Match youtube.com/watch?v=VIDEO_ID
+  const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
+  if (watchMatch) {
+    videoId = watchMatch[1];
+  }
+
+  // Match youtu.be/VIDEO_ID
+  const shortMatch = url.match(/youtu\.be\/([^?]+)/);
+  if (shortMatch) {
+    videoId = shortMatch[1];
+  }
+
+  if (videoId) {
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+
+  // Return original URL if no match (might be Vimeo or other)
+  return url;
+};
+
+// Check if URL is a YouTube or embeddable video
+const isEmbeddableVideo = (url: string) => {
+  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
+};
+
 interface Service {
   id: string;
   title: string;
@@ -1252,7 +1290,7 @@ export default function PortfolioCollectionPage() {
                     />
                   ) : (
                     <iframe
-                      src={selectedItem.video_url}
+                      src={getYouTubeEmbedUrl(selectedItem.video_url)}
                       className="w-full h-full"
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1331,7 +1369,7 @@ export default function PortfolioCollectionPage() {
                                 />
                               ) : (
                                 <iframe
-                                  src={item.url}
+                                  src={getYouTubeEmbedUrl(item.url)}
                                   className="w-full h-full"
                                   allowFullScreen
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
