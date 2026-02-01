@@ -5,13 +5,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ComposableMap,
   Geographies,
-  Geography
+  Geography,
+  Marker
 } from 'react-simple-maps';
 import { supabase } from '../lib/supabase';
-import { alpha2ToAlpha3, alpha3ToAlpha2 } from '../lib/country-codes';
+import { alpha2ToAlpha3 } from '../lib/country-codes';
 
 // GeoJSON URL for world map (TopoJSON format)
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+// My location (Bangladesh)
+const MY_LOCATION = {
+  coordinates: [90.4125, 23.8103] as [number, number], // Dhaka, Bangladesh
+  name: "Bangladesh"
+};
 
 // Interface for aggregated country data
 interface CountryStats {
@@ -228,30 +235,54 @@ export default function WorldMap() {
                 })
               }
             </Geographies>
+
+            {/* My Location Marker */}
+            <Marker coordinates={MY_LOCATION.coordinates}>
+              <g transform="translate(-12, -24)">
+                {/* Location Pin SVG */}
+                <path
+                  d="M12 0C7.03 0 3 4.03 3 9c0 6.75 9 15 9 15s9-8.25 9-15c0-4.97-4.03-9-9-9z"
+                  fill="#2ecc71"
+                  stroke="#fff"
+                  strokeWidth="1.5"
+                />
+                <circle cx="12" cy="9" r="3.5" fill="#fff" />
+              </g>
+            </Marker>
           </ComposableMap>
         )}
 
-        {/* Tooltip */}
+        {/* Tooltip - Fiverr Style */}
         <AnimatePresence>
           {tooltip.visible && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
               transition={{ duration: 0.15 }}
               className="fixed z-[100] pointer-events-none"
               style={{
-                left: tooltip.x + 15,
-                top: tooltip.y - 60
+                left: tooltip.x,
+                top: tooltip.y - 55,
+                transform: 'translateX(-50%)'
               }}
             >
-              <div className="bg-slate-900/95 backdrop-blur-md border border-[#2ecc71]/40 rounded-xl px-4 py-3 shadow-2xl shadow-black/50">
-                <div className="text-white font-bold text-sm">
-                  {tooltip.countryName}
+              <div className="relative">
+                {/* Tooltip Box */}
+                <div className="bg-slate-800 rounded-lg px-4 py-2 shadow-xl">
+                  <span className="text-white font-medium text-sm whitespace-nowrap">
+                    {tooltip.countryName} - {tooltip.salesCount} {tooltip.salesCount === 1 ? 'Sale' : 'Sales'}
+                  </span>
                 </div>
-                <div className="text-[#2ecc71] text-xs font-bold mt-0.5">
-                  {tooltip.salesCount} {tooltip.salesCount === 1 ? 'Sale' : 'Sales'}
-                </div>
+                {/* Arrow Pointer */}
+                <div
+                  className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0"
+                  style={{
+                    borderLeft: '8px solid transparent',
+                    borderRight: '8px solid transparent',
+                    borderTop: '8px solid #1e293b'
+                  }}
+                />
               </div>
             </motion.div>
           )}
