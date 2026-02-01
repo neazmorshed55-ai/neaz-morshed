@@ -262,7 +262,7 @@ export default function ReviewsManagement() {
     setDeleteConfirm(null);
   };
 
-  const platformOptions = ['Fiverr', 'Upwork', 'LinkedIn', 'Facebook', 'Google', 'Direct', 'Other'];
+  const platformOptions = ['Fiverr', 'Upwork', 'LinkedIn', 'Facebook', 'Google', 'Freelancer', 'Direct', 'Other'];
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
