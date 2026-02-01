@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Link from 'next/link';
 import {
   Star, Quote, Linkedin, Facebook,
@@ -34,6 +34,38 @@ const getFlagUrl = (countryCode: string) => {
   if (!countryCode) return '';
   return `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
 };
+
+// Count-up animation component
+function CountUpStat({ end, suffix = '', duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const hasStarted = useRef(false);
+
+  useEffect(() => {
+    if (!isInView) return;
+    if (hasStarted.current) return;
+    hasStarted.current = true;
+
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * end));
+
+      if (progress >= 1) {
+        clearInterval(timer);
+        setCount(end);
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [end, duration, isInView]);
+
+  return <span ref={ref}>{count}{suffix}</span>;
+}
 
 export default function ReviewsPage() {
   const [activeFilter, setActiveFilter] = useState<string>('all');
@@ -136,9 +168,9 @@ export default function ReviewsPage() {
     : reviews.filter(review => review.platform.toLowerCase() === activeFilter);
 
   const stats = [
-    { label: 'Happy Clients', value: '180+', icon: <Users className="w-6 h-6" /> },
-    { label: 'Five Star Reviews', value: '150+', icon: <Star className="w-6 h-6" /> },
-    { label: 'Repeat Clients', value: '85%', icon: <ThumbsUp className="w-6 h-6" /> },
+    { label: 'Happy Clients', value: 1000, suffix: '+', icon: <Users className="w-6 h-6" /> },
+    { label: 'Five Star Reviews', value: 64, suffix: '', icon: <Star className="w-6 h-6" /> },
+    { label: 'Repeat Clients', value: 85, suffix: '%', icon: <ThumbsUp className="w-6 h-6" /> },
   ];
 
   const getPlatformIcon = (platform: string) => {
@@ -209,7 +241,9 @@ export default function ReviewsPage() {
                 <div className="inline-flex p-4 bg-[#2ecc71]/10 rounded-2xl text-[#2ecc71] mb-4">
                   {stat.icon}
                 </div>
-                <div className="text-4xl font-black text-white mb-2">{stat.value}</div>
+                <div className="text-4xl font-black text-white mb-2">
+                  <CountUpStat end={stat.value} suffix={stat.suffix} duration={2000} />
+                </div>
                 <div className="text-[11px] font-black uppercase tracking-widest text-slate-500">{stat.label}</div>
               </motion.div>
             ))}

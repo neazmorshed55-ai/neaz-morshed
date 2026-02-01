@@ -1,7 +1,39 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+
+// Custom hook for count-up animation
+function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const hasStarted = useRef(false);
+
+  useEffect(() => {
+    if (startOnView && !isInView) return;
+    if (hasStarted.current) return;
+    hasStarted.current = true;
+
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * end));
+
+      if (progress >= 1) {
+        clearInterval(timer);
+        setCount(end);
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [end, duration, isInView, startOnView]);
+
+  return { count, ref };
+}
 import {
   ComposableMap,
   Geographies,
@@ -150,6 +182,18 @@ export default function WorldMap() {
     return countryStats.reduce((sum, s) => sum + s.count, 0);
   }, [countryStats]);
 
+  // Top 3 countries by sales
+  const top3Countries = useMemo(() => {
+    return [...countryStats]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3);
+  }, [countryStats]);
+
+  // Count-up animations
+  const { count: animatedPercentage, ref: percentageRef } = useCountUp(presencePercentage, 1500);
+  const { count: animatedCountries, ref: countriesRef } = useCountUp(countryStats.length, 1500);
+  const { count: animatedSales, ref: salesRef } = useCountUp(totalSales, 2000);
+
   // Get stats for a specific country by Alpha-2 code
   const getCountryStatsByAlpha2 = (alpha2Code: string | null): CountryStats | undefined => {
     if (!alpha2Code) return undefined;
@@ -204,26 +248,50 @@ export default function WorldMap() {
         className="relative bg-slate-900/40 border border-white/5 rounded-[2rem] lg:rounded-[3rem] p-4 lg:p-8 overflow-hidden"
       >
         {/* Top Left - International Presence */}
-        <div className="absolute top-4 left-4 lg:top-8 lg:left-8 z-10">
+        <div ref={percentageRef} className="absolute top-4 left-4 lg:top-8 lg:left-8 z-10">
           <div className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-wider">
             International Presence
           </div>
           <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">
-            {presencePercentage}%
+            {animatedPercentage}%
+          </div>
+        </div>
+
+        {/* Top Right - Top 3 Countries */}
+        <div className="absolute top-4 right-4 lg:top-8 lg:right-8 z-10">
+          <div className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+            Top Countries
+          </div>
+          <div className="space-y-1.5">
+            {top3Countries.map((country, index) => (
+              <div key={country.country_code} className="flex items-center gap-2">
+                <img
+                  src={`https://flagcdn.com/w20/${country.country_code.toLowerCase()}.png`}
+                  alt={country.country_name}
+                  className="w-5 h-3.5 object-cover rounded-sm shadow-sm"
+                />
+                <span className="text-white text-xs lg:text-sm font-medium">
+                  {country.country_name}
+                </span>
+                <span className="text-[#2ecc71] text-xs lg:text-sm font-bold ml-auto">
+                  {country.count}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Bottom Left - Countries */}
-        <div className="absolute bottom-4 left-4 lg:bottom-8 lg:left-8 z-10">
-          <div className="text-2xl lg:text-3xl font-black text-white">{countryStats.length}</div>
+        <div ref={countriesRef} className="absolute bottom-4 left-4 lg:bottom-8 lg:left-8 z-10">
+          <div className="text-2xl lg:text-3xl font-black text-white">{animatedCountries}</div>
           <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-500">
             Countries
           </div>
         </div>
 
         {/* Bottom Right - Total Sales */}
-        <div className="absolute bottom-4 right-4 lg:bottom-8 lg:right-8 z-10 text-right">
-          <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">{totalSales}</div>
+        <div ref={salesRef} className="absolute bottom-4 right-4 lg:bottom-8 lg:right-8 z-10 text-right">
+          <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">{animatedSales}</div>
           <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-500">
             Total Sales
           </div>
