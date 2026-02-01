@@ -106,6 +106,7 @@ export default function PortfolioManagement() {
   });
 
   const getServiceName = (serviceId: string) => {
+    if (serviceId === 'blog') return 'Blog';
     const service = services.find(s => s.id === serviceId);
     return service?.title || 'Unknown';
   };
@@ -420,6 +421,7 @@ export default function PortfolioManagement() {
             {services.map(s => (
               <option key={s.id} value={s.id}>{s.title}</option>
             ))}
+            <option value="blog">Blog</option>
           </select>
         </div>
 
@@ -540,6 +542,7 @@ export default function PortfolioManagement() {
                         {services.map(s => (
                           <option key={s.id} value={s.id}>{s.title}</option>
                         ))}
+                        <option value="blog">Blog</option>
                       </select>
                     </div>
 
