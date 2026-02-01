@@ -16,6 +16,40 @@ import {
 import { supabase } from '../lib/supabase';
 import Navbar from '../components/Navbar';
 
+// CountUp Animation Component
+const CountUp = ({ end, suffix = '', duration = 2000 }: { end: number, suffix?: string, duration?: number }) => {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = React.useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          const startTime = Date.now();
+          const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(easeOut * end));
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          };
+          animate();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [end, duration, hasAnimated]);
+
+  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+};
+
 // Typewriter Effect Component
 const TypewriterEffect = ({ texts, speed = 100, deleteSpeed = 50, pauseTime = 2000 }: {
   texts: string[],
@@ -88,9 +122,9 @@ export default function PortfolioPage() {
   const title = "Expert Virtual Assistant & Professional Outsourcer";
 
   const stats = [
-    { label: 'Job Success', value: '100%', icon: <Star className="w-5 h-5 text-[#2ecc71]" /> },
-    { label: 'Global Clients', value: '180+', icon: <Users className="w-5 h-5 text-[#2ecc71]" /> },
-    { label: 'Hours Completed', value: '5,000+', icon: <Clock className="w-5 h-5 text-[#2ecc71]" /> },
+    { label: 'Job Success', value: 100, suffix: '%', icon: <Star className="w-5 h-5 text-[#2ecc71]" /> },
+    { label: 'Global Clients', value: 1000, suffix: '+', icon: <Users className="w-5 h-5 text-[#2ecc71]" /> },
+    { label: 'Hours Completed', value: 10000, suffix: '+', icon: <Clock className="w-5 h-5 text-[#2ecc71]" /> },
   ];
 
   const services = [
@@ -220,7 +254,9 @@ export default function PortfolioPage() {
                 <div className="flex gap-6 pl-4 border-l border-white/10">
                   {stats.map((stat, i) => (
                     <div key={i} className="flex flex-col">
-                      <span className="text-2xl font-black text-white">{stat.value}</span>
+                      <span className="text-2xl font-black text-white">
+                        <CountUp end={stat.value} suffix={stat.suffix} duration={2000} />
+                      </span>
                       <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">{stat.label}</span>
                     </div>
                   ))}
@@ -299,9 +335,31 @@ export default function PortfolioPage() {
                 <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Our Solutions</span>
                 <h2 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none">High-Impact <br /> <span className="text-slate-600">Business Services</span></h2>
               </div>
-              <p className="text-slate-400 max-w-sm text-sm leading-relaxed mb-6 font-medium">
-                Custom-tailored outsourcing strategies for modern startups and established enterprises.
-              </p>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="relative max-w-sm group"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-r from-[#2ecc71]/20 via-[#2ecc71]/10 to-transparent rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative p-6 rounded-3xl bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-[#2ecc71]/30 transition-all duration-300">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-2xl bg-[#2ecc71]/10 border border-[#2ecc71]/20">
+                      <Target className="w-6 h-6 text-[#2ecc71]" />
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold text-base leading-relaxed mb-2">
+                        Custom-tailored <span className="text-[#2ecc71]">outsourcing strategies</span> for modern startups and established enterprises.
+                      </p>
+                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+                        <span className="w-2 h-2 rounded-full bg-[#2ecc71] animate-pulse"></span>
+                        Trusted by 1000+ businesses
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
