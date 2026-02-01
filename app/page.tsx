@@ -193,7 +193,7 @@ export default function PortfolioPage() {
 
       <main>
         {/* Hero */}
-        <section id="home" className="relative min-h-screen flex items-center pt-24 overflow-hidden">
+        <section id="home" className="relative min-h-screen flex items-center pt-36 overflow-hidden">
           <div className="absolute top-[10%] left-[5%] w-[600px] h-[600px] bg-[#2ecc71]/5 rounded-full blur-[180px] pointer-events-none animate-subtle-pulse"></div>
 
           <div className="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-16 items-center max-w-7xl relative z-10">
