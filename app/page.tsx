@@ -130,81 +130,52 @@ export default function PortfolioPage() {
     { label: 'Content Operations', years: '5+ Years', icon: <PenTool size={18} /> },
   ];
 
-  // Hard-coded experience data for timeline
-  const experienceData = [
-    {
-      id: 1,
-      company: 'Berger Paints Bangladesh Limited',
-      position: 'Project Support Engineer',
-      description: 'Contractual Job. Project Documentation and IT Infrastructure.',
-      startDate: 'August 2015',
-      endDate: 'December 2015',
-      skills: ['Project Documentation', 'IT Infrastructure'],
-      isCurrent: false,
-    },
-    {
-      id: 2,
-      company: 'Cityscape International Limited',
-      position: 'IT Associate Engineer',
-      description: 'Network Administration',
-      startDate: 'January 2016',
-      endDate: 'December 2016',
-      skills: ['Network Administration', 'IT Support'],
-      isCurrent: false,
-    },
-    {
-      id: 3,
-      company: 'Power Sonic Transformar and Switchgear Co. Ltd.',
-      position: 'Assistant Engineer',
-      description: 'Project Survey, Layout design of substation following DESCO and DPDC rules, LT HT meter cable Measurement, Consult with clients about everything before and after getting any substation project.',
-      startDate: 'January 2017',
-      endDate: 'May 2018',
-      skills: ['Project Survey', 'Layout Design', 'Client Consultation'],
-      isCurrent: false,
-    },
-    {
-      id: 4,
-      company: 'Tritech Building Services Ltd.',
-      position: 'Client Relationship Manager',
-      description: 'Project Survey and Reports',
-      startDate: 'May 2018',
-      endDate: 'January 2020',
-      skills: ['Project Survey', 'Client Relations', 'Reports'],
-      isCurrent: false,
-    },
-    {
-      id: 5,
-      company: 'HJ Visualization',
-      position: 'Virtual Assistant',
-      description: 'Remote and Part time Job',
-      startDate: 'January 2019',
-      endDate: 'December 2023',
-      skills: ['Virtual Assistance', 'Remote Work'],
-      isCurrent: false,
-    },
-    {
-      id: 6,
-      company: 'Tritech Building Services Ltd.',
-      position: 'Team Leader - Brand & Communication',
-      description: 'Brand Promotion',
-      startDate: 'January 2020',
-      endDate: 'October 2022',
-      skills: ['Brand Promotion', 'Team Leadership', 'Communication'],
-      isCurrent: false,
-    },
-    {
-      id: 7,
-      company: 'The Global Council for Anthropological Linguistics - GLOCAL',
-      position: 'Media and Web Design Coordinator',
-      description: 'Remote and Full time job. Web development and design for GLOCAL website and three other websites like CALA, COMELA, AFALA, JALA, JOMELA.',
-      startDate: 'January 2021',
-      endDate: 'December 2022',
-      skills: ['Responsive Web Design', 'Excel', 'Graphic Design', 'Problem Solving', 'WordPress'],
-      isCurrent: false,
-    },
-  ];
+  // Experience data from Supabase
+  interface Experience {
+    id: string;
+    company: string;
+    position: string;
+    location: string;
+    start_date: string;
+    end_date: string;
+    description: string[];
+    type: 'full-time' | 'part-time' | 'project';
+    skills: string[];
+    order_index: number;
+  }
 
-  const [activeExperience, setActiveExperience] = useState<number | null>(null);
+  const [experienceData, setExperienceData] = useState<Experience[]>([]);
+  const [experienceLoading, setExperienceLoading] = useState(true);
+  const [activeExperience, setActiveExperience] = useState<string | null>(null);
+
+  // Fetch experiences from Supabase
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      if (!supabase) {
+        setExperienceLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('experiences')
+          .select('*')
+          .order('order_index', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching experiences:', error);
+        } else if (data) {
+          setExperienceData(data);
+        }
+      } catch (err) {
+        console.error('Error fetching experiences:', err);
+      } finally {
+        setExperienceLoading(false);
+      }
+    };
+
+    fetchExperiences();
+  }, []);
 
   const skills = [
     { name: 'Lead Research', level: 98 },
@@ -380,8 +351,15 @@ export default function PortfolioPage() {
               {/* Mobile Timeline Line */}
               <div className="absolute left-8 w-1 h-full bg-gradient-to-b from-[#2ecc71] via-[#2ecc71]/50 to-[#2ecc71]/20 rounded-full lg:hidden"></div>
 
+              {/* Loading State */}
+              {experienceLoading && (
+                <div className="flex justify-center items-center py-20">
+                  <div className="w-12 h-12 border-4 border-[#2ecc71]/20 border-t-[#2ecc71] rounded-full animate-spin"></div>
+                </div>
+              )}
+
               <div className="space-y-12 lg:space-y-0">
-                {experienceData.map((exp, index) => (
+                {experienceData.filter(exp => exp.type === 'full-time').slice(0, 7).map((exp, index) => (
                   <motion.div
                     key={exp.id}
                     initial={{ opacity: 0, y: 50 }}
@@ -429,9 +407,9 @@ export default function PortfolioPage() {
                         <div className="flex items-center gap-2 mb-4">
                           <Calendar size={14} className="text-[#2ecc71]" />
                           <span className="text-[#2ecc71] text-[11px] font-black tracking-wider">
-                            {exp.startDate} - {exp.endDate}
+                            {exp.start_date} - {exp.end_date}
                           </span>
-                          {exp.isCurrent && (
+                          {exp.end_date === 'Present' && (
                             <span className="ml-2 px-2 py-1 bg-[#2ecc71] text-slate-900 text-[9px] font-black rounded-full uppercase">
                               Current
                             </span>
@@ -449,7 +427,7 @@ export default function PortfolioPage() {
 
                         {/* Description */}
                         <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                          {exp.description}
+                          {Array.isArray(exp.description) ? exp.description[0] : exp.description}
                         </p>
 
                         {/* Skills - Expandable */}
@@ -502,10 +480,10 @@ export default function PortfolioPage() {
                             className="text-center"
                           >
                             <div className="text-8xl font-black text-[#2ecc71]/20 leading-none">
-                              {exp.startDate.split(' ')[1]}
+                              {exp.start_date.split(' ')[1] || exp.start_date}
                             </div>
                             <div className="text-sm font-bold text-slate-500 mt-2 uppercase tracking-widest">
-                              {exp.endDate.split(' ')[1]}
+                              {exp.end_date === 'Present' ? 'Present' : (exp.end_date.split(' ')[1] || exp.end_date)}
                             </div>
                           </motion.div>
                         )}
@@ -514,6 +492,16 @@ export default function PortfolioPage() {
                   </motion.div>
                 ))}
               </div>
+            </div>
+
+            {/* View All Experience Link */}
+            <div className="flex justify-center mt-16">
+              <Link
+                href="/experience"
+                className="inline-flex items-center gap-3 px-10 py-5 bg-white/5 border border-white/10 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#2ecc71]/10 hover:border-[#2ecc71]/30 transition-all group"
+              >
+                View All Experience <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
 
             {/* Technical Experience Summary */}

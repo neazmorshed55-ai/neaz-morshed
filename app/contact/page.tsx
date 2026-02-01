@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Script from 'next/script';
 import {
   Mail, Globe, CheckCircle2, Send, Loader2,
   MapPin, Clock, MessageSquare, Linkedin, Facebook
@@ -14,8 +13,38 @@ import VideoBackground from '../../components/VideoBackground';
 
 export default function ContactPage() {
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [isCalendarLoaded, setIsCalendarLoaded] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+
+  // Calendly lazy loading states
+  const [isCalendlyVisible, setIsCalendlyVisible] = useState(false);
+  const [isCalendlyLoaded, setIsCalendlyLoaded] = useState(false);
+  const calendlySectionRef = useRef<HTMLElement>(null);
+
+  // Intersection Observer for lazy loading Calendly
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isCalendlyVisible) {
+            setIsCalendlyVisible(true);
+            // Load Calendly script asynchronously
+            const script = document.createElement('script');
+            script.src = 'https://assets.calendly.com/assets/external/widget.js';
+            script.async = true;
+            script.onload = () => setIsCalendlyLoaded(true);
+            document.body.appendChild(script);
+          }
+        });
+      },
+      { rootMargin: '200px', threshold: 0.1 }
+    );
+
+    if (calendlySectionRef.current) {
+      observer.observe(calendlySectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isCalendlyVisible]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,27 +249,59 @@ export default function ContactPage() {
             </motion.div>
           </div>
         </section>
-        {/* Calendly Section */}
+        {/* Calendly Section - Lazy Loaded with Intersection Observer */}
+        <section
+          ref={calendlySectionRef}
+          className="py-12 container mx-auto px-6 max-w-7xl bg-[#000000] relative rounded-[3rem] border border-[#39ff14]/20"
+          style={{ minHeight: '700px' }}
+        >
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <span className="text-[#39ff14] text-[11px] font-black uppercase tracking-[0.5em] mb-4 block">Schedule a Call</span>
+            <h2 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter">Book a Meeting</h2>
+          </motion.div>
 
-        <section className="py-8 container mx-auto px-6 max-w-7xl bg-[#0b0f1a] relative min-h-[600px]">
-          {!isCalendarLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
+          {/* Loading Placeholder */}
+          {!isCalendlyLoaded && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#000000] rounded-[3rem]">
+              <div className="relative">
+                {/* Outer glow ring */}
+                <div className="absolute inset-0 w-20 h-20 rounded-full bg-[#39ff14]/20 animate-ping" />
+                {/* Inner spinning ring */}
+                <div className="w-20 h-20 rounded-full border-4 border-[#39ff14]/30 border-t-[#39ff14] animate-spin" />
+              </div>
+              <p className="mt-6 text-[#39ff14] text-sm font-bold uppercase tracking-widest animate-pulse">
+                Loading Calendar...
+              </p>
+              <div className="mt-4 flex gap-1">
+                <span className="w-2 h-2 bg-[#39ff14] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-[#39ff14] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-[#39ff14] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
             </div>
           )}
 
-          <div className="w-full h-[600px] relative z-10">
+          {/* Calendly Widget - Only renders when visible */}
+          {isCalendlyVisible && (
             <div
-              className="calendly-inline-widget w-full h-full"
-              data-url="https://calendly.com/neazmd-tamim/new-meeting?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=0b0f1a&text_color=ffffff&primary_color=2ecc71"
-              style={{ minWidth: '320px', height: '100%' }}
-            />
-          </div>
-          <Script
-            src="https://assets.calendly.com/assets/external/widget.js"
-            strategy="lazyOnload"
-            onLoad={() => setIsCalendarLoaded(true)}
-          />
+              className="w-full relative z-10 transition-opacity duration-500"
+              style={{
+                height: '650px',
+                opacity: isCalendlyLoaded ? 1 : 0
+              }}
+            >
+              <div
+                className="calendly-inline-widget w-full h-full"
+                data-url="https://calendly.com/neazmd-tamim/new-meeting?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=000000&text_color=ffffff&primary_color=39ff14"
+                style={{ minWidth: '320px', height: '100%' }}
+              />
+            </div>
+          )}
         </section>
       </main>
 
@@ -266,8 +327,17 @@ export default function ContactPage() {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
+        .text-gradient-neon {
+          background: linear-gradient(135deg, #39ff14 0%, #2ecc71 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
         html {
           scroll-behavior: smooth;
+        }
+        /* Calendly widget dark theme override */
+        .calendly-inline-widget {
+          background-color: #000000 !important;
         }
       `}</style>
     </div>
