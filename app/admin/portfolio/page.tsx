@@ -12,7 +12,7 @@ import { supabase } from '../../../lib/supabase';
 
 interface PortfolioItem {
   id: string;
-  service_id: string;
+  service_id: string | null;
   title: string;
   description: string;
   thumbnail_url: string | null;
@@ -101,11 +101,19 @@ export default function PortfolioManagement() {
   const filteredItems = portfolioItems.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.client_name && item.client_name.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesService = filterService === 'all' || item.service_id === filterService;
+    // Handle blog filter - blog posts have null service_id and 'blog' in tags
+    const isBlogPost = !item.service_id && item.tags?.includes('blog');
+    const matchesService = filterService === 'all' ||
+      (filterService === 'blog' ? isBlogPost : item.service_id === filterService);
     return matchesSearch && matchesService;
   });
 
-  const getServiceName = (serviceId: string) => {
+  const getServiceName = (serviceId: string | null, tags?: string[]) => {
+    if (!serviceId) {
+      // Check if it's a blog post by tags
+      if (tags?.includes('blog')) return 'Blog';
+      return 'Unknown';
+    }
     if (serviceId === 'blog') return 'Blog';
     const service = services.find(s => s.id === serviceId);
     return service?.title || 'Unknown';
@@ -115,8 +123,10 @@ export default function PortfolioManagement() {
     if (item) {
       setEditingItem(item);
       fetchGalleryItems(item.id);
+      // Check if it's a blog post (null service_id with 'blog' tag)
+      const isBlogPost = !item.service_id && item.tags?.includes('blog');
       setFormData({
-        service_id: item.service_id,
+        service_id: isBlogPost ? 'blog' : (item.service_id || ''),
         title: item.title,
         description: item.description || '',
         thumbnail_url: item.thumbnail_url || '',
@@ -163,8 +173,15 @@ export default function PortfolioManagement() {
     if (!formData.title || !formData.service_id) return;
     setSaving(true);
 
+    // Handle tags - add 'blog' tag automatically if blog is selected
+    let tags = formData.tags.split(',').map(t => t.trim()).filter(t => t);
+    const isBlogPost = formData.service_id === 'blog';
+    if (isBlogPost && !tags.includes('blog')) {
+      tags = ['blog', ...tags];
+    }
+
     const itemData = {
-      service_id: formData.service_id,
+      service_id: isBlogPost ? null : formData.service_id,
       title: formData.title,
       description: formData.description || null,
       thumbnail_url: formData.thumbnail_url || null,
@@ -175,7 +192,7 @@ export default function PortfolioManagement() {
       completion_date: formData.completion_date || null,
       duration: formData.duration || null,
       tools_used: formData.tools_used.split(',').map(t => t.trim()).filter(t => t),
-      tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
+      tags: tags,
       is_featured: formData.is_featured,
       order_index: formData.order_index
     };
@@ -465,7 +482,7 @@ export default function PortfolioManagement() {
                 {/* Content */}
                 <div className="p-4">
                   <h3 className="text-white font-bold mb-1 line-clamp-1">{item.title}</h3>
-                  <p className="text-slate-500 text-sm mb-2">{getServiceName(item.service_id)}</p>
+                  <p className="text-slate-500 text-sm mb-2">{getServiceName(item.service_id, item.tags)}</p>
                   {item.client_name && (
                     <p className="text-slate-400 text-xs">Client: {item.client_name}</p>
                   )}
