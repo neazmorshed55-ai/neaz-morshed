@@ -603,11 +603,11 @@ export default function ExperiencePage() {
                 <div className="text-slate-400 text-xs uppercase tracking-wider">Total Positions</div>
               </div>
               <div className="p-6 bg-slate-900/50 rounded-2xl border border-white/5 text-center">
-                <div className="text-4xl font-black text-[#2ecc71] mb-2">180+</div>
+                <div className="text-4xl font-black text-[#2ecc71] mb-2">1,000+</div>
                 <div className="text-slate-400 text-xs uppercase tracking-wider">Global Clients</div>
               </div>
               <div className="p-6 bg-slate-900/50 rounded-2xl border border-white/5 text-center">
-                <div className="text-4xl font-black text-[#2ecc71] mb-2">5,000+</div>
+                <div className="text-4xl font-black text-[#2ecc71] mb-2">10,000+</div>
                 <div className="text-slate-400 text-xs uppercase tracking-wider">Hours Completed</div>
               </div>
             </motion.div>
@@ -798,7 +798,7 @@ export default function ExperiencePage() {
                 Ready to Work Together?
               </h3>
               <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-                With over 12 years of diverse experience and 180+ global clients, I'm ready to bring my expertise to your next project.
+                With over 12 years of diverse experience and 1,000+ global clients, I'm ready to bring my expertise to your next project.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
