@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   Plus, Edit2, Trash2, Search, Loader2, X,
-  MessageSquare, ArrowLeft, Save, Star, User, Upload, Image as ImageIcon
+  MessageSquare, ArrowLeft, Save, Star, User, Upload, Image as ImageIcon,
+  FileSpreadsheet, Download, CheckCircle, AlertCircle
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -100,6 +101,11 @@ export default function ReviewsManagement() {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [csvData, setCsvData] = useState<any[]>([]);
+  const [csvUploading, setCsvUploading] = useState(false);
+  const [csvError, setCsvError] = useState<string | null>(null);
+  const [csvSuccess, setCsvSuccess] = useState<number>(0);
 
   const [formData, setFormData] = useState({
     client_name: '',
@@ -272,6 +278,146 @@ export default function ReviewsManagement() {
     setUploadingImage(false);
   };
 
+  // CSV Parser
+  const parseCSV = (text: string) => {
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length < 2) return [];
+
+    // Parse header row
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+
+    const data: any[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const values: string[] = [];
+      let current = '';
+      let inQuotes = false;
+
+      // Handle quoted values with commas
+      for (const char of lines[i]) {
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          values.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      values.push(current.trim());
+
+      if (values.length >= 3) {
+        const row: any = {};
+        headers.forEach((header, idx) => {
+          row[header] = values[idx]?.replace(/^["']|["']$/g, '') || '';
+        });
+        data.push(row);
+      }
+    }
+    return data;
+  };
+
+  // Handle CSV file upload
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCsvError(null);
+    setCsvSuccess(0);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const parsed = parseCSV(text);
+
+        if (parsed.length === 0) {
+          setCsvError('No valid data found in CSV. Make sure the file has headers and data rows.');
+          return;
+        }
+
+        // Map CSV columns to review fields
+        const mappedData = parsed.map((row, index) => ({
+          client_name: row.client_name || row.name || row.client || '',
+          client_title: row.client_title || row.title || row.position || '',
+          client_company: row.client_company || row.company || '',
+          rating: parseInt(row.rating) || 5,
+          review_text: row.review_text || row.review || row.text || row.testimonial || '',
+          platform: row.platform || 'Direct',
+          date: row.date || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+          country_code: row.country_code || '',
+          country_name: row.country_name || row.country || '',
+          is_featured: row.is_featured === 'true' || row.featured === 'true' || false,
+          order_index: reviews.length + index + 1,
+          client_image: null
+        }));
+
+        // Filter out rows without required fields
+        const validData = mappedData.filter(row => row.client_name && row.review_text);
+
+        if (validData.length === 0) {
+          setCsvError('No valid reviews found. Each row must have client_name and review_text.');
+          return;
+        }
+
+        setCsvData(validData);
+      } catch (error) {
+        setCsvError('Error parsing CSV file. Please check the format.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Bulk insert reviews from CSV
+  const handleCsvBulkInsert = async () => {
+    if (!supabase || csvData.length === 0) return;
+
+    setCsvUploading(true);
+    setCsvError(null);
+    setCsvSuccess(0);
+
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .insert(csvData.map(row => ({
+          ...row,
+          country_code: row.country_code || null,
+          country_name: row.country_name || null
+        })));
+
+      if (error) throw error;
+
+      setCsvSuccess(csvData.length);
+      await fetchReviews();
+
+      // Reset after 2 seconds
+      setTimeout(() => {
+        setShowCsvModal(false);
+        setCsvData([]);
+        setCsvSuccess(0);
+      }, 2000);
+    } catch (error) {
+      console.error('Error bulk inserting reviews:', error);
+      setCsvError('Error uploading reviews. Please try again.');
+    }
+    setCsvUploading(false);
+  };
+
+  // Download sample CSV template
+  const downloadSampleCSV = () => {
+    const headers = 'client_name,client_title,client_company,rating,review_text,platform,date,country_code,country_name,is_featured';
+    const sample1 = '"John Doe","CEO","TechCorp",5,"Excellent work! Very professional and delivered on time.","Fiverr","January 2025","US","United States",false';
+    const sample2 = '"Jane Smith","Marketing Director","Digital Inc",5,"Amazing virtual assistant services. Highly recommended!","Upwork","February 2025","GB","United Kingdom",true';
+
+    const csvContent = `${headers}\n${sample1}\n${sample2}`;
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'reviews_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
@@ -286,13 +432,22 @@ export default function ReviewsManagement() {
             </div>
             <p className="text-slate-400">Manage client reviews and testimonials</p>
           </div>
-          <button
-            onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all"
-          >
-            <Plus size={18} />
-            Add Review
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowCsvModal(true)}
+              className="flex items-center gap-2 bg-slate-800 text-slate-300 px-5 py-3 rounded-xl font-bold text-sm hover:bg-slate-700 transition-all border border-white/10"
+            >
+              <FileSpreadsheet size={18} />
+              Upload CSV
+            </button>
+            <button
+              onClick={() => handleOpenModal()}
+              className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all"
+            >
+              <Plus size={18} />
+              Add Review
+            </button>
+          </div>
         </div>
 
         {/* Search */}
@@ -627,6 +782,167 @@ export default function ReviewsManagement() {
                   </button>
                   <button onClick={() => handleDelete(deleteConfirm)} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold">
                     Delete
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* CSV Upload Modal */}
+        <AnimatePresence>
+          {showCsvModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => { setShowCsvModal(false); setCsvData([]); setCsvError(null); }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="p-6 border-b border-white/10 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Upload Reviews via CSV</h2>
+                    <p className="text-slate-500 text-sm mt-1">Bulk import reviews from a CSV file</p>
+                  </div>
+                  <button
+                    onClick={() => { setShowCsvModal(false); setCsvData([]); setCsvError(null); }}
+                    className="p-2 text-slate-500 hover:text-white rounded-lg"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
+                  {/* Download Template */}
+                  <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-xl border border-white/5">
+                    <div>
+                      <h3 className="text-white font-medium">Download Sample Template</h3>
+                      <p className="text-slate-500 text-sm">Get a CSV template with the correct format</p>
+                    </div>
+                    <button
+                      onClick={downloadSampleCSV}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#2ecc71]/10 text-[#2ecc71] rounded-lg hover:bg-[#2ecc71]/20 transition-all text-sm font-medium"
+                    >
+                      <Download size={16} />
+                      Download
+                    </button>
+                  </div>
+
+                  {/* CSV File Upload */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                      Select CSV File
+                    </label>
+                    <label className="flex flex-col items-center justify-center w-full p-8 border-2 border-dashed border-white/20 rounded-xl cursor-pointer hover:border-[#2ecc71]/50 hover:bg-slate-800/30 transition-all">
+                      <FileSpreadsheet size={40} className="text-slate-500 mb-3" />
+                      <span className="text-slate-400 text-sm">Click to upload or drag and drop</span>
+                      <span className="text-slate-600 text-xs mt-1">CSV files only</span>
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={handleCsvUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Error Message */}
+                  {csvError && (
+                    <div className="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+                      <AlertCircle size={20} className="text-red-400" />
+                      <p className="text-red-400 text-sm">{csvError}</p>
+                    </div>
+                  )}
+
+                  {/* Success Message */}
+                  {csvSuccess > 0 && (
+                    <div className="flex items-center gap-3 p-4 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-xl">
+                      <CheckCircle size={20} className="text-[#2ecc71]" />
+                      <p className="text-[#2ecc71] text-sm">Successfully uploaded {csvSuccess} reviews!</p>
+                    </div>
+                  )}
+
+                  {/* Preview Table */}
+                  {csvData.length > 0 && !csvSuccess && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-white font-medium">Preview ({csvData.length} reviews)</h3>
+                        <span className="text-[#2ecc71] text-sm">{csvData.length} valid rows found</span>
+                      </div>
+                      <div className="overflow-x-auto rounded-xl border border-white/10">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-slate-800/50 text-left">
+                              <th className="px-4 py-3 text-slate-400 font-medium">#</th>
+                              <th className="px-4 py-3 text-slate-400 font-medium">Client Name</th>
+                              <th className="px-4 py-3 text-slate-400 font-medium">Company</th>
+                              <th className="px-4 py-3 text-slate-400 font-medium">Rating</th>
+                              <th className="px-4 py-3 text-slate-400 font-medium">Platform</th>
+                              <th className="px-4 py-3 text-slate-400 font-medium">Country</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {csvData.slice(0, 10).map((row, idx) => (
+                              <tr key={idx} className="border-t border-white/5">
+                                <td className="px-4 py-3 text-slate-500">{idx + 1}</td>
+                                <td className="px-4 py-3 text-white">{row.client_name}</td>
+                                <td className="px-4 py-3 text-slate-400">{row.client_company || '-'}</td>
+                                <td className="px-4 py-3">
+                                  <div className="flex gap-0.5">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star key={i} size={12} className={i < row.rating ? 'text-yellow-500 fill-yellow-500' : 'text-slate-600'} />
+                                    ))}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-slate-400">{row.platform}</td>
+                                <td className="px-4 py-3 text-slate-400">
+                                  {row.country_code ? `${getFlagEmoji(row.country_code)} ${row.country_name}` : '-'}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        {csvData.length > 10 && (
+                          <div className="px-4 py-3 bg-slate-800/30 text-center text-slate-500 text-sm">
+                            ... and {csvData.length - 10} more reviews
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CSV Format Help */}
+                  <div className="p-4 bg-slate-800/30 rounded-xl">
+                    <h4 className="text-white font-medium mb-2">CSV Format Guide</h4>
+                    <p className="text-slate-500 text-xs mb-2">Required columns: <span className="text-slate-300">client_name, review_text</span></p>
+                    <p className="text-slate-500 text-xs">Optional columns: <span className="text-slate-300">client_title, client_company, rating, platform, date, country_code, country_name, is_featured</span></p>
+                  </div>
+                </div>
+
+                <div className="p-6 border-t border-white/10 flex gap-3">
+                  <button
+                    onClick={() => { setShowCsvModal(false); setCsvData([]); setCsvError(null); }}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCsvBulkInsert}
+                    disabled={csvUploading || csvData.length === 0 || csvSuccess > 0}
+                    className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {csvUploading ? (
+                      <><Loader2 className="w-5 h-5 animate-spin" /> Uploading...</>
+                    ) : (
+                      <><Upload size={18} /> Upload {csvData.length} Reviews</>
+                    )}
                   </button>
                 </div>
               </motion.div>
