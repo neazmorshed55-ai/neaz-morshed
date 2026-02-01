@@ -1,6 +1,8 @@
 import './globals.css';
 import React from 'react';
 import type { Metadata } from 'next';
+import VisitorTracker from '../components/VisitorTracker';
+import AIChatbot from '../components/AIChatbot';
 
 /**
  * Root Layout for the Next.js Portfolio.
@@ -60,7 +62,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden">
+        <VisitorTracker />
         {children}
+        <AIChatbot />
       </body>
     </html>
   );
