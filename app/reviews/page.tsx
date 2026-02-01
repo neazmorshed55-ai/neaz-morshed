@@ -28,14 +28,10 @@ interface Review {
   city?: string;
 }
 
-// Convert country code to flag emoji
-const getFlagEmoji = (countryCode: string) => {
+// Get flag image URL from CDN
+const getFlagUrl = (countryCode: string) => {
   if (!countryCode) return '';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
+  return `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
 };
 
 export default function ReviewsPage() {
@@ -289,7 +285,11 @@ export default function ReviewsPage() {
                       <h4 className="font-black text-white">{review.client_name}</h4>
                       {review.country_code && (
                         <div className="flex items-center gap-1.5 mt-1 mb-2">
-                          <span className="text-base">{getFlagEmoji(review.country_code)}</span>
+                          <img
+                            src={getFlagUrl(review.country_code)}
+                            alt={review.country_name || ''}
+                            className="w-5 h-auto rounded-sm"
+                          />
                           <span className="text-[11px] text-slate-400">
                             {review.city ? `${review.city}, ` : ''}{review.country_name}
                           </span>

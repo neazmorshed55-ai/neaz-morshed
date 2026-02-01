@@ -83,7 +83,13 @@ const countries = [
   { code: 'UA', name: 'Ukraine' },
 ];
 
-// Convert country code to flag emoji
+// Get flag image URL from CDN
+const getFlagUrl = (countryCode: string) => {
+  if (!countryCode) return '';
+  return `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
+};
+
+// Convert country code to flag emoji (for select dropdown)
 const getFlagEmoji = (countryCode: string) => {
   if (!countryCode) return '';
   const codePoints = countryCode
@@ -508,7 +514,11 @@ export default function ReviewsManagement() {
                         <h3 className="text-white font-bold">{review.client_name}</h3>
                         {review.country_code && (
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-sm">{getFlagEmoji(review.country_code)}</span>
+                            <img
+                              src={getFlagUrl(review.country_code)}
+                              alt={review.country_name || ''}
+                              className="w-5 h-auto rounded-sm"
+                            />
                             <span className="text-slate-400 text-xs">
                               {review.city ? `${review.city}, ` : ''}{review.country_name}
                             </span>
@@ -923,8 +933,12 @@ export default function ReviewsManagement() {
                                 <td className="px-4 py-3 text-slate-400">{row.platform}</td>
                                 <td className="px-4 py-3 text-slate-400">
                                   {row.country_code ? (
-                                    <span className="flex items-center gap-1">
-                                      <span>{getFlagEmoji(row.country_code)}</span>
+                                    <span className="flex items-center gap-1.5">
+                                      <img
+                                        src={getFlagUrl(row.country_code)}
+                                        alt={row.country_name || ''}
+                                        className="w-5 h-auto rounded-sm"
+                                      />
                                       <span>{row.city ? `${row.city}, ` : ''}{row.country_name}</span>
                                     </span>
                                   ) : '-'}
