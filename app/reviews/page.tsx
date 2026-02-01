@@ -10,6 +10,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import Navbar from '../../components/Navbar';
 import VideoBackground from '../../components/VideoBackground';
+import WorldMap from '../../components/WorldMap';
 
 interface Review {
   id: string | number;
@@ -358,6 +359,9 @@ export default function ReviewsPage() {
             </div>
           </div>
         </section>
+
+        {/* World Map Section */}
+        <WorldMap />
 
         {/* CTA Section */}
         <section className="container mx-auto px-6 max-w-7xl mt-20">
