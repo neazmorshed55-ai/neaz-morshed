@@ -783,14 +783,30 @@ export default function PortfolioManagement() {
                             </button>
                           </div>
 
-                          {/* Upload Button */}
-                          <label className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-800/50 border border-white/10 rounded-xl cursor-pointer hover:bg-slate-800 hover:border-[#2ecc71]/30 transition-all w-full">
+                          {/* OR Divider */}
+                          <div className="flex items-center gap-3 my-2">
+                            <div className="flex-1 h-px bg-white/10"></div>
+                            <span className="text-slate-500 text-xs font-medium uppercase">or</span>
+                            <div className="flex-1 h-px bg-white/10"></div>
+                          </div>
+
+                          {/* File Upload Area */}
+                          <label className="flex flex-col items-center justify-center gap-3 p-6 bg-slate-800/30 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:bg-slate-800/50 hover:border-[#2ecc71]/40 transition-all w-full group">
                             {addingGalleryItem && !newGalleryItem.url ? (
-                              <Loader2 size={16} className="text-[#2ecc71] animate-spin" />
+                              <Loader2 size={32} className="text-[#2ecc71] animate-spin" />
                             ) : (
-                              <Upload size={16} className="text-[#2ecc71]" />
+                              <div className="p-3 bg-[#2ecc71]/10 rounded-full group-hover:bg-[#2ecc71]/20 transition-all">
+                                <Upload size={24} className="text-[#2ecc71]" />
+                              </div>
                             )}
-                            <span className="text-slate-400 text-sm">Upload {newGalleryItem.type === 'image' ? 'Image' : 'Video'}</span>
+                            <div className="text-center">
+                              <span className="text-white font-semibold block">
+                                Click to upload {newGalleryItem.type === 'image' ? 'Image' : 'Video'}
+                              </span>
+                              <span className="text-slate-500 text-xs mt-1 block">
+                                {newGalleryItem.type === 'image' ? 'PNG, JPG, WEBP up to 10MB' : 'MP4, WEBM up to 50MB'}
+                              </span>
+                            </div>
                             <input
                               type="file"
                               accept={newGalleryItem.type === 'image' ? "image/*" : "video/*"}
