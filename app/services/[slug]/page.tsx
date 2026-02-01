@@ -85,7 +85,7 @@ interface GalleryItem {
   id: string;
   portfolio_item_id: string;
   url: string;
-  type: 'image' | 'video';
+  type: 'image' | 'video' | 'link';
   order_index: number;
 }
 
@@ -1375,6 +1375,31 @@ export default function PortfolioCollectionPage() {
                                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                   loading="lazy"
                                 />
+                              )}
+                            </div>
+                          ) : item.type === 'link' ? (
+                            <div className="aspect-video relative">
+                              {isEmbeddableVideo(item.url) ? (
+                                <iframe
+                                  src={getYouTubeEmbedUrl(item.url)}
+                                  className="w-full h-full"
+                                  allowFullScreen
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                                >
+                                  <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                                    <ExternalLink size={32} />
+                                    <span className="text-white font-bold">View External Link</span>
+                                    <span className="text-slate-400 text-sm max-w-[80%] truncate">{item.url}</span>
+                                  </div>
+                                </a>
                               )}
                             </div>
                           ) : (

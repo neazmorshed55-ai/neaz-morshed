@@ -38,7 +38,7 @@ interface GalleryItem {
   id: string;
   portfolio_item_id: string;
   url: string;
-  type: 'image' | 'video';
+  type: 'image' | 'video' | 'link';
   order_index: number;
 }
 
@@ -54,7 +54,7 @@ export default function PortfolioManagement() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', type: 'image' as 'image' | 'video' });
+  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', type: 'image' as 'image' | 'video' | 'link' });
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -757,11 +757,12 @@ export default function PortfolioManagement() {
                       <div className="flex gap-3 mb-6 items-start">
                         <select
                           value={newGalleryItem.type}
-                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' })}
+                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' | 'link' })}
                           className="bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 h-[46px]"
                         >
                           <option value="image">Image</option>
                           <option value="video">Video</option>
+                          <option value="link">Link</option>
                         </select>
 
                         <div className="flex-1 flex flex-col gap-2">
@@ -771,7 +772,13 @@ export default function PortfolioManagement() {
                               value={newGalleryItem.url}
                               onChange={(e) => setNewGalleryItem({ ...newGalleryItem, url: e.target.value })}
                               className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                              placeholder={newGalleryItem.type === 'image' ? "Paste Image URL or Upload..." : "Paste Video URL (YouTube) or Upload..."}
+                              placeholder={
+                                newGalleryItem.type === 'image'
+                                  ? "Paste Image URL or Upload..."
+                                  : newGalleryItem.type === 'video'
+                                  ? "Paste Video URL (YouTube) or Upload..."
+                                  : "Paste external link (YouTube, website, etc.)"
+                              }
                             />
                             <button
                               type="button"
@@ -783,38 +790,42 @@ export default function PortfolioManagement() {
                             </button>
                           </div>
 
-                          {/* OR Divider */}
-                          <div className="flex items-center gap-3 my-2">
-                            <div className="flex-1 h-px bg-white/10"></div>
-                            <span className="text-slate-500 text-xs font-medium uppercase">or</span>
-                            <div className="flex-1 h-px bg-white/10"></div>
-                          </div>
-
-                          {/* File Upload Area */}
-                          <label className="flex flex-col items-center justify-center gap-3 p-6 bg-slate-800/30 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:bg-slate-800/50 hover:border-[#2ecc71]/40 transition-all w-full group">
-                            {addingGalleryItem && !newGalleryItem.url ? (
-                              <Loader2 size={32} className="text-[#2ecc71] animate-spin" />
-                            ) : (
-                              <div className="p-3 bg-[#2ecc71]/10 rounded-full group-hover:bg-[#2ecc71]/20 transition-all">
-                                <Upload size={24} className="text-[#2ecc71]" />
+                          {/* OR Divider and File Upload - Only for image/video, not links */}
+                          {newGalleryItem.type !== 'link' && (
+                            <>
+                              <div className="flex items-center gap-3 my-2">
+                                <div className="flex-1 h-px bg-white/10"></div>
+                                <span className="text-slate-500 text-xs font-medium uppercase">or</span>
+                                <div className="flex-1 h-px bg-white/10"></div>
                               </div>
-                            )}
-                            <div className="text-center">
-                              <span className="text-white font-semibold block">
-                                Click to upload {newGalleryItem.type === 'image' ? 'Image' : 'Video'}
-                              </span>
-                              <span className="text-slate-500 text-xs mt-1 block">
-                                {newGalleryItem.type === 'image' ? 'PNG, JPG, WEBP up to 10MB' : 'MP4, WEBM up to 50MB'}
-                              </span>
-                            </div>
-                            <input
-                              type="file"
-                              accept={newGalleryItem.type === 'image' ? "image/*" : "video/*"}
-                              onChange={handleGalleryFileUpload}
-                              className="hidden"
-                              disabled={addingGalleryItem}
-                            />
-                          </label>
+
+                              {/* File Upload Area */}
+                              <label className="flex flex-col items-center justify-center gap-3 p-6 bg-slate-800/30 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:bg-slate-800/50 hover:border-[#2ecc71]/40 transition-all w-full group">
+                                {addingGalleryItem && !newGalleryItem.url ? (
+                                  <Loader2 size={32} className="text-[#2ecc71] animate-spin" />
+                                ) : (
+                                  <div className="p-3 bg-[#2ecc71]/10 rounded-full group-hover:bg-[#2ecc71]/20 transition-all">
+                                    <Upload size={24} className="text-[#2ecc71]" />
+                                  </div>
+                                )}
+                                <div className="text-center">
+                                  <span className="text-white font-semibold block">
+                                    Click to upload {newGalleryItem.type === 'image' ? 'Image' : 'Video'}
+                                  </span>
+                                  <span className="text-slate-500 text-xs mt-1 block">
+                                    {newGalleryItem.type === 'image' ? 'PNG, JPG, WEBP up to 10MB' : 'MP4, WEBM up to 50MB'}
+                                  </span>
+                                </div>
+                                <input
+                                  type="file"
+                                  accept={newGalleryItem.type === 'image' ? "image/*" : "video/*"}
+                                  onChange={handleGalleryFileUpload}
+                                  className="hidden"
+                                  disabled={addingGalleryItem}
+                                />
+                              </label>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -825,12 +836,25 @@ export default function PortfolioManagement() {
                             <div key={item.id} className="relative group aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/10">
                               {item.type === 'image' ? (
                                 <img src={item.url} alt="Gallery item" className="w-full h-full object-cover" />
-                              ) : (
+                              ) : item.type === 'video' ? (
                                 <div className="w-full h-full flex items-center justify-center bg-slate-900">
                                   <div className="text-slate-500 flex flex-col items-center">
                                     <span className="text-xs">Video</span>
                                   </div>
                                 </div>
+                              ) : (
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="text-[#2ecc71] flex flex-col items-center gap-2">
+                                    <ExternalLink size={24} />
+                                    <span className="text-xs text-slate-400 max-w-[80%] truncate">{item.url}</span>
+                                  </div>
+                                </a>
                               )}
                               <button
                                 type="button"
