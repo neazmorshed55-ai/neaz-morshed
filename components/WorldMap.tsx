@@ -9,7 +9,6 @@ import {
   Marker
 } from 'react-simple-maps';
 import { supabase } from '../lib/supabase';
-import { alpha2ToAlpha3 } from '../lib/country-codes';
 
 // GeoJSON URL for world map (TopoJSON format)
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -18,6 +17,44 @@ const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const MY_LOCATION = {
   coordinates: [90.4125, 23.8103] as [number, number], // Dhaka, Bangladesh
   name: "Bangladesh"
+};
+
+// UN M49 numeric codes to ISO Alpha-2 mapping
+const numericToAlpha2: Record<string, string> = {
+  '840': 'US', '826': 'GB', '276': 'DE', '250': 'FR', '380': 'IT',
+  '724': 'ES', '578': 'NO', '752': 'SE', '208': 'DK', '528': 'NL',
+  '056': 'BE', '040': 'AT', '756': 'CH', '616': 'PL', '203': 'CZ',
+  '620': 'PT', '300': 'GR', '372': 'IE', '246': 'FI', '348': 'HU',
+  '642': 'RO', '100': 'BG', '191': 'HR', '703': 'SK', '705': 'SI',
+  '440': 'LT', '428': 'LV', '233': 'EE', '804': 'UA', '112': 'BY',
+  '643': 'RU', '792': 'TR', '036': 'AU', '554': 'NZ', '392': 'JP',
+  '156': 'CN', '410': 'KR', '356': 'IN', '050': 'BD', '586': 'PK',
+  '360': 'ID', '458': 'MY', '702': 'SG', '764': 'TH', '704': 'VN',
+  '608': 'PH', '124': 'CA', '484': 'MX', '076': 'BR', '032': 'AR',
+  '152': 'CL', '170': 'CO', '604': 'PE', '862': 'VE', '218': 'EC',
+  '858': 'UY', '600': 'PY', '068': 'BO', '818': 'EG', '710': 'ZA',
+  '566': 'NG', '404': 'KE', '504': 'MA', '012': 'DZ', '788': 'TN',
+  '784': 'AE', '682': 'SA', '376': 'IL', '400': 'JO', '422': 'LB',
+  '634': 'QA', '414': 'KW', '512': 'OM', '048': 'BH', '364': 'IR',
+  '368': 'IQ', '760': 'SY', '196': 'CY', '470': 'MT', '442': 'LU',
+  '352': 'IS', '499': 'ME', '008': 'AL', '807': 'MK',
+  '688': 'RS', '070': 'BA', '498': 'MD', '268': 'GE', '051': 'AM',
+  '031': 'AZ', '398': 'KZ', '860': 'UZ', '762': 'TJ', '417': 'KG',
+  '795': 'TM', '496': 'MN', '144': 'LK', '524': 'NP', '104': 'MM',
+  '116': 'KH', '418': 'LA', '388': 'JM', '780': 'TT', '044': 'BS',
+  '188': 'CR', '591': 'PA', '320': 'GT', '340': 'HN', '558': 'NI',
+  '222': 'SV', '084': 'BZ', '192': 'CU', '214': 'DO', '332': 'HT',
+  '630': 'PR', '533': 'AW', '531': 'CW', '238': 'FK', '308': 'GD',
+  '740': 'SR', '328': 'GY', '854': 'BF', '466': 'ML',
+  '562': 'NE', '694': 'SL', '768': 'TG', '204': 'BJ', '384': 'CI',
+  '288': 'GH', '686': 'SN', '324': 'GN', '430': 'LR', '624': 'GW',
+  '132': 'CV', '478': 'MR', '270': 'GM', '266': 'GA', '178': 'CG',
+  '180': 'CD', '024': 'AO', '508': 'MZ', '834': 'TZ', '800': 'UG',
+  '646': 'RW', '108': 'BI', '454': 'MW', '716': 'ZW', '894': 'ZM',
+  '072': 'BW', '426': 'LS', '748': 'SZ', '516': 'NA', '450': 'MG',
+  '480': 'MU', '690': 'SC', '174': 'KM', '175': 'YT', '638': 'RE',
+  '262': 'DJ', '232': 'ER', '728': 'SS', '729': 'SD', '434': 'LY',
+  '148': 'TD', '140': 'CF', '120': 'CM', '226': 'GQ', '678': 'ST'
 };
 
 // Interface for aggregated country data
@@ -86,17 +123,20 @@ export default function WorldMap() {
     fetchCountryStats();
   }, []);
 
-  // Create a map of Alpha-3 codes to stats for O(1) lookup
+  // Create a map of Alpha-2 codes to stats for O(1) lookup
   const statsMap = useMemo(() => {
     const map: Record<string, CountryStats> = {};
     countryStats.forEach(stat => {
-      const alpha3 = alpha2ToAlpha3[stat.country_code.toUpperCase()];
-      if (alpha3) {
-        map[alpha3] = stat;
-      }
+      map[stat.country_code.toUpperCase()] = stat;
     });
     return map;
   }, [countryStats]);
+
+  // Get Alpha-2 code from geo object (uses numeric UN M49 code)
+  const getAlpha2FromGeo = (geo: any): string | null => {
+    const numericId = geo.id?.toString();
+    return numericToAlpha2[numericId] || null;
+  };
 
   // Calculate international presence percentage
   const presencePercentage = useMemo(() => {
@@ -110,22 +150,24 @@ export default function WorldMap() {
     return countryStats.reduce((sum, s) => sum + s.count, 0);
   }, [countryStats]);
 
-  // Get stats for a specific country by Alpha-3 code
-  const getCountryStats = (alpha3Code: string): CountryStats | undefined => {
-    return statsMap[alpha3Code];
+  // Get stats for a specific country by Alpha-2 code
+  const getCountryStatsByAlpha2 = (alpha2Code: string | null): CountryStats | undefined => {
+    if (!alpha2Code) return undefined;
+    return statsMap[alpha2Code.toUpperCase()];
   };
 
   // Check if country is highlighted
-  const isCountryHighlighted = (alpha3Code: string): boolean => {
-    return !!statsMap[alpha3Code];
+  const isCountryHighlighted = (geo: any): boolean => {
+    const alpha2 = getAlpha2FromGeo(geo);
+    return alpha2 ? !!statsMap[alpha2] : false;
   };
 
   const handleMouseEnter = (
     geo: any,
     event: React.MouseEvent<SVGPathElement>
   ) => {
-    const alpha3 = geo.properties?.ISO_A3 || geo.id;
-    const stats = getCountryStats(alpha3);
+    const alpha2 = getAlpha2FromGeo(geo);
+    const stats = getCountryStatsByAlpha2(alpha2);
     if (stats) {
       setTooltip({
         x: event.clientX,
@@ -206,8 +248,7 @@ export default function WorldMap() {
             <Geographies geography={geoUrl}>
               {({ geographies }) =>
                 geographies.map((geo) => {
-                  const alpha3 = geo.properties?.ISO_A3 || geo.id;
-                  const isHighlighted = isCountryHighlighted(alpha3);
+                  const highlighted = isCountryHighlighted(geo);
 
                   return (
                     <Geography
@@ -218,21 +259,21 @@ export default function WorldMap() {
                       onMouseMove={handleMouseMove}
                       style={{
                         default: {
-                          fill: isHighlighted ? "#2ecc71" : "#1e293b",
+                          fill: highlighted ? "#2ecc71" : "#1e293b",
                           stroke: "#0f172a",
                           strokeWidth: 0.5,
                           outline: "none",
                           transition: "all 0.3s ease"
                         },
                         hover: {
-                          fill: isHighlighted ? "#27ae60" : "#334155",
-                          stroke: isHighlighted ? "#2ecc71" : "#475569",
-                          strokeWidth: isHighlighted ? 1.5 : 0.5,
+                          fill: highlighted ? "#27ae60" : "#334155",
+                          stroke: highlighted ? "#2ecc71" : "#475569",
+                          strokeWidth: highlighted ? 1.5 : 0.5,
                           outline: "none",
-                          cursor: isHighlighted ? "pointer" : "default"
+                          cursor: highlighted ? "pointer" : "default"
                         },
                         pressed: {
-                          fill: isHighlighted ? "#27ae60" : "#334155",
+                          fill: highlighted ? "#27ae60" : "#334155",
                           outline: "none"
                         }
                       }}
