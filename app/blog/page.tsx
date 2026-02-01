@@ -22,7 +22,7 @@ interface BlogPost {
     external_link: string;
     author: string;
     tags: string[];
-    publication_date: string;
+    published_at: string;
 }
 
 export default function BlogPage() {
@@ -42,7 +42,7 @@ export default function BlogPage() {
                 .from('blogs')
                 .select('*')
                 .eq('is_published', true)
-                .order('publication_date', { ascending: false });
+                .order('published_at', { ascending: false });
 
             if (!error && data) {
                 setBlogs(data);
@@ -181,7 +181,7 @@ export default function BlogPage() {
                                         <div className="flex items-center gap-4 text-xs text-slate-500 mb-4 font-bold uppercase tracking-wider">
                                             <div className="flex items-center gap-2">
                                                 <Calendar size={12} className="text-[#2ecc71]" />
-                                                <span>{new Date(blog.publication_date || blog.id).toLocaleDateString()}</span>
+                                                <span>{new Date(blog.published_at || blog.id).toLocaleDateString()}</span>
                                             </div>
                                             {blog.tags && blog.tags.length > 0 && (
                                                 <div className="flex items-center gap-2">
@@ -200,23 +200,24 @@ export default function BlogPage() {
                                         </p>
 
                                         <div className="mt-auto">
-                                            {blog.external_link ? (
-                                                <a
-                                                    href={blog.external_link}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 text-[#2ecc71] font-black uppercase tracking-widest text-xs group-hover:translate-x-2 transition-transform"
-                                                >
-                                                    Read on {blog.external_link.includes('linkedin') ? 'LinkedIn' : 'External Site'} <ExternalLink size={14} />
-                                                </a>
-                                            ) : (
-                                                <Link
-                                                    href={`/blog/${blog.slug}`}
-                                                    className="inline-flex items-center gap-2 text-[#2ecc71] font-black uppercase tracking-widest text-xs group-hover:translate-x-2 transition-transform"
-                                                >
-                                                    Read Article <ArrowRight size={14} />
-                                                </Link>
-                                            )}
+                                            {// External link logic
+                                                blog.external_link ? (
+                                                    <a
+                                                        href={blog.external_link}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 text-[#2ecc71] font-black uppercase tracking-widest text-xs group-hover:translate-x-2 transition-transform"
+                                                    >
+                                                        Read on {blog.external_link.includes('linkedin') ? 'LinkedIn' : 'External Site'} <ExternalLink size={14} />
+                                                    </a>
+                                                ) : (
+                                                    <Link
+                                                        href={`/blog/${blog.slug}`}
+                                                        className="inline-flex items-center gap-2 text-[#2ecc71] font-black uppercase tracking-widest text-xs group-hover:translate-x-2 transition-transform"
+                                                    >
+                                                        Read Article <ArrowRight size={14} />
+                                                    </Link>
+                                                )}
                                         </div>
                                     </div>
                                 </motion.div>

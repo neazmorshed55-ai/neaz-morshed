@@ -20,7 +20,7 @@ interface BlogPost {
     external_link: string;
     author: string;
     tags: string[];
-    publication_date: string;
+    published_at: string;
 }
 
 export default function BlogDetailPage({ params }: { params: { slug: string } }) {
@@ -112,7 +112,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                             </div>
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} className="text-[#2ecc71]" />
-                                <span className="font-medium">{new Date(blog.publication_date).toLocaleDateString()}</span>
+                                <span className="font-medium">{new Date(blog.published_at).toLocaleDateString()}</span>
                             </div>
                         </div>
                     </div>

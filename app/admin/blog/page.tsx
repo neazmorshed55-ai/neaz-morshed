@@ -28,7 +28,7 @@ interface BlogPost {
     author: string;
     tags: string[];
     is_published: boolean;
-    publication_date: string;
+    published_at: string;
 }
 
 export default function BlogAdminPage() {
@@ -481,7 +481,7 @@ export default function BlogAdminPage() {
                                                     {blog.is_published ? 'Published' : 'Draft'}
                                                 </span>
                                                 <span>•</span>
-                                                <span>{new Date(blog.publication_date).toLocaleDateString()}</span>
+                                                <span>{new Date(blog.published_at).toLocaleDateString()}</span>
                                             </div>
                                         </div>
                                     </div>
