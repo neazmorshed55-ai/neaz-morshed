@@ -25,6 +25,7 @@ interface Review {
   order_index?: number;
   country_code?: string;
   country_name?: string;
+  city?: string;
 }
 
 // Convert country code to flag emoji
@@ -285,17 +286,17 @@ export default function ReviewsPage() {
                   {/* Author Info */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-black text-white">{review.client_name}</h4>
-                        {review.country_code && (
-                          <span className="text-lg" title={review.country_name}>
-                            {getFlagEmoji(review.country_code)}
+                      <h4 className="font-black text-white">{review.client_name}</h4>
+                      {review.country_code && (
+                        <div className="flex items-center gap-1.5 mt-1 mb-2">
+                          <span className="text-base">{getFlagEmoji(review.country_code)}</span>
+                          <span className="text-[11px] text-slate-400">
+                            {review.city ? `${review.city}, ` : ''}{review.country_name}
                           </span>
-                        )}
-                      </div>
+                        </div>
+                      )}
                       <p className="text-[10px] text-slate-500 uppercase tracking-wider">
                         {review.client_title} • {review.client_company}
-                        {review.country_name && ` • ${review.country_name}`}
                       </p>
                     </div>
                     <div className={`px-3 py-2 rounded-xl border flex items-center gap-2 ${getPlatformColor(review.platform)}`}>

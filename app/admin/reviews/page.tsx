@@ -25,6 +25,7 @@ interface Review {
   order_index: number;
   country_code: string | null;
   country_name: string | null;
+  city: string | null;
 }
 
 // Country list with codes for flag emojis
@@ -119,7 +120,8 @@ export default function ReviewsManagement() {
     is_featured: false,
     order_index: 0,
     country_code: '',
-    country_name: ''
+    country_name: '',
+    city: ''
   });
 
   useEffect(() => {
@@ -168,7 +170,8 @@ export default function ReviewsManagement() {
         is_featured: review.is_featured,
         order_index: review.order_index,
         country_code: review.country_code || '',
-        country_name: review.country_name || ''
+        country_name: review.country_name || '',
+        city: review.city || ''
       });
     } else {
       setEditingReview(null);
@@ -184,7 +187,8 @@ export default function ReviewsManagement() {
         is_featured: false,
         order_index: reviews.length + 1,
         country_code: '',
-        country_name: ''
+        country_name: '',
+        city: ''
       });
     }
     setShowModal(true);
@@ -203,7 +207,8 @@ export default function ReviewsManagement() {
       ...formData,
       client_image: formData.client_image || null,
       country_code: formData.country_code || null,
-      country_name: formData.country_name || null
+      country_name: formData.country_name || null,
+      city: formData.city || null
     };
 
     if (!supabase) {
@@ -346,6 +351,7 @@ export default function ReviewsManagement() {
           date: row.date || new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
           country_code: row.country_code || '',
           country_name: row.country_name || row.country || '',
+          city: row.city || '',
           is_featured: row.is_featured === 'true' || row.featured === 'true' || false,
           order_index: reviews.length + index + 1,
           client_image: null
@@ -381,7 +387,8 @@ export default function ReviewsManagement() {
         .insert(csvData.map(row => ({
           ...row,
           country_code: row.country_code || null,
-          country_name: row.country_name || null
+          country_name: row.country_name || null,
+          city: row.city || null
         })));
 
       if (error) throw error;
@@ -404,9 +411,9 @@ export default function ReviewsManagement() {
 
   // Download sample CSV template
   const downloadSampleCSV = () => {
-    const headers = 'client_name,client_title,client_company,rating,review_text,platform,date,country_code,country_name,is_featured';
-    const sample1 = '"John Doe","CEO","TechCorp",5,"Excellent work! Very professional and delivered on time.","Fiverr","January 2025","US","United States",false';
-    const sample2 = '"Jane Smith","Marketing Director","Digital Inc",5,"Amazing virtual assistant services. Highly recommended!","Upwork","February 2025","GB","United Kingdom",true';
+    const headers = 'client_name,client_title,client_company,rating,review_text,platform,date,country_code,country_name,city,is_featured';
+    const sample1 = '"John Doe","CEO","TechCorp",5,"Excellent work! Very professional and delivered on time.","Fiverr","January 2025","US","United States","New York",false';
+    const sample2 = '"Jane Smith","Marketing Director","Digital Inc",5,"Amazing virtual assistant services. Highly recommended!","Upwork","February 2025","GB","United Kingdom","London",true';
 
     const csvContent = `${headers}\n${sample1}\n${sample2}`;
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -498,15 +505,16 @@ export default function ReviewsManagement() {
                         </div>
                       )}
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-white font-bold">{review.client_name}</h3>
-                          {review.country_code && (
-                            <span className="text-lg" title={review.country_name || ''}>
-                              {getFlagEmoji(review.country_code)}
+                        <h3 className="text-white font-bold">{review.client_name}</h3>
+                        {review.country_code && (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-sm">{getFlagEmoji(review.country_code)}</span>
+                            <span className="text-slate-400 text-xs">
+                              {review.city ? `${review.city}, ` : ''}{review.country_name}
                             </span>
-                          )}
-                        </div>
-                        <p className="text-slate-500 text-sm">{review.client_title} at {review.client_company}</p>
+                          </div>
+                        )}
+                        <p className="text-slate-500 text-sm mt-1">{review.client_title} at {review.client_company}</p>
                       </div>
                       {review.is_featured && (
                         <span className="px-2 py-0.5 bg-[#2ecc71]/10 text-[#2ecc71] text-[10px] font-bold rounded-full uppercase">
@@ -675,8 +683,8 @@ export default function ReviewsManagement() {
                       />
                     </div>
 
-                    <div className="col-span-2">
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Country (Optional)</label>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Country</label>
                       <select
                         value={formData.country_code}
                         onChange={(e) => {
@@ -695,6 +703,17 @@ export default function ReviewsManagement() {
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">City</label>
+                      <input
+                        type="text"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                        placeholder="e.g., New York"
+                      />
                     </div>
                   </div>
 
@@ -903,7 +922,12 @@ export default function ReviewsManagement() {
                                 </td>
                                 <td className="px-4 py-3 text-slate-400">{row.platform}</td>
                                 <td className="px-4 py-3 text-slate-400">
-                                  {row.country_code ? `${getFlagEmoji(row.country_code)} ${row.country_name}` : '-'}
+                                  {row.country_code ? (
+                                    <span className="flex items-center gap-1">
+                                      <span>{getFlagEmoji(row.country_code)}</span>
+                                      <span>{row.city ? `${row.city}, ` : ''}{row.country_name}</span>
+                                    </span>
+                                  ) : '-'}
                                 </td>
                               </tr>
                             ))}
@@ -922,7 +946,7 @@ export default function ReviewsManagement() {
                   <div className="p-4 bg-slate-800/30 rounded-xl">
                     <h4 className="text-white font-medium mb-2">CSV Format Guide</h4>
                     <p className="text-slate-500 text-xs mb-2">Required columns: <span className="text-slate-300">client_name, review_text</span></p>
-                    <p className="text-slate-500 text-xs">Optional columns: <span className="text-slate-300">client_title, client_company, rating, platform, date, country_code, country_name, is_featured</span></p>
+                    <p className="text-slate-500 text-xs">Optional columns: <span className="text-slate-300">client_title, client_company, rating, platform, date, country_code, country_name, city, is_featured</span></p>
                   </div>
                 </div>
 
