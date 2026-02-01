@@ -228,7 +228,7 @@ export default function ReviewsPage() {
         </section>
 
         {/* Stats Section */}
-        <section className="container mx-auto px-6 max-w-7xl mb-16">
+        <section className="container mx-auto px-6 max-w-7xl mb-16 -mt-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {stats.map((stat, index) => (
               <motion.div
