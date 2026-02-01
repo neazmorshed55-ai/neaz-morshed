@@ -433,9 +433,9 @@ export default function ContactPage() {
         html {
           scroll-behavior: smooth;
         }
-        /* Calendly widget dark theme override */
+        /* Calendly widget transparent background */
         .calendly-inline-widget {
-          background-color: #000000 !important;
+          background-color: transparent !important;
         }
       `}</style>
     </div>
