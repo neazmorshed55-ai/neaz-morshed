@@ -144,7 +144,7 @@ export default function ReviewsPage() {
         try {
           const { data, error } = await supabase
             .from('reviews')
-            .select('*')
+            .select('id, client_name, client_title, client_company, review_text, rating, platform, client_image, client_image_alt_text, date, order_index, country_code, country_name, city')
             .order('order_index', { ascending: true });
 
           if (error) throw error;

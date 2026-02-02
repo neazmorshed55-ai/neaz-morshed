@@ -1,8 +1,16 @@
 import './globals.css';
 import React from 'react';
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import VisitorTracker from '../components/VisitorTracker';
 import AIChatbot from '../components/AIChatbot';
+
+// Optimized font loading - preloads and serves locally
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 /**
  * Root Layout for the Next.js Portfolio.
@@ -60,8 +68,8 @@ export default function RootLayout({
   children?: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden">
+    <html lang="en" className={`scroll-smooth ${inter.variable}`}>
+      <body className={`${inter.className} bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden`}>
         <VisitorTracker />
         {children}
         <AIChatbot />

@@ -44,7 +44,7 @@ export default function ServicesPage() {
 
       const { data, error } = await supabase
         .from('services')
-        .select('*')
+        .select('id, title, slug, description, icon, cover_image, order_index')
         .eq('is_active', true)
         .order('order_index', { ascending: true });
 

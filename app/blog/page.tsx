@@ -17,12 +17,12 @@ interface BlogPost {
     title: string;
     slug: string;
     excerpt: string;
-    content: string;
+    content?: string; // Optional for listing
     cover_image: string;
     cover_image_alt_text?: string | null;
-    video_url: string;
-    external_link: string;
-    author: string;
+    video_url?: string; // Optional for listing
+    external_link?: string;
+    author?: string; // Optional for listing
     tags: string[];
     published_at: string;
 }
@@ -42,7 +42,7 @@ export default function BlogPage() {
 
             const { data, error } = await supabase
                 .from('blogs')
-                .select('*')
+                .select('id, title, slug, excerpt, cover_image, cover_image_alt_text, external_link, tags, published_at')
                 .eq('is_published', true)
                 .order('published_at', { ascending: false });
 
