@@ -404,7 +404,7 @@ export default function MediaLibraryPage() {
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
-  // Helper: Sanitize file name for storage (keep original name readable)
+  // Helper: Sanitize file name for storage (SEO friendly, original keyword first)
   const sanitizeFileName = (name: string): string => {
     // Remove extension first
     const ext = name.split('.').pop() || '';
@@ -418,13 +418,13 @@ export default function MediaLibraryPage() {
       .replace(/-+/g, '-')       // Replace multiple hyphens with single
       .trim();
 
-    return `${sanitized}.${ext}`;
+    return `${sanitized}.${ext.toLowerCase()}`;
   };
 
   // Helper: Generate ALT text from file name
   const generateAltTextFromFileName = (name: string): string => {
-    // Remove extension
-    const nameWithoutExt = name.replace(/\.[^/.]+$/, '');
+    // Remove extension and any (1), (2) suffixes for cleaner ALT text
+    const nameWithoutExt = name.replace(/\.[^/.]+$/, '').replace(/\s*\(\d+\)$/, '');
 
     // Convert hyphens and underscores to spaces, capitalize each word
     const altText = nameWithoutExt
@@ -436,6 +436,40 @@ export default function MediaLibraryPage() {
       .join(' ');
 
     return altText;
+  };
+
+  // Helper: Check if file exists and get unique name (Windows style: filename (1).jpg)
+  const getUniqueFileName = async (baseName: string, folder: string = 'media'): Promise<string> => {
+    if (!supabase) return baseName;
+
+    const ext = baseName.split('.').pop() || '';
+    const nameWithoutExt = baseName.replace(/\.[^/.]+$/, '');
+
+    // List all files in the folder to check for duplicates
+    const { data: existingFiles } = await supabase.storage
+      .from('images')
+      .list(folder);
+
+    if (!existingFiles || existingFiles.length === 0) {
+      return baseName; // No files exist, use original name
+    }
+
+    // Check if exact file name exists
+    const exactMatch = existingFiles.find(f => f.name === baseName);
+    if (!exactMatch) {
+      return baseName; // No exact match, use original name
+    }
+
+    // Find the next available number (Windows style)
+    let counter = 1;
+    let newName = `${nameWithoutExt} (${counter}).${ext}`;
+
+    while (existingFiles.some(f => f.name === newName)) {
+      counter++;
+      newName = `${nameWithoutExt} (${counter}).${ext}`;
+    }
+
+    return newName;
   };
 
   // File upload handler
@@ -451,11 +485,12 @@ export default function MediaLibraryPage() {
 
     for (const file of Array.from(files)) {
       try {
-        // Keep original file name (sanitized) with timestamp prefix for uniqueness
+        // Sanitize file name (SEO friendly, keeps original keyword)
         const sanitizedName = sanitizeFileName(file.name);
-        const timestamp = Date.now();
-        const fileName = `${timestamp}-${sanitizedName}`;
-        const filePath = `media/${fileName}`;
+
+        // Check for duplicates and get unique name (Windows style: filename (1).jpg)
+        const uniqueFileName = await getUniqueFileName(sanitizedName, 'media');
+        const filePath = `media/${uniqueFileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('images')
@@ -473,14 +508,14 @@ export default function MediaLibraryPage() {
           height = dimensions.height;
         }
 
-        // Auto-generate ALT text from original file name
-        const autoAltText = generateAltTextFromFileName(file.name);
+        // Auto-generate ALT text from file name (without any (1), (2) suffix)
+        const autoAltText = generateAltTextFromFileName(uniqueFileName);
 
         const { error: insertError } = await supabase
           .from('media_assets')
           .insert({
-            file_name: file.name,                              // Original file name
-            display_name: file.name.replace(/\.[^/.]+$/, ''),  // Display name without extension
+            file_name: uniqueFileName,                                    // Actual file name in storage
+            display_name: uniqueFileName.replace(/\.[^/.]+$/, ''),        // Display name without extension
             file_path: filePath,
             public_url: urlData.publicUrl,
             file_size: file.size,
