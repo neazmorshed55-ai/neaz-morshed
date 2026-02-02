@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowLeft, Search, Loader2, X, Upload, Trash2, Edit2, Save,
   Image as ImageIcon, Video, File, FolderOpen, Grid, List,
-  Copy, Check, Filter, SortAsc, SortDesc, RefreshCw
+  Copy, Check, SortAsc, SortDesc, RefreshCw, ChevronRight, ExternalLink
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
 
+// Extended interface to track source table
 interface MediaAsset {
   id: string;
   file_name: string;
@@ -28,11 +29,16 @@ interface MediaAsset {
   tags: string[];
   uploaded_at: string;
   updated_at: string;
+  // Source tracking
+  source_table: 'media_assets' | 'portfolio_items' | 'portfolio_gallery' | 'reviews' | 'blogs' | 'services';
+  source_id: string;
+  source_field: string; // e.g., 'thumbnail_url', 'image_url', 'client_image', 'cover_image'
+  source_name?: string; // Title of the source item for context
 }
 
 const folderOptions = [
   { value: 'all', label: 'All Files' },
-  { value: 'general', label: 'General' },
+  { value: 'media_assets', label: 'Media Library' },
   { value: 'portfolio', label: 'Portfolio' },
   { value: 'reviews', label: 'Reviews' },
   { value: 'blog', label: 'Blog' },
@@ -52,8 +58,8 @@ export default function MediaLibraryPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Edit modal state
-  const [editingAsset, setEditingAsset] = useState<MediaAsset | null>(null);
+  // Slide panel state (instead of modal)
+  const [selectedAsset, setSelectedAsset] = useState<MediaAsset | null>(null);
   const [editForm, setEditForm] = useState({
     display_name: '',
     alt_text: '',
@@ -72,28 +78,269 @@ export default function MediaLibraryPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAssets();
+    fetchAllAssets();
   }, []);
 
-  async function fetchAssets() {
+  // Fetch from ALL sources
+  async function fetchAllAssets() {
     if (!supabase) {
       setLoading(false);
       return;
     }
 
     setLoading(true);
+    const allAssets: MediaAsset[] = [];
+
     try {
-      const { data, error } = await supabase
+      // 1. Fetch from media_assets table
+      const { data: mediaData } = await supabase
         .from('media_assets')
         .select('*')
         .order('uploaded_at', { ascending: false });
 
-      if (error) throw error;
-      setAssets(data || []);
+      if (mediaData) {
+        mediaData.forEach(item => {
+          allAssets.push({
+            ...item,
+            source_table: 'media_assets',
+            source_id: item.id,
+            source_field: 'public_url',
+            source_name: item.display_name || item.file_name
+          });
+        });
+      }
+
+      // 2. Fetch from portfolio_items (thumbnail_url and image_url)
+      const { data: portfolioData } = await supabase
+        .from('portfolio_items')
+        .select('id, title, thumbnail_url, thumbnail_alt_text, image_url, image_alt_text, created_at')
+        .order('created_at', { ascending: false });
+
+      if (portfolioData) {
+        portfolioData.forEach(item => {
+          if (item.thumbnail_url) {
+            allAssets.push({
+              id: `portfolio-thumb-${item.id}`,
+              file_name: extractFileName(item.thumbnail_url),
+              display_name: `${item.title} - Thumbnail`,
+              file_path: item.thumbnail_url,
+              public_url: item.thumbnail_url,
+              alt_text: item.thumbnail_alt_text || null,
+              title: item.title,
+              caption: null,
+              file_size: null,
+              mime_type: getMimeTypeFromUrl(item.thumbnail_url),
+              width: null,
+              height: null,
+              folder: 'portfolio',
+              tags: ['portfolio', 'thumbnail'],
+              uploaded_at: item.created_at,
+              updated_at: item.created_at,
+              source_table: 'portfolio_items',
+              source_id: item.id,
+              source_field: 'thumbnail_alt_text',
+              source_name: item.title
+            });
+          }
+          if (item.image_url) {
+            allAssets.push({
+              id: `portfolio-img-${item.id}`,
+              file_name: extractFileName(item.image_url),
+              display_name: `${item.title} - Main Image`,
+              file_path: item.image_url,
+              public_url: item.image_url,
+              alt_text: item.image_alt_text || null,
+              title: item.title,
+              caption: null,
+              file_size: null,
+              mime_type: getMimeTypeFromUrl(item.image_url),
+              width: null,
+              height: null,
+              folder: 'portfolio',
+              tags: ['portfolio', 'main'],
+              uploaded_at: item.created_at,
+              updated_at: item.created_at,
+              source_table: 'portfolio_items',
+              source_id: item.id,
+              source_field: 'image_alt_text',
+              source_name: item.title
+            });
+          }
+        });
+      }
+
+      // 3. Fetch from portfolio_gallery
+      const { data: galleryData } = await supabase
+        .from('portfolio_gallery')
+        .select('id, portfolio_id, url, alt_text, caption, created_at')
+        .order('created_at', { ascending: false });
+
+      if (galleryData) {
+        galleryData.forEach(item => {
+          if (item.url) {
+            allAssets.push({
+              id: `gallery-${item.id}`,
+              file_name: extractFileName(item.url),
+              display_name: item.caption || 'Gallery Image',
+              file_path: item.url,
+              public_url: item.url,
+              alt_text: item.alt_text || null,
+              title: item.caption || null,
+              caption: item.caption || null,
+              file_size: null,
+              mime_type: getMimeTypeFromUrl(item.url),
+              width: null,
+              height: null,
+              folder: 'portfolio',
+              tags: ['portfolio', 'gallery'],
+              uploaded_at: item.created_at,
+              updated_at: item.created_at,
+              source_table: 'portfolio_gallery',
+              source_id: item.id,
+              source_field: 'alt_text',
+              source_name: `Gallery #${item.id.substring(0, 8)}`
+            });
+          }
+        });
+      }
+
+      // 4. Fetch from reviews (client_image)
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('id, client_name, client_image, client_image_alt_text, created_at')
+        .order('created_at', { ascending: false });
+
+      if (reviewsData) {
+        reviewsData.forEach(item => {
+          if (item.client_image) {
+            allAssets.push({
+              id: `review-${item.id}`,
+              file_name: extractFileName(item.client_image),
+              display_name: `${item.client_name} - Client Image`,
+              file_path: item.client_image,
+              public_url: item.client_image,
+              alt_text: item.client_image_alt_text || null,
+              title: item.client_name,
+              caption: null,
+              file_size: null,
+              mime_type: getMimeTypeFromUrl(item.client_image),
+              width: null,
+              height: null,
+              folder: 'reviews',
+              tags: ['reviews', 'client'],
+              uploaded_at: item.created_at,
+              updated_at: item.created_at,
+              source_table: 'reviews',
+              source_id: item.id,
+              source_field: 'client_image_alt_text',
+              source_name: item.client_name
+            });
+          }
+        });
+      }
+
+      // 5. Fetch from blogs (cover_image)
+      const { data: blogsData } = await supabase
+        .from('blogs')
+        .select('id, title, cover_image, cover_image_alt_text, created_at')
+        .order('created_at', { ascending: false });
+
+      if (blogsData) {
+        blogsData.forEach(item => {
+          if (item.cover_image) {
+            allAssets.push({
+              id: `blog-${item.id}`,
+              file_name: extractFileName(item.cover_image),
+              display_name: `${item.title} - Cover`,
+              file_path: item.cover_image,
+              public_url: item.cover_image,
+              alt_text: item.cover_image_alt_text || null,
+              title: item.title,
+              caption: null,
+              file_size: null,
+              mime_type: getMimeTypeFromUrl(item.cover_image),
+              width: null,
+              height: null,
+              folder: 'blog',
+              tags: ['blog', 'cover'],
+              uploaded_at: item.created_at,
+              updated_at: item.created_at,
+              source_table: 'blogs',
+              source_id: item.id,
+              source_field: 'cover_image_alt_text',
+              source_name: item.title
+            });
+          }
+        });
+      }
+
+      // 6. Fetch from services (cover_image)
+      const { data: servicesData } = await supabase
+        .from('services')
+        .select('id, title, cover_image, cover_image_alt_text, created_at')
+        .order('created_at', { ascending: false });
+
+      if (servicesData) {
+        servicesData.forEach(item => {
+          if (item.cover_image) {
+            allAssets.push({
+              id: `service-${item.id}`,
+              file_name: extractFileName(item.cover_image),
+              display_name: `${item.title} - Cover`,
+              file_path: item.cover_image,
+              public_url: item.cover_image,
+              alt_text: item.cover_image_alt_text || null,
+              title: item.title,
+              caption: null,
+              file_size: null,
+              mime_type: getMimeTypeFromUrl(item.cover_image),
+              width: null,
+              height: null,
+              folder: 'services',
+              tags: ['services', 'cover'],
+              uploaded_at: item.created_at,
+              updated_at: item.created_at,
+              source_table: 'services',
+              source_id: item.id,
+              source_field: 'cover_image_alt_text',
+              source_name: item.title
+            });
+          }
+        });
+      }
+
+      setAssets(allAssets);
     } catch (error) {
       console.error('Error fetching media assets:', error);
     }
     setLoading(false);
+  }
+
+  // Helper: Extract filename from URL
+  function extractFileName(url: string): string {
+    try {
+      const path = new URL(url).pathname;
+      return path.split('/').pop() || 'unknown';
+    } catch {
+      return url.split('/').pop() || 'unknown';
+    }
+  }
+
+  // Helper: Get mime type from URL
+  function getMimeTypeFromUrl(url: string): string {
+    const ext = url.split('.').pop()?.toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+      'svg': 'image/svg+xml',
+      'mp4': 'video/mp4',
+      'webm': 'video/webm',
+      'mov': 'video/quicktime'
+    };
+    return mimeTypes[ext || ''] || 'image/jpeg';
   }
 
   // Filter and sort assets
@@ -102,8 +349,13 @@ export default function MediaLibraryPage() {
       const matchesSearch =
         (asset.display_name || asset.file_name).toLowerCase().includes(searchQuery.toLowerCase()) ||
         (asset.alt_text || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (asset.source_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (asset.tags || []).some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesFolder = selectedFolder === 'all' || asset.folder === selectedFolder;
+
+      const matchesFolder = selectedFolder === 'all' ||
+        asset.folder === selectedFolder ||
+        (selectedFolder === 'media_assets' && asset.source_table === 'media_assets');
+
       return matchesSearch && matchesFolder;
     })
     .sort((a, b) => {
@@ -139,17 +391,14 @@ export default function MediaLibraryPage() {
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `media/${fileName}`;
 
-        // Upload to Supabase Storage
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(filePath, file, { upsert: true });
 
         if (uploadError) throw uploadError;
 
-        // Get public URL
         const { data: urlData } = supabase.storage.from('images').getPublicUrl(filePath);
 
-        // Get image dimensions if it's an image
         let width = null;
         let height = null;
         if (file.type.startsWith('image/')) {
@@ -158,12 +407,11 @@ export default function MediaLibraryPage() {
           height = dimensions.height;
         }
 
-        // Insert into media_assets table
         const { error: insertError } = await supabase
           .from('media_assets')
           .insert({
             file_name: file.name,
-            display_name: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+            display_name: file.name.replace(/\.[^/.]+$/, ''),
             file_path: filePath,
             public_url: urlData.publicUrl,
             file_size: file.size,
@@ -184,11 +432,10 @@ export default function MediaLibraryPage() {
 
     setUploading(false);
     setUploadProgress(0);
-    fetchAssets();
-    e.target.value = ''; // Reset input
+    fetchAllAssets();
+    e.target.value = '';
   };
 
-  // Get image dimensions
   const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -202,9 +449,9 @@ export default function MediaLibraryPage() {
     });
   };
 
-  // Open edit modal
-  const handleEdit = (asset: MediaAsset) => {
-    setEditingAsset(asset);
+  // Open slide panel
+  const handleSelectAsset = (asset: MediaAsset) => {
+    setSelectedAsset(asset);
     setEditForm({
       display_name: asset.display_name || asset.file_name,
       alt_text: asset.alt_text || '',
@@ -215,28 +462,83 @@ export default function MediaLibraryPage() {
     });
   };
 
-  // Save edit
+  // Save changes - updates source table!
   const handleSaveEdit = async () => {
-    if (!editingAsset || !supabase) return;
+    if (!selectedAsset || !supabase) return;
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('media_assets')
-        .update({
-          display_name: editForm.display_name || null,
-          alt_text: editForm.alt_text || null,
-          title: editForm.title || null,
-          caption: editForm.caption || null,
-          folder: editForm.folder,
-          tags: editForm.tags.split(',').map(t => t.trim()).filter(t => t)
-        })
-        .eq('id', editingAsset.id);
+      // Update based on source table
+      if (selectedAsset.source_table === 'media_assets') {
+        const { error } = await supabase
+          .from('media_assets')
+          .update({
+            display_name: editForm.display_name || null,
+            alt_text: editForm.alt_text || null,
+            title: editForm.title || null,
+            caption: editForm.caption || null,
+            folder: editForm.folder,
+            tags: editForm.tags.split(',').map(t => t.trim()).filter(t => t)
+          })
+          .eq('id', selectedAsset.source_id);
 
-      if (error) throw error;
+        if (error) throw error;
+      } else if (selectedAsset.source_table === 'portfolio_items') {
+        // Update the specific alt_text field in portfolio_items
+        const updateField = selectedAsset.source_field === 'thumbnail_alt_text'
+          ? { thumbnail_alt_text: editForm.alt_text || null }
+          : { image_alt_text: editForm.alt_text || null };
 
-      await fetchAssets();
-      setEditingAsset(null);
+        const { error } = await supabase
+          .from('portfolio_items')
+          .update(updateField)
+          .eq('id', selectedAsset.source_id);
+
+        if (error) throw error;
+      } else if (selectedAsset.source_table === 'portfolio_gallery') {
+        const { error } = await supabase
+          .from('portfolio_gallery')
+          .update({
+            alt_text: editForm.alt_text || null,
+            caption: editForm.caption || null
+          })
+          .eq('id', selectedAsset.source_id);
+
+        if (error) throw error;
+      } else if (selectedAsset.source_table === 'reviews') {
+        const { error } = await supabase
+          .from('reviews')
+          .update({ client_image_alt_text: editForm.alt_text || null })
+          .eq('id', selectedAsset.source_id);
+
+        if (error) throw error;
+      } else if (selectedAsset.source_table === 'blogs') {
+        const { error } = await supabase
+          .from('blogs')
+          .update({ cover_image_alt_text: editForm.alt_text || null })
+          .eq('id', selectedAsset.source_id);
+
+        if (error) throw error;
+      } else if (selectedAsset.source_table === 'services') {
+        const { error } = await supabase
+          .from('services')
+          .update({ cover_image_alt_text: editForm.alt_text || null })
+          .eq('id', selectedAsset.source_id);
+
+        if (error) throw error;
+      }
+
+      await fetchAllAssets();
+
+      // Update the selected asset in state
+      setSelectedAsset(prev => prev ? {
+        ...prev,
+        display_name: editForm.display_name,
+        alt_text: editForm.alt_text,
+        title: editForm.title,
+        caption: editForm.caption
+      } : null);
+
     } catch (error) {
       console.error('Error saving asset:', error);
       alert('Error saving changes. Please try again.');
@@ -244,31 +546,36 @@ export default function MediaLibraryPage() {
     setSaving(false);
   };
 
-  // Delete asset
+  // Delete asset (only for media_assets)
   const handleDelete = async (id: string) => {
     if (!supabase) return;
 
     const asset = assets.find(a => a.id === id);
-    if (!asset) return;
+    if (!asset || asset.source_table !== 'media_assets') {
+      alert('Can only delete files from Media Library. Edit the source (portfolio, review, etc.) to remove other images.');
+      setDeleteConfirm(null);
+      return;
+    }
 
     setDeleting(true);
     try {
-      // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('images')
         .remove([asset.file_path]);
 
       if (storageError) console.warn('Storage delete warning:', storageError);
 
-      // Delete from database
       const { error: dbError } = await supabase
         .from('media_assets')
         .delete()
-        .eq('id', id);
+        .eq('id', asset.source_id);
 
       if (dbError) throw dbError;
 
-      await fetchAssets();
+      await fetchAllAssets();
+      if (selectedAsset?.id === id) {
+        setSelectedAsset(null);
+      }
     } catch (error) {
       console.error('Error deleting asset:', error);
       alert('Error deleting file. Please try again.');
@@ -277,7 +584,6 @@ export default function MediaLibraryPage() {
     setDeleteConfirm(null);
   };
 
-  // Copy URL to clipboard
   const copyToClipboard = async (url: string, id: string) => {
     try {
       await navigator.clipboard.writeText(url);
@@ -288,15 +594,13 @@ export default function MediaLibraryPage() {
     }
   };
 
-  // Format file size
   const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return 'Unknown';
+    if (!bytes) return '-';
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
-  // Get file icon
   const getFileIcon = (mimeType: string | null) => {
     if (!mimeType) return <File size={24} className="text-slate-500" />;
     if (mimeType.startsWith('image/')) return <ImageIcon size={24} className="text-[#2ecc71]" />;
@@ -304,427 +608,438 @@ export default function MediaLibraryPage() {
     return <File size={24} className="text-slate-500" />;
   };
 
+  const getSourceBadge = (source: string) => {
+    const colors: Record<string, string> = {
+      'media_assets': 'bg-slate-700 text-slate-300',
+      'portfolio_items': 'bg-purple-500/20 text-purple-400',
+      'portfolio_gallery': 'bg-purple-500/20 text-purple-400',
+      'reviews': 'bg-yellow-500/20 text-yellow-400',
+      'blogs': 'bg-blue-500/20 text-blue-400',
+      'services': 'bg-green-500/20 text-green-400'
+    };
+    const labels: Record<string, string> = {
+      'media_assets': 'Library',
+      'portfolio_items': 'Portfolio',
+      'portfolio_gallery': 'Gallery',
+      'reviews': 'Review',
+      'blogs': 'Blog',
+      'services': 'Service'
+    };
+    return (
+      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${colors[source] || 'bg-slate-700'}`}>
+        {labels[source] || source}
+      </span>
+    );
+  };
+
   return (
     <ProtectedRoute>
-      <div className="min-h-screen">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Link href="/admin" className="text-slate-500 hover:text-white transition-colors">
-                <ArrowLeft size={20} />
-              </Link>
-              <h1 className="text-3xl font-black text-white uppercase tracking-tight">Media Library</h1>
+      <div className="min-h-screen flex">
+        {/* Main Content */}
+        <div className={`flex-1 transition-all duration-300 ${selectedAsset ? 'mr-[400px]' : ''}`}>
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Link href="/admin" className="text-slate-500 hover:text-white transition-colors">
+                  <ArrowLeft size={20} />
+                </Link>
+                <h1 className="text-3xl font-black text-white uppercase tracking-tight">Media Library</h1>
+              </div>
+              <p className="text-slate-400">All images and media from your website</p>
             </div>
-            <p className="text-slate-400">Manage your uploaded files, images and media assets</p>
+            <div className="flex gap-3">
+              <button
+                onClick={fetchAllAssets}
+                className="flex items-center gap-2 bg-slate-800 text-slate-300 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-700 transition-all border border-white/10"
+              >
+                <RefreshCw size={18} />
+              </button>
+              <label className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                {uploading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    {uploadProgress}%
+                  </>
+                ) : (
+                  <>
+                    <Upload size={18} />
+                    Upload Files
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  disabled={uploading}
+                />
+              </label>
+            </div>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={fetchAssets}
-              className="flex items-center gap-2 bg-slate-800 text-slate-300 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-700 transition-all border border-white/10"
-            >
-              <RefreshCw size={18} />
-            </button>
-            <label className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all cursor-pointer">
-              {uploading ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" />
-                  {uploadProgress}%
-                </>
-              ) : (
-                <>
-                  <Upload size={18} />
-                  Upload Files
-                </>
-              )}
+
+          {/* Filters & Search */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
               <input
-                type="file"
-                accept="image/*,video/*"
-                multiple
-                onChange={handleFileUpload}
-                className="hidden"
-                disabled={uploading}
+                type="text"
+                placeholder="Search by name, alt text or source..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all"
               />
-            </label>
-          </div>
-        </div>
-
-        {/* Filters & Search */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-            <input
-              type="text"
-              placeholder="Search by name, alt text or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all"
-            />
-          </div>
-          <select
-            value={selectedFolder}
-            onChange={(e) => setSelectedFolder(e.target.value)}
-            className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-          >
-            {folderOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'date' | 'name' | 'size')}
-            className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-          >
-            <option value="date">Sort by Date</option>
-            <option value="name">Sort by Name</option>
-            <option value="size">Sort by Size</option>
-          </select>
-          <button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white hover:bg-slate-800 transition-all"
-          >
-            {sortOrder === 'asc' ? <SortAsc size={20} /> : <SortDesc size={20} />}
-          </button>
-          <div className="flex bg-slate-900/60 border border-white/10 rounded-xl overflow-hidden">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-3 ${viewMode === 'grid' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
+            </div>
+            <select
+              value={selectedFolder}
+              onChange={(e) => setSelectedFolder(e.target.value)}
+              className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
             >
-              <Grid size={20} />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-3 ${viewMode === 'list' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
+              {folderOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'date' | 'name' | 'size')}
+              className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
             >
-              <List size={20} />
+              <option value="date">Sort by Date</option>
+              <option value="name">Sort by Name</option>
+              <option value="size">Sort by Size</option>
+            </select>
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white hover:bg-slate-800 transition-all"
+            >
+              {sortOrder === 'asc' ? <SortAsc size={20} /> : <SortDesc size={20} />}
             </button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="flex gap-4 mb-6 text-sm text-slate-500">
-          <span>{filteredAssets.length} files</span>
-          <span>|</span>
-          <span>{formatFileSize(filteredAssets.reduce((acc, a) => acc + (a.file_size || 0), 0))} total</span>
-        </div>
-
-        {/* Media Grid/List */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#2ecc71] animate-spin" />
-          </div>
-        ) : filteredAssets.length === 0 ? (
-          <div className="text-center py-20">
-            <FolderOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-            <p className="text-slate-500">No media files found</p>
-            <p className="text-slate-600 text-sm mt-1">Upload your first file to get started</p>
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filteredAssets.map((asset, index) => (
-              <motion.div
-                key={asset.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.02 }}
-                className="bg-slate-900/60 border border-white/5 rounded-xl overflow-hidden hover:border-[#2ecc71]/30 transition-all group"
+            <div className="flex bg-slate-900/60 border border-white/10 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-3 ${viewMode === 'grid' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
               >
-                {/* Thumbnail */}
-                <div className="aspect-square relative bg-slate-800 overflow-hidden">
-                  {asset.mime_type?.startsWith('image/') ? (
-                    <img
-                      src={asset.public_url}
-                      alt={asset.alt_text || asset.display_name || asset.file_name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      {getFileIcon(asset.mime_type)}
+                <Grid size={20} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-3 ${viewMode === 'list' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
+              >
+                <List size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="flex gap-4 mb-6 text-sm text-slate-500">
+            <span>{filteredAssets.length} files</span>
+            <span>|</span>
+            <span>{assets.filter(a => a.source_table === 'media_assets').length} in Media Library</span>
+            <span>|</span>
+            <span>{assets.filter(a => !a.alt_text).length} missing alt text</span>
+          </div>
+
+          {/* Media Grid/List */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-[#2ecc71] animate-spin" />
+            </div>
+          ) : filteredAssets.length === 0 ? (
+            <div className="text-center py-20">
+              <FolderOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+              <p className="text-slate-500">No media files found</p>
+              <p className="text-slate-600 text-sm mt-1">Upload files or add images to your content</p>
+            </div>
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {filteredAssets.map((asset, index) => (
+                <motion.div
+                  key={asset.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.02 }}
+                  onClick={() => handleSelectAsset(asset)}
+                  className={`bg-slate-900/60 border rounded-xl overflow-hidden hover:border-[#2ecc71]/30 transition-all group cursor-pointer ${
+                    selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
+                  }`}
+                >
+                  {/* Thumbnail */}
+                  <div className="aspect-square relative bg-slate-800 overflow-hidden">
+                    {asset.mime_type?.startsWith('image/') ? (
+                      <img
+                        src={asset.public_url}
+                        alt={asset.alt_text || asset.display_name || asset.file_name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        {getFileIcon(asset.mime_type)}
+                      </div>
+                    )}
+                    {/* Badges overlay */}
+                    <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
+                      {getSourceBadge(asset.source_table)}
+                      {!asset.alt_text && (
+                        <span className="px-2 py-0.5 bg-amber-500/80 rounded text-[10px] font-bold text-slate-950">
+                          No Alt
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => handleEdit(asset)}
-                      className="p-2 bg-white/20 rounded-lg hover:bg-[#2ecc71] hover:text-slate-950 transition-all"
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => copyToClipboard(asset.public_url, asset.id)}
-                      className="p-2 bg-white/20 rounded-lg hover:bg-blue-500 transition-all"
-                    >
-                      {copiedId === asset.id ? <Check size={16} /> : <Copy size={16} />}
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirm(asset.id)}
-                      className="p-2 bg-white/20 rounded-lg hover:bg-red-500 transition-all"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {/* Select indicator */}
+                    {selectedAsset?.id === asset.id && (
+                      <div className="absolute bottom-2 right-2">
+                        <ChevronRight className="w-6 h-6 text-[#2ecc71]" />
+                      </div>
+                    )}
                   </div>
-                  {/* Alt text indicator */}
-                  {!asset.alt_text && (
-                    <div className="absolute top-2 right-2 px-2 py-1 bg-amber-500/80 rounded text-[10px] font-bold text-slate-950">
-                      No Alt
+                  {/* Info */}
+                  <div className="p-3">
+                    <p className="text-white text-sm font-medium truncate">
+                      {asset.display_name || asset.file_name}
+                    </p>
+                    <p className="text-slate-500 text-xs mt-1 truncate">
+                      {asset.source_name || formatFileSize(asset.file_size)}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            /* List View */
+            <div className="space-y-2">
+              {filteredAssets.map((asset, index) => (
+                <motion.div
+                  key={asset.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.02 }}
+                  onClick={() => handleSelectAsset(asset)}
+                  className={`bg-slate-900/60 border rounded-xl p-4 hover:border-[#2ecc71]/30 transition-all flex items-center gap-4 cursor-pointer ${
+                    selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
+                  }`}
+                >
+                  {/* Thumbnail */}
+                  <div className="w-16 h-16 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0">
+                    {asset.mime_type?.startsWith('image/') ? (
+                      <img
+                        src={asset.public_url}
+                        alt={asset.alt_text || asset.display_name || asset.file_name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        {getFileIcon(asset.mime_type)}
+                      </div>
+                    )}
+                  </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-white font-medium truncate">
+                        {asset.display_name || asset.file_name}
+                      </p>
+                      {getSourceBadge(asset.source_table)}
                     </div>
-                  )}
-                </div>
-                {/* Info */}
-                <div className="p-3">
-                  <p className="text-white text-sm font-medium truncate">
-                    {asset.display_name || asset.file_name}
-                  </p>
-                  <p className="text-slate-500 text-xs mt-1">
-                    {formatFileSize(asset.file_size)}
-                    {asset.width && asset.height && ` • ${asset.width}x${asset.height}`}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          /* List View */
-          <div className="space-y-2">
-            {filteredAssets.map((asset, index) => (
-              <motion.div
-                key={asset.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.02 }}
-                className="bg-slate-900/60 border border-white/5 rounded-xl p-4 hover:border-[#2ecc71]/30 transition-all flex items-center gap-4"
-              >
-                {/* Thumbnail */}
-                <div className="w-16 h-16 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0">
-                  {asset.mime_type?.startsWith('image/') ? (
-                    <img
-                      src={asset.public_url}
-                      alt={asset.alt_text || asset.display_name || asset.file_name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      {getFileIcon(asset.mime_type)}
-                    </div>
-                  )}
-                </div>
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-white font-medium truncate">
-                    {asset.display_name || asset.file_name}
-                  </p>
-                  <p className="text-slate-500 text-sm truncate">
-                    {asset.alt_text || <span className="text-amber-500">No alt text</span>}
-                  </p>
-                  <p className="text-slate-600 text-xs mt-1">
-                    {formatFileSize(asset.file_size)} • {asset.folder} • {new Date(asset.uploaded_at).toLocaleDateString()}
-                  </p>
-                </div>
-                {/* Actions */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleEdit(asset)}
-                    className="p-2 text-slate-500 hover:text-[#2ecc71] hover:bg-[#2ecc71]/10 rounded-lg transition-all"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => copyToClipboard(asset.public_url, asset.id)}
-                    className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-all"
-                  >
-                    {copiedId === asset.id ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirm(asset.id)}
-                    className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                    <p className="text-slate-500 text-sm truncate">
+                      {asset.alt_text || <span className="text-amber-500">No alt text</span>}
+                    </p>
+                    <p className="text-slate-600 text-xs mt-1">
+                      {asset.source_name} • {new Date(asset.uploaded_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  {/* Arrow */}
+                  <ChevronRight className={`w-5 h-5 transition-colors ${
+                    selectedAsset?.id === asset.id ? 'text-[#2ecc71]' : 'text-slate-600'
+                  }`} />
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        {/* Edit Modal */}
+        {/* RIGHT SIDE SLIDE PANEL */}
         <AnimatePresence>
-          {editingAsset && (
+          {selectedAsset && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-              onClick={() => setEditingAsset(null)}
+              initial={{ x: 400, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 400, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 h-full w-[400px] bg-slate-900 border-l border-white/10 z-40 flex flex-col shadow-2xl"
             >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="p-6 border-b border-white/10 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-white">Edit Media Details</h2>
-                  <button onClick={() => setEditingAsset(null)} className="p-2 text-slate-500 hover:text-white rounded-lg">
-                    <X size={20} />
-                  </button>
+              {/* Panel Header */}
+              <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/95 backdrop-blur">
+                <h2 className="text-lg font-bold text-white">Edit Details</h2>
+                <button
+                  onClick={() => setSelectedAsset(null)}
+                  className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Panel Content - Scrollable */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Image Preview */}
+                <div className="aspect-video rounded-xl bg-slate-800 overflow-hidden relative">
+                  {selectedAsset.mime_type?.startsWith('image/') ? (
+                    <img
+                      src={selectedAsset.public_url}
+                      alt={selectedAsset.alt_text || ''}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      {getFileIcon(selectedAsset.mime_type)}
+                    </div>
+                  )}
+                  <a
+                    href={selectedAsset.public_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute top-2 right-2 p-2 bg-black/50 rounded-lg text-white hover:bg-black/70 transition-all"
+                  >
+                    <ExternalLink size={16} />
+                  </a>
                 </div>
 
-                <div className="p-6">
-                  <div className="flex gap-6">
-                    {/* Preview */}
-                    <div className="w-48 flex-shrink-0">
-                      <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden">
-                        {editingAsset.mime_type?.startsWith('image/') ? (
-                          <img
-                            src={editingAsset.public_url}
-                            alt={editingAsset.alt_text || ''}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            {getFileIcon(editingAsset.mime_type)}
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-3 text-xs text-slate-500 space-y-1">
-                        <p>File: {editingAsset.file_name}</p>
-                        <p>Size: {formatFileSize(editingAsset.file_size)}</p>
-                        {editingAsset.width && editingAsset.height && (
-                          <p>Dimensions: {editingAsset.width} x {editingAsset.height}</p>
-                        )}
-                        <p>Type: {editingAsset.mime_type}</p>
-                      </div>
+                {/* Source Info */}
+                <div className="bg-slate-800/50 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    {getSourceBadge(selectedAsset.source_table)}
+                    <span className="text-slate-400 text-sm">{selectedAsset.source_name}</span>
+                  </div>
+                  <p className="text-slate-500 text-xs">
+                    File: {selectedAsset.file_name}
+                  </p>
+                  {selectedAsset.file_size && (
+                    <p className="text-slate-500 text-xs">
+                      Size: {formatFileSize(selectedAsset.file_size)}
+                    </p>
+                  )}
+                  {selectedAsset.width && selectedAsset.height && (
+                    <p className="text-slate-500 text-xs">
+                      Dimensions: {selectedAsset.width} x {selectedAsset.height}
+                    </p>
+                  )}
+                </div>
+
+                {/* Edit Form */}
+                <div className="space-y-4">
+                  {selectedAsset.source_table === 'media_assets' && (
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                        Display Name
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm.display_name}
+                        onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                        placeholder="Enter a display name"
+                      />
                     </div>
+                  )}
 
-                    {/* Form */}
-                    <div className="flex-1 space-y-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                      Alt Text (SEO) <span className="text-[#2ecc71]">*Important</span>
+                    </label>
+                    <textarea
+                      value={editForm.alt_text}
+                      onChange={(e) => setEditForm({ ...editForm, alt_text: e.target.value })}
+                      rows={3}
+                      className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 resize-none"
+                      placeholder="Describe this image for search engines and accessibility"
+                    />
+                    <p className="text-slate-600 text-xs mt-1">
+                      Good alt text helps SEO and screen readers. Changes will update everywhere this image is used.
+                    </p>
+                  </div>
+
+                  {(selectedAsset.source_table === 'media_assets' || selectedAsset.source_table === 'portfolio_gallery') && (
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                        Caption
+                      </label>
+                      <textarea
+                        value={editForm.caption}
+                        onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })}
+                        rows={2}
+                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 resize-none"
+                        placeholder="Optional caption"
+                      />
+                    </div>
+                  )}
+
+                  {selectedAsset.source_table === 'media_assets' && (
+                    <>
                       <div>
                         <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          Display Name
+                          Tags (comma separated)
                         </label>
                         <input
                           type="text"
-                          value={editForm.display_name}
-                          onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                          value={editForm.tags}
+                          onChange={(e) => setEditForm({ ...editForm, tags: e.target.value })}
                           className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                          placeholder="Enter a display name"
+                          placeholder="e.g., video, portfolio, featured"
                         />
                       </div>
+                    </>
+                  )}
 
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          Alt Text (SEO) <span className="text-[#2ecc71]">*Important</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={editForm.alt_text}
-                          onChange={(e) => setEditForm({ ...editForm, alt_text: e.target.value })}
-                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                          placeholder="Describe this image for search engines"
-                        />
-                        <p className="text-slate-600 text-xs mt-1">
-                          Good alt text helps SEO and accessibility. Describe what's in the image.
-                        </p>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          Title
-                        </label>
-                        <input
-                          type="text"
-                          value={editForm.title}
-                          onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                          placeholder="Title attribute for the image"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          Caption
-                        </label>
-                        <textarea
-                          value={editForm.caption}
-                          onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })}
-                          rows={2}
-                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 resize-none"
-                          placeholder="Optional description or caption"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                            Folder
-                          </label>
-                          <select
-                            value={editForm.folder}
-                            onChange={(e) => setEditForm({ ...editForm, folder: e.target.value })}
-                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                          >
-                            {folderOptions.filter(o => o.value !== 'all').map(opt => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                            Tags (comma separated)
-                          </label>
-                          <input
-                            type="text"
-                            value={editForm.tags}
-                            onChange={(e) => setEditForm({ ...editForm, tags: e.target.value })}
-                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                            placeholder="e.g., video, portfolio, featured"
-                          />
-                        </div>
-                      </div>
-
-                      {/* URL Copy */}
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          Public URL
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={editingAsset.public_url}
-                            readOnly
-                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-slate-400 text-sm"
-                          />
-                          <button
-                            onClick={() => copyToClipboard(editingAsset.public_url, editingAsset.id)}
-                            className="px-4 bg-slate-800 border border-white/10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all"
-                          >
-                            {copiedId === editingAsset.id ? <Check size={18} /> : <Copy size={18} />}
-                          </button>
-                        </div>
-                      </div>
+                  {/* URL Copy */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                      Public URL
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={selectedAsset.public_url}
+                        readOnly
+                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-slate-400 text-xs"
+                      />
+                      <button
+                        onClick={() => copyToClipboard(selectedAsset.public_url, selectedAsset.id)}
+                        className="px-4 bg-slate-800 border border-white/10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all flex-shrink-0"
+                      >
+                        {copiedId === selectedAsset.id ? <Check size={18} className="text-[#2ecc71]" /> : <Copy size={18} />}
+                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="p-6 border-t border-white/10 flex gap-3">
+              {/* Panel Footer - Actions */}
+              <div className="p-4 border-t border-white/10 bg-slate-900/95 backdrop-blur space-y-3">
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={saving}
+                  className="w-full py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-[#27ae60] transition-all"
+                >
+                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save size={18} /> Save Changes</>}
+                </button>
+
+                {selectedAsset.source_table === 'media_assets' && (
                   <button
-                    onClick={() => setEditingAsset(null)}
-                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                    onClick={() => setDeleteConfirm(selectedAsset.id)}
+                    className="w-full py-3 border border-red-500/30 text-red-400 rounded-xl font-medium hover:bg-red-500/10 transition-all flex items-center justify-center gap-2"
                   >
-                    Cancel
+                    <Trash2 size={18} /> Delete File
                   </button>
-                  <button
-                    onClick={handleSaveEdit}
-                    disabled={saving}
-                    className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save size={18} /> Save Changes</>}
-                  </button>
-                </div>
-              </motion.div>
+                )}
+
+                {selectedAsset.source_table !== 'media_assets' && (
+                  <p className="text-slate-500 text-xs text-center">
+                    To delete this image, edit the original {selectedAsset.source_table.replace('_', ' ')} item.
+                  </p>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
