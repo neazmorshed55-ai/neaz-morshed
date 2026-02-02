@@ -7,7 +7,7 @@ import {
   ArrowLeft, Search, Loader2, X, Upload, Trash2, Save,
   Image as ImageIcon, Video, File, FolderOpen, Grid, List,
   Copy, Check, SortAsc, SortDesc, RefreshCw, ChevronRight, ExternalLink,
-  RotateCcw, AlertTriangle, Trash
+  RotateCcw, AlertTriangle, Trash, Pencil
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -960,8 +960,79 @@ export default function MediaLibraryPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex">
+        {/* Google Photos Style Selection Bar - Fixed at Top */}
+        <AnimatePresence>
+          {selectedIds.size > 0 && (
+            <motion.div
+              initial={{ y: -80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -80, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-white/10 shadow-xl"
+            >
+              <div className={`flex items-center justify-between px-6 py-4 transition-all duration-300 ${selectedAsset ? 'mr-[400px]' : ''}`}>
+                {/* Left side - Close & Count */}
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={deselectAll}
+                    className="p-2 hover:bg-white/10 rounded-full transition-all"
+                  >
+                    <X size={24} className="text-white" />
+                  </button>
+                  <span className="text-white font-bold text-lg">
+                    {selectedIds.size} selected
+                  </span>
+                </div>
+
+                {/* Right side - Actions */}
+                <div className="flex items-center gap-2">
+                  {currentView === 'library' ? (
+                    <>
+                      <button
+                        onClick={() => setBulkAction('trash')}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full font-medium transition-all"
+                        title="Move to Trash"
+                      >
+                        <Trash2 size={20} />
+                        <span className="hidden sm:inline">Trash</span>
+                      </button>
+                      <button
+                        onClick={() => setBulkAction('delete')}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full font-medium transition-all"
+                        title="Delete Permanently"
+                      >
+                        <Trash size={20} />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setBulkAction('restore')}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-[#2ecc71]/20 hover:bg-[#2ecc71]/30 text-[#2ecc71] rounded-full font-medium transition-all"
+                        title="Restore"
+                      >
+                        <RotateCcw size={20} />
+                        <span className="hidden sm:inline">Restore</span>
+                      </button>
+                      <button
+                        onClick={() => setBulkAction('delete')}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full font-medium transition-all"
+                        title="Delete Permanently"
+                      >
+                        <Trash size={20} />
+                        <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Main Content */}
-        <div className={`flex-1 transition-all duration-300 ${selectedAsset ? 'mr-[400px]' : ''}`}>
+        <div className={`flex-1 transition-all duration-300 ${selectedAsset ? 'mr-[400px]' : ''} ${selectedIds.size > 0 ? 'pt-[72px]' : ''}`}>
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
@@ -1101,90 +1172,45 @@ export default function MediaLibraryPage() {
             </div>
           )}
 
-          {/* Stats */}
-          <div className="flex gap-4 mb-6 text-sm text-slate-500">
-            {currentView === 'library' ? (
-              <>
-                <span>{filteredAssets.length} files</span>
-                <span>|</span>
-                <span>{assets.filter(a => a.source_table === 'media_assets').length} in Media Library</span>
-                <span>|</span>
-                <span>{assets.filter(a => !a.alt_text).length} missing alt text</span>
-              </>
-            ) : (
-              <>
-                <span>{trashedAssets.length} files in trash</span>
-                <span>|</span>
-                <span className="text-amber-500">Files are auto-deleted after 30 days</span>
-              </>
-            )}
-          </div>
-
-          {/* Selection Toolbar */}
-          {selectableCount > 0 && (
-            <div className="flex items-center gap-4 mb-6 p-3 bg-slate-800/50 border border-white/10 rounded-xl">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedIds.size > 0 && selectedIds.size === selectableCount}
-                  onChange={(e) => e.target.checked ? selectAll() : deselectAll()}
-                  className="w-4 h-4 rounded border-white/20 bg-slate-700 text-[#2ecc71] focus:ring-[#2ecc71] focus:ring-offset-0"
-                />
-                <span className="text-slate-400 text-sm">
-                  {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
-                </span>
-              </div>
-
-              {selectedIds.size > 0 && (
+          {/* Stats with Select All option */}
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex gap-4 text-sm text-slate-500">
+              {currentView === 'library' ? (
                 <>
-                  <div className="h-6 w-px bg-white/10" />
-
-                  {currentView === 'library' ? (
-                    <>
-                      <button
-                        onClick={() => setBulkAction('trash')}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 text-amber-400 rounded-lg text-sm font-medium hover:bg-amber-500/30 transition-all"
-                      >
-                        <Trash2 size={16} />
-                        Move to Trash
-                      </button>
-                      <button
-                        onClick={() => setBulkAction('delete')}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-all"
-                      >
-                        <Trash size={16} />
-                        Delete Permanently
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => setBulkAction('restore')}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg text-sm font-medium hover:bg-[#2ecc71]/30 transition-all"
-                      >
-                        <RotateCcw size={16} />
-                        Restore Selected
-                      </button>
-                      <button
-                        onClick={() => setBulkAction('delete')}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-all"
-                      >
-                        <Trash size={16} />
-                        Delete Permanently
-                      </button>
-                    </>
-                  )}
-
-                  <button
-                    onClick={deselectAll}
-                    className="ml-auto text-slate-500 hover:text-white text-sm"
-                  >
-                    Clear selection
-                  </button>
+                  <span>{filteredAssets.length} files</span>
+                  <span>|</span>
+                  <span>{assets.filter(a => a.source_table === 'media_assets').length} in Media Library</span>
+                  <span>|</span>
+                  <span>{assets.filter(a => !a.alt_text).length} missing alt text</span>
+                </>
+              ) : (
+                <>
+                  <span>{trashedAssets.length} files in trash</span>
+                  <span>|</span>
+                  <span className="text-amber-500">Files are auto-deleted after 30 days</span>
                 </>
               )}
             </div>
-          )}
+
+            {/* Select All Button */}
+            {selectableCount > 0 && (
+              <button
+                onClick={() => selectedIds.size === selectableCount ? deselectAll() : selectAll()}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+              >
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                  selectedIds.size > 0 && selectedIds.size === selectableCount
+                    ? 'bg-[#2ecc71] border-[#2ecc71]'
+                    : 'border-slate-500 hover:border-[#2ecc71]'
+                }`}>
+                  {selectedIds.size > 0 && selectedIds.size === selectableCount && (
+                    <Check size={12} className="text-slate-950" />
+                  )}
+                </div>
+                Select All
+              </button>
+            )}
+          </div>
 
           {/* Media Grid/List */}
           {loading ? (
@@ -1209,154 +1235,221 @@ export default function MediaLibraryPage() {
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {filteredAssets.map((asset, index) => (
-                <motion.div
-                  key={asset.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.02 }}
-                  onClick={() => handleSelectAsset(asset)}
-                  className={`bg-slate-900/60 border rounded-xl overflow-hidden hover:border-[#2ecc71]/30 transition-all group cursor-pointer ${
-                    selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
-                  } ${currentView === 'trash' ? 'opacity-75' : ''}`}
-                >
-                  {/* Thumbnail */}
-                  <div className="aspect-square relative bg-slate-800 overflow-hidden">
-                    {asset.mime_type?.startsWith('image/') ? (
-                      <img
-                        src={asset.public_url}
-                        alt={asset.alt_text || asset.display_name || asset.file_name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        {getFileIcon(asset.mime_type)}
-                      </div>
+              {filteredAssets.map((asset, index) => {
+                const isSelectable = currentView === 'trash' || asset.source_table === 'media_assets';
+                const isSelected = selectedIds.has(asset.id);
+
+                return (
+                  <motion.div
+                    key={asset.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.02 }}
+                    onClick={() => {
+                      // If in selection mode (any item selected), toggle selection
+                      if (selectedIds.size > 0 && isSelectable) {
+                        const newSelected = new Set(selectedIds);
+                        if (isSelected) {
+                          newSelected.delete(asset.id);
+                        } else {
+                          newSelected.add(asset.id);
+                        }
+                        setSelectedIds(newSelected);
+                      } else {
+                        handleSelectAsset(asset);
+                      }
+                    }}
+                    className={`bg-slate-900/60 border-2 rounded-xl overflow-hidden transition-all group cursor-pointer relative ${
+                      isSelected
+                        ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30 scale-[0.98]'
+                        : selectedAsset?.id === asset.id
+                        ? 'border-[#2ecc71]/50'
+                        : 'border-transparent hover:border-white/20'
+                    } ${currentView === 'trash' ? 'opacity-75' : ''}`}
+                  >
+                    {/* Selected overlay tint */}
+                    {isSelected && (
+                      <div className="absolute inset-0 bg-[#2ecc71]/10 z-[5] pointer-events-none" />
                     )}
-                    {/* Selection checkbox - only for media_assets in library or all in trash */}
-                    {(currentView === 'trash' || asset.source_table === 'media_assets') && (
-                      <div
-                        className={`absolute top-2 left-2 z-10 transition-opacity ${
-                          selectedIds.size > 0 || selectedIds.has(asset.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                        }`}
-                        onClick={(e) => toggleSelection(asset.id, e)}
-                      >
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                          selectedIds.has(asset.id)
-                            ? 'bg-[#2ecc71] border-[#2ecc71]'
-                            : 'bg-black/50 border-white/50 hover:border-[#2ecc71]'
-                        }`}>
-                          {selectedIds.has(asset.id) && <Check size={14} className="text-slate-950" />}
+
+                    {/* Thumbnail */}
+                    <div className="aspect-square relative bg-slate-800 overflow-hidden">
+                      {asset.mime_type?.startsWith('image/') ? (
+                        <img
+                          src={asset.public_url}
+                          alt={asset.alt_text || asset.display_name || asset.file_name}
+                          className={`w-full h-full object-cover transition-transform duration-300 ${
+                            isSelected ? 'scale-95 rounded-lg' : 'group-hover:scale-105'
+                          }`}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          {getFileIcon(asset.mime_type)}
                         </div>
+                      )}
+
+                      {/* Google Photos style circular checkbox */}
+                      {isSelectable && (
+                        <div
+                          className={`absolute top-3 left-3 z-10 transition-all duration-200 ${
+                            selectedIds.size > 0 || isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100'
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSelection(asset.id, e);
+                          }}
+                        >
+                          <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                            isSelected
+                              ? 'bg-[#2ecc71] border-2 border-[#2ecc71]'
+                              : 'bg-black/60 border-2 border-white/70 hover:border-[#2ecc71] hover:bg-black/80'
+                          }`}>
+                            {isSelected && <Check size={16} className="text-slate-950 stroke-[3]" />}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Badges overlay */}
+                      <div className={`absolute top-2 right-2 flex items-start gap-1 ${
+                        !isSelectable ? 'left-2' : ''
+                      }`}>
+                        {!isSelectable && getSourceBadge(asset.source_table)}
+                        {currentView === 'trash' && asset.deleted_at ? (
+                          <span className="px-2 py-0.5 bg-red-500/80 rounded text-[10px] font-bold text-white">
+                            {getDaysUntilDelete(asset.deleted_at)}d left
+                          </span>
+                        ) : !asset.alt_text && (
+                          <span className="px-2 py-0.5 bg-amber-500/80 rounded text-[10px] font-bold text-slate-950">
+                            No Alt
+                          </span>
+                        )}
                       </div>
-                    )}
-                    {/* Badges overlay */}
-                    <div className={`absolute top-2 right-2 flex items-start gap-1 ${
-                      (currentView === 'trash' || asset.source_table === 'media_assets') ? '' : 'left-2'
-                    }`}>
-                      {!(currentView === 'trash' || asset.source_table === 'media_assets') && getSourceBadge(asset.source_table)}
-                      {currentView === 'trash' && asset.deleted_at ? (
-                        <span className="px-2 py-0.5 bg-red-500/80 rounded text-[10px] font-bold text-white">
-                          {getDaysUntilDelete(asset.deleted_at)}d left
-                        </span>
-                      ) : !asset.alt_text && (
-                        <span className="px-2 py-0.5 bg-amber-500/80 rounded text-[10px] font-bold text-slate-950">
-                          No Alt
-                        </span>
+
+                      {/* Source badge for selectable items */}
+                      {isSelectable && (
+                        <div className="absolute bottom-2 left-2">
+                          {getSourceBadge(asset.source_table)}
+                        </div>
+                      )}
+
+                      {selectedAsset?.id === asset.id && !isSelected && (
+                        <div className="absolute bottom-2 right-2">
+                          <ChevronRight className="w-6 h-6 text-[#2ecc71]" />
+                        </div>
                       )}
                     </div>
-                    {/* Source badge for selectable items - moved to bottom left */}
-                    {(currentView === 'trash' || asset.source_table === 'media_assets') && (
-                      <div className="absolute bottom-2 left-2">
-                        {getSourceBadge(asset.source_table)}
-                      </div>
-                    )}
-                    {selectedAsset?.id === asset.id && (
-                      <div className="absolute bottom-2 right-2">
-                        <ChevronRight className="w-6 h-6 text-[#2ecc71]" />
-                      </div>
-                    )}
-                  </div>
-                  {/* Info */}
-                  <div className="p-3">
-                    <p className="text-white text-sm font-medium truncate">
-                      {asset.display_name || asset.file_name}
-                    </p>
-                    <p className="text-slate-500 text-xs mt-1 truncate">
-                      {asset.source_name || formatFileSize(asset.file_size)}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Info */}
+                    <div className="p-3">
+                      <p className="text-white text-sm font-medium truncate">
+                        {asset.display_name || asset.file_name}
+                      </p>
+                      <p className="text-slate-500 text-xs mt-1 truncate">
+                        {asset.source_name || formatFileSize(asset.file_size)}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           ) : (
             /* List View */
             <div className="space-y-2">
-              {filteredAssets.map((asset, index) => (
-                <motion.div
-                  key={asset.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.02 }}
-                  onClick={() => handleSelectAsset(asset)}
-                  className={`bg-slate-900/60 border rounded-xl p-4 hover:border-[#2ecc71]/30 transition-all flex items-center gap-4 cursor-pointer ${
-                    selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
-                  } ${currentView === 'trash' ? 'opacity-75' : ''} ${selectedIds.has(asset.id) ? 'bg-[#2ecc71]/5' : ''}`}
-                >
-                  {/* Selection checkbox */}
-                  {(currentView === 'trash' || asset.source_table === 'media_assets') && (
-                    <div
-                      onClick={(e) => toggleSelection(asset.id, e)}
-                      className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                        selectedIds.has(asset.id)
-                          ? 'bg-[#2ecc71] border-[#2ecc71]'
-                          : 'bg-slate-800 border-white/20 hover:border-[#2ecc71]'
-                      }`}
-                    >
-                      {selectedIds.has(asset.id) && <Check size={14} className="text-slate-950" />}
-                    </div>
-                  )}
-                  {/* Thumbnail */}
-                  <div className="w-16 h-16 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0">
-                    {asset.mime_type?.startsWith('image/') ? (
-                      <img
-                        src={asset.public_url}
-                        alt={asset.alt_text || asset.display_name || asset.file_name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        {getFileIcon(asset.mime_type)}
+              {filteredAssets.map((asset, index) => {
+                const isSelectable = currentView === 'trash' || asset.source_table === 'media_assets';
+                const isSelected = selectedIds.has(asset.id);
+
+                return (
+                  <motion.div
+                    key={asset.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.02 }}
+                    onClick={() => {
+                      // If in selection mode (any item selected), toggle selection
+                      if (selectedIds.size > 0 && isSelectable) {
+                        const newSelected = new Set(selectedIds);
+                        if (isSelected) {
+                          newSelected.delete(asset.id);
+                        } else {
+                          newSelected.add(asset.id);
+                        }
+                        setSelectedIds(newSelected);
+                      } else {
+                        handleSelectAsset(asset);
+                      }
+                    }}
+                    className={`bg-slate-900/60 border-2 rounded-xl p-4 transition-all flex items-center gap-4 cursor-pointer relative ${
+                      isSelected
+                        ? 'border-[#2ecc71] bg-[#2ecc71]/5'
+                        : selectedAsset?.id === asset.id
+                        ? 'border-[#2ecc71]/50'
+                        : 'border-transparent hover:border-white/20'
+                    } ${currentView === 'trash' ? 'opacity-75' : ''}`}
+                  >
+                    {/* Selection checkbox - circular like Google Photos */}
+                    {isSelectable && (
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelection(asset.id, e);
+                        }}
+                        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                          isSelected
+                            ? 'bg-[#2ecc71] border-2 border-[#2ecc71]'
+                            : 'bg-slate-800 border-2 border-white/30 hover:border-[#2ecc71]'
+                        }`}
+                      >
+                        {isSelected && <Check size={16} className="text-slate-950 stroke-[3]" />}
                       </div>
                     )}
-                  </div>
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-white font-medium truncate">
-                        {asset.display_name || asset.file_name}
-                      </p>
-                      {getSourceBadge(asset.source_table)}
-                      {currentView === 'trash' && asset.deleted_at && (
-                        <span className="px-2 py-0.5 bg-red-500/20 rounded text-[10px] font-bold text-red-400">
-                          {getDaysUntilDelete(asset.deleted_at)} days left
-                        </span>
+
+                    {/* Thumbnail */}
+                    <div className={`w-16 h-16 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0 transition-all ${
+                      isSelected ? 'ring-2 ring-[#2ecc71]/30' : ''
+                    }`}>
+                      {asset.mime_type?.startsWith('image/') ? (
+                        <img
+                          src={asset.public_url}
+                          alt={asset.alt_text || asset.display_name || asset.file_name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          {getFileIcon(asset.mime_type)}
+                        </div>
                       )}
                     </div>
-                    <p className="text-slate-500 text-sm truncate">
-                      {asset.alt_text || <span className="text-amber-500">No alt text</span>}
-                    </p>
-                    <p className="text-slate-600 text-xs mt-1">
-                      {asset.source_name} • {new Date(asset.uploaded_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <ChevronRight className={`w-5 h-5 transition-colors ${
-                    selectedAsset?.id === asset.id ? 'text-[#2ecc71]' : 'text-slate-600'
-                  }`} />
-                </motion.div>
-              ))}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-white font-medium truncate">
+                          {asset.display_name || asset.file_name}
+                        </p>
+                        {getSourceBadge(asset.source_table)}
+                        {currentView === 'trash' && asset.deleted_at && (
+                          <span className="px-2 py-0.5 bg-red-500/20 rounded text-[10px] font-bold text-red-400">
+                            {getDaysUntilDelete(asset.deleted_at)} days left
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-slate-500 text-sm truncate">
+                        {asset.alt_text || <span className="text-amber-500">No alt text</span>}
+                      </p>
+                      <p className="text-slate-600 text-xs mt-1">
+                        {asset.source_name} • {new Date(asset.uploaded_at).toLocaleDateString()}
+                      </p>
+                    </div>
+
+                    <ChevronRight className={`w-5 h-5 transition-colors ${
+                      selectedAsset?.id === asset.id ? 'text-[#2ecc71]' : 'text-slate-600'
+                    }`} />
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -1426,20 +1519,42 @@ export default function MediaLibraryPage() {
                 )}
 
                 {/* Source Info */}
-                <div className="bg-slate-800/50 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="bg-slate-800/50 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-2">
                     {getSourceBadge(selectedAsset.source_table)}
                     <span className="text-slate-400 text-sm">{selectedAsset.source_name}</span>
                   </div>
-                  <p className="text-slate-500 text-xs">File: {selectedAsset.file_name}</p>
-                  {selectedAsset.file_size && (
-                    <p className="text-slate-500 text-xs">Size: {formatFileSize(selectedAsset.file_size)}</p>
-                  )}
-                  {selectedAsset.width && selectedAsset.height && (
-                    <p className="text-slate-500 text-xs">Dimensions: {selectedAsset.width} x {selectedAsset.height}</p>
-                  )}
+
+                  {/* File Details */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-slate-600">File Name:</span>
+                      <p className="text-white font-mono truncate" title={selectedAsset.file_name}>
+                        {selectedAsset.file_name}
+                      </p>
+                    </div>
+                    {selectedAsset.file_size && (
+                      <div>
+                        <span className="text-slate-600">Size:</span>
+                        <p className="text-white">{formatFileSize(selectedAsset.file_size)}</p>
+                      </div>
+                    )}
+                    {selectedAsset.width && selectedAsset.height && (
+                      <div>
+                        <span className="text-slate-600">Dimensions:</span>
+                        <p className="text-white">{selectedAsset.width} x {selectedAsset.height}px</p>
+                      </div>
+                    )}
+                    {selectedAsset.mime_type && (
+                      <div>
+                        <span className="text-slate-600">Type:</span>
+                        <p className="text-white">{selectedAsset.mime_type}</p>
+                      </div>
+                    )}
+                  </div>
+
                   {currentView === 'trash' && selectedAsset.deleted_at && (
-                    <p className="text-red-400 text-xs mt-2">
+                    <p className="text-red-400 text-xs pt-2 border-t border-white/5">
                       Deleted: {new Date(selectedAsset.deleted_at).toLocaleString()}
                     </p>
                   )}
@@ -1448,32 +1563,37 @@ export default function MediaLibraryPage() {
                 {/* Edit Form - Only show for library view */}
                 {currentView === 'library' && (
                   <div className="space-y-4">
-                    {/* File Name - Actual storage file name (editable for media_assets) */}
+                    {/* Rename File - Prominent section for media_assets */}
                     {selectedAsset.source_table === 'media_assets' && (
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          File Name <span className="text-[#2ecc71]">*Original</span>
-                        </label>
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Pencil size={18} className="text-blue-400" />
+                          <label className="text-sm font-bold text-blue-400">
+                            Rename File
+                          </label>
+                        </div>
                         <div className="flex gap-2">
                           <input
                             type="text"
                             value={editForm.file_name}
                             onChange={(e) => setEditForm({ ...editForm, file_name: e.target.value })}
-                            className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                            className="flex-1 bg-slate-800 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-blue-500/50"
                             placeholder="Enter file name"
                           />
-                          {editForm.file_name !== selectedAsset.file_name && (
-                            <button
-                              onClick={handleRenameFile}
-                              disabled={renaming}
-                              className="px-4 bg-blue-500 text-white rounded-xl font-bold text-sm hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2"
-                            >
-                              {renaming ? <Loader2 size={16} className="animate-spin" /> : 'Rename'}
-                            </button>
-                          )}
+                          <button
+                            onClick={handleRenameFile}
+                            disabled={renaming || editForm.file_name === selectedAsset.file_name}
+                            className={`px-4 rounded-xl font-bold text-sm flex items-center gap-2 transition-all ${
+                              editForm.file_name !== selectedAsset.file_name
+                                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                : 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                            }`}
+                          >
+                            {renaming ? <Loader2 size={16} className="animate-spin" /> : <><Pencil size={16} /> Rename</>}
+                          </button>
                         </div>
-                        <p className="text-slate-600 text-xs mt-1">
-                          This is the actual file name in storage. Rename will update the file.
+                        <p className="text-slate-500 text-xs mt-2">
+                          Changes the actual file name in storage. The URL will be updated.
                         </p>
                       </div>
                     )}
@@ -1481,7 +1601,7 @@ export default function MediaLibraryPage() {
                     {/* Display Name - Editable for media_assets, read-only info for others */}
                     <div>
                       <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        Display Name {selectedAsset.source_table === 'media_assets' && <span className="text-slate-500">(Optional)</span>}
+                        Display Name {selectedAsset.source_table === 'media_assets' && <span className="text-slate-500">(shown in library)</span>}
                       </label>
                       {selectedAsset.source_table === 'media_assets' ? (
                         <>
@@ -1493,7 +1613,7 @@ export default function MediaLibraryPage() {
                             placeholder="Enter a display name"
                           />
                           <p className="text-slate-600 text-xs mt-1">
-                            Friendly name shown in the library. Leave empty to use file name.
+                            This is just for organizing in the library. Does not affect the actual file.
                           </p>
                         </>
                       ) : (
