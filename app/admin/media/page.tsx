@@ -82,6 +82,10 @@ export default function MediaLibraryPage() {
   const [emptyTrashConfirm, setEmptyTrashConfirm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Selection state for bulk actions
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'trash' | 'delete' | 'restore' | null>(null);
+
   // Copy URL state
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -701,6 +705,137 @@ export default function MediaLibraryPage() {
     }
   };
 
+  // Selection handlers
+  const toggleSelection = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const selectAll = () => {
+    const selectableIds = filteredAssets
+      .filter(a => currentView === 'library' ? a.source_table === 'media_assets' : true)
+      .map(a => a.id);
+    setSelectedIds(new Set(selectableIds));
+  };
+
+  const deselectAll = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Bulk action handlers
+  const handleBulkMoveToTrash = async () => {
+    if (!supabase || selectedIds.size === 0) return;
+
+    setActionLoading(true);
+    try {
+      const idsToTrash = Array.from(selectedIds)
+        .map(id => assets.find(a => a.id === id))
+        .filter(a => a && a.source_table === 'media_assets')
+        .map(a => a!.source_id);
+
+      if (idsToTrash.length === 0) {
+        alert('Only Media Library files can be moved to trash.');
+        setActionLoading(false);
+        setBulkAction(null);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('media_assets')
+        .update({ deleted_at: new Date().toISOString() })
+        .in('id', idsToTrash);
+
+      if (error) throw error;
+
+      await fetchAllAssets();
+      setSelectedIds(new Set());
+      setSelectedAsset(null);
+    } catch (error) {
+      console.error('Error moving to trash:', error);
+      alert('Error moving files to trash.');
+    }
+    setActionLoading(false);
+    setBulkAction(null);
+  };
+
+  const handleBulkRestore = async () => {
+    if (!supabase || selectedIds.size === 0) return;
+
+    setActionLoading(true);
+    try {
+      const idsToRestore = Array.from(selectedIds)
+        .map(id => trashedAssets.find(a => a.id === id))
+        .filter(a => a)
+        .map(a => a!.source_id);
+
+      const { error } = await supabase
+        .from('media_assets')
+        .update({ deleted_at: null })
+        .in('id', idsToRestore);
+
+      if (error) throw error;
+
+      await fetchAllAssets();
+      setSelectedIds(new Set());
+      setSelectedAsset(null);
+    } catch (error) {
+      console.error('Error restoring files:', error);
+      alert('Error restoring files.');
+    }
+    setActionLoading(false);
+    setBulkAction(null);
+  };
+
+  const handleBulkPermanentDelete = async () => {
+    if (!supabase || selectedIds.size === 0) return;
+
+    setActionLoading(true);
+    try {
+      const assetsToDelete = Array.from(selectedIds)
+        .map(id => (currentView === 'trash' ? trashedAssets : assets).find(a => a.id === id))
+        .filter(a => a && a.source_table === 'media_assets');
+
+      if (assetsToDelete.length === 0) {
+        alert('Only Media Library files can be permanently deleted.');
+        setActionLoading(false);
+        setBulkAction(null);
+        return;
+      }
+
+      // Delete from storage
+      const filePaths = assetsToDelete.map(a => a!.file_path);
+      await supabase.storage.from('images').remove(filePaths);
+
+      // Delete from database
+      const { error } = await supabase
+        .from('media_assets')
+        .delete()
+        .in('id', assetsToDelete.map(a => a!.source_id));
+
+      if (error) throw error;
+
+      await fetchAllAssets();
+      setSelectedIds(new Set());
+      setSelectedAsset(null);
+    } catch (error) {
+      console.error('Error deleting files:', error);
+      alert('Error deleting files.');
+    }
+    setActionLoading(false);
+    setBulkAction(null);
+  };
+
+  // Get selectable count (only media_assets can be selected for bulk actions in library view)
+  const selectableCount = currentView === 'library'
+    ? filteredAssets.filter(a => a.source_table === 'media_assets').length
+    : filteredAssets.length;
+
   const formatFileSize = (bytes: number | null) => {
     if (!bytes) return '-';
     if (bytes < 1024) return `${bytes} B`;
@@ -910,6 +1045,72 @@ export default function MediaLibraryPage() {
             )}
           </div>
 
+          {/* Selection Toolbar */}
+          {selectableCount > 0 && (
+            <div className="flex items-center gap-4 mb-6 p-3 bg-slate-800/50 border border-white/10 rounded-xl">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size > 0 && selectedIds.size === selectableCount}
+                  onChange={(e) => e.target.checked ? selectAll() : deselectAll()}
+                  className="w-4 h-4 rounded border-white/20 bg-slate-700 text-[#2ecc71] focus:ring-[#2ecc71] focus:ring-offset-0"
+                />
+                <span className="text-slate-400 text-sm">
+                  {selectedIds.size > 0 ? `${selectedIds.size} selected` : 'Select all'}
+                </span>
+              </div>
+
+              {selectedIds.size > 0 && (
+                <>
+                  <div className="h-6 w-px bg-white/10" />
+
+                  {currentView === 'library' ? (
+                    <>
+                      <button
+                        onClick={() => setBulkAction('trash')}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 text-amber-400 rounded-lg text-sm font-medium hover:bg-amber-500/30 transition-all"
+                      >
+                        <Trash2 size={16} />
+                        Move to Trash
+                      </button>
+                      <button
+                        onClick={() => setBulkAction('delete')}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-all"
+                      >
+                        <Trash size={16} />
+                        Delete Permanently
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setBulkAction('restore')}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-[#2ecc71]/20 text-[#2ecc71] rounded-lg text-sm font-medium hover:bg-[#2ecc71]/30 transition-all"
+                      >
+                        <RotateCcw size={16} />
+                        Restore Selected
+                      </button>
+                      <button
+                        onClick={() => setBulkAction('delete')}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-all"
+                      >
+                        <Trash size={16} />
+                        Delete Permanently
+                      </button>
+                    </>
+                  )}
+
+                  <button
+                    onClick={deselectAll}
+                    className="ml-auto text-slate-500 hover:text-white text-sm"
+                  >
+                    Clear selection
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
           {/* Media Grid/List */}
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -958,9 +1159,28 @@ export default function MediaLibraryPage() {
                         {getFileIcon(asset.mime_type)}
                       </div>
                     )}
+                    {/* Selection checkbox - only for media_assets in library or all in trash */}
+                    {(currentView === 'trash' || asset.source_table === 'media_assets') && (
+                      <div
+                        className={`absolute top-2 left-2 z-10 transition-opacity ${
+                          selectedIds.size > 0 || selectedIds.has(asset.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                        }`}
+                        onClick={(e) => toggleSelection(asset.id, e)}
+                      >
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          selectedIds.has(asset.id)
+                            ? 'bg-[#2ecc71] border-[#2ecc71]'
+                            : 'bg-black/50 border-white/50 hover:border-[#2ecc71]'
+                        }`}>
+                          {selectedIds.has(asset.id) && <Check size={14} className="text-slate-950" />}
+                        </div>
+                      </div>
+                    )}
                     {/* Badges overlay */}
-                    <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
-                      {getSourceBadge(asset.source_table)}
+                    <div className={`absolute top-2 right-2 flex items-start gap-1 ${
+                      (currentView === 'trash' || asset.source_table === 'media_assets') ? '' : 'left-2'
+                    }`}>
+                      {!(currentView === 'trash' || asset.source_table === 'media_assets') && getSourceBadge(asset.source_table)}
                       {currentView === 'trash' && asset.deleted_at ? (
                         <span className="px-2 py-0.5 bg-red-500/80 rounded text-[10px] font-bold text-white">
                           {getDaysUntilDelete(asset.deleted_at)}d left
@@ -971,6 +1191,12 @@ export default function MediaLibraryPage() {
                         </span>
                       )}
                     </div>
+                    {/* Source badge for selectable items - moved to bottom left */}
+                    {(currentView === 'trash' || asset.source_table === 'media_assets') && (
+                      <div className="absolute bottom-2 left-2">
+                        {getSourceBadge(asset.source_table)}
+                      </div>
+                    )}
                     {selectedAsset?.id === asset.id && (
                       <div className="absolute bottom-2 right-2">
                         <ChevronRight className="w-6 h-6 text-[#2ecc71]" />
@@ -1001,8 +1227,21 @@ export default function MediaLibraryPage() {
                   onClick={() => handleSelectAsset(asset)}
                   className={`bg-slate-900/60 border rounded-xl p-4 hover:border-[#2ecc71]/30 transition-all flex items-center gap-4 cursor-pointer ${
                     selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
-                  } ${currentView === 'trash' ? 'opacity-75' : ''}`}
+                  } ${currentView === 'trash' ? 'opacity-75' : ''} ${selectedIds.has(asset.id) ? 'bg-[#2ecc71]/5' : ''}`}
                 >
+                  {/* Selection checkbox */}
+                  {(currentView === 'trash' || asset.source_table === 'media_assets') && (
+                    <div
+                      onClick={(e) => toggleSelection(asset.id, e)}
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                        selectedIds.has(asset.id)
+                          ? 'bg-[#2ecc71] border-[#2ecc71]'
+                          : 'bg-slate-800 border-white/20 hover:border-[#2ecc71]'
+                      }`}
+                    >
+                      {selectedIds.has(asset.id) && <Check size={14} className="text-slate-950" />}
+                    </div>
+                  )}
                   {/* Thumbnail */}
                   <div className="w-16 h-16 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0">
                     {asset.mime_type?.startsWith('image/') ? (
@@ -1426,6 +1665,147 @@ export default function MediaLibraryPage() {
                     className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Empty Trash'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bulk Move to Trash Confirmation Modal */}
+        <AnimatePresence>
+          {bulkAction === 'trash' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setBulkAction(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-amber-500/20 rounded-xl">
+                    <Trash2 size={24} className="text-amber-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Move to Trash?</h3>
+                </div>
+                <p className="text-slate-400 mb-6">
+                  Move <strong className="text-white">{selectedIds.size} files</strong> to trash?
+                  They will be kept for 30 days before permanent deletion. You can restore them anytime.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setBulkAction(null)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkMoveToTrash}
+                    disabled={actionLoading}
+                    className="flex-1 py-3 bg-amber-500 text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Move to Trash'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bulk Restore Confirmation Modal */}
+        <AnimatePresence>
+          {bulkAction === 'restore' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setBulkAction(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-[#2ecc71]/20 rounded-xl">
+                    <RotateCcw size={24} className="text-[#2ecc71]" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Restore Files?</h3>
+                </div>
+                <p className="text-slate-400 mb-6">
+                  Restore <strong className="text-white">{selectedIds.size} files</strong> from trash?
+                  They will be moved back to the Media Library.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setBulkAction(null)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkRestore}
+                    disabled={actionLoading}
+                    className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Restore Files'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bulk Permanent Delete Confirmation Modal */}
+        <AnimatePresence>
+          {bulkAction === 'delete' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setBulkAction(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-red-500/30 rounded-2xl w-full max-w-sm p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-red-500/20 rounded-xl">
+                    <AlertTriangle size={24} className="text-red-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Delete Permanently?</h3>
+                </div>
+                <p className="text-slate-400 mb-6">
+                  Permanently delete <strong className="text-white">{selectedIds.size} files</strong> from storage?
+                  <strong className="text-red-400"> This action cannot be undone.</strong>
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setBulkAction(null)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkPermanentDelete}
+                    disabled={actionLoading}
+                    className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Delete Forever'}
                   </button>
                 </div>
               </motion.div>
