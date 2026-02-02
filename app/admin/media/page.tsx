@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
-  ArrowLeft, Search, Loader2, X, Upload, Trash2, Edit2, Save,
+  ArrowLeft, Search, Loader2, X, Upload, Trash2, Save,
   Image as ImageIcon, Video, File, FolderOpen, Grid, List,
-  Copy, Check, SortAsc, SortDesc, RefreshCw, ChevronRight, ExternalLink
+  Copy, Check, SortAsc, SortDesc, RefreshCw, ChevronRight, ExternalLink,
+  RotateCcw, AlertTriangle, Trash
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -29,11 +30,12 @@ interface MediaAsset {
   tags: string[];
   uploaded_at: string;
   updated_at: string;
+  deleted_at?: string | null; // For trash functionality
   // Source tracking
   source_table: 'media_assets' | 'portfolio_items' | 'portfolio_gallery' | 'reviews' | 'blogs' | 'services';
   source_id: string;
-  source_field: string; // e.g., 'thumbnail_url', 'image_url', 'client_image', 'cover_image'
-  source_name?: string; // Title of the source item for context
+  source_field: string;
+  source_name?: string;
 }
 
 const folderOptions = [
@@ -47,6 +49,7 @@ const folderOptions = [
 
 export default function MediaLibraryPage() {
   const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [trashedAssets, setTrashedAssets] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('all');
@@ -54,11 +57,14 @@ export default function MediaLibraryPage() {
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'size'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
+  // View mode: 'library' or 'trash'
+  const [currentView, setCurrentView] = useState<'library' | 'trash'>('library');
+
   // Upload state
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Slide panel state (instead of modal)
+  // Slide panel state
   const [selectedAsset, setSelectedAsset] = useState<MediaAsset | null>(null);
   const [editForm, setEditForm] = useState({
     display_name: '',
@@ -70,9 +76,11 @@ export default function MediaLibraryPage() {
   });
   const [saving, setSaving] = useState(false);
 
-  // Delete state
+  // Delete/Trash state
+  const [trashConfirm, setTrashConfirm] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [emptyTrashConfirm, setEmptyTrashConfirm] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Copy URL state
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -90,9 +98,10 @@ export default function MediaLibraryPage() {
 
     setLoading(true);
     const allAssets: MediaAsset[] = [];
+    const trashed: MediaAsset[] = [];
 
     try {
-      // 1. Fetch from media_assets table
+      // 1. Fetch from media_assets table (both active and trashed)
       const { data: mediaData } = await supabase
         .from('media_assets')
         .select('*')
@@ -100,13 +109,19 @@ export default function MediaLibraryPage() {
 
       if (mediaData) {
         mediaData.forEach(item => {
-          allAssets.push({
+          const asset: MediaAsset = {
             ...item,
             source_table: 'media_assets',
             source_id: item.id,
             source_field: 'public_url',
             source_name: item.display_name || item.file_name
-          });
+          };
+
+          if (item.deleted_at) {
+            trashed.push(asset);
+          } else {
+            allAssets.push(asset);
+          }
         });
       }
 
@@ -310,6 +325,7 @@ export default function MediaLibraryPage() {
       }
 
       setAssets(allAssets);
+      setTrashedAssets(trashed);
     } catch (error) {
       console.error('Error fetching media assets:', error);
     }
@@ -343,8 +359,11 @@ export default function MediaLibraryPage() {
     return mimeTypes[ext || ''] || 'image/jpeg';
   }
 
+  // Get current display assets based on view
+  const currentAssets = currentView === 'library' ? assets : trashedAssets;
+
   // Filter and sort assets
-  const filteredAssets = assets
+  const filteredAssets = currentAssets
     .filter(asset => {
       const matchesSearch =
         (asset.display_name || asset.file_name).toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -352,7 +371,7 @@ export default function MediaLibraryPage() {
         (asset.source_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (asset.tags || []).some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchesFolder = selectedFolder === 'all' ||
+      const matchesFolder = currentView === 'trash' || selectedFolder === 'all' ||
         asset.folder === selectedFolder ||
         (selectedFolder === 'media_assets' && asset.source_table === 'media_assets');
 
@@ -360,16 +379,21 @@ export default function MediaLibraryPage() {
     })
     .sort((a, b) => {
       let comparison = 0;
-      switch (sortBy) {
-        case 'name':
-          comparison = (a.display_name || a.file_name).localeCompare(b.display_name || b.file_name);
-          break;
-        case 'size':
-          comparison = (a.file_size || 0) - (b.file_size || 0);
-          break;
-        case 'date':
-        default:
-          comparison = new Date(a.uploaded_at).getTime() - new Date(b.uploaded_at).getTime();
+      if (currentView === 'trash') {
+        // Sort trash by deleted_at
+        comparison = new Date(a.deleted_at || 0).getTime() - new Date(b.deleted_at || 0).getTime();
+      } else {
+        switch (sortBy) {
+          case 'name':
+            comparison = (a.display_name || a.file_name).localeCompare(b.display_name || b.file_name);
+            break;
+          case 'size':
+            comparison = (a.file_size || 0) - (b.file_size || 0);
+            break;
+          case 'date':
+          default:
+            comparison = new Date(a.uploaded_at).getTime() - new Date(b.uploaded_at).getTime();
+        }
       }
       return sortOrder === 'asc' ? comparison : -comparison;
     });
@@ -462,13 +486,12 @@ export default function MediaLibraryPage() {
     });
   };
 
-  // Save changes - updates source table!
+  // Save changes
   const handleSaveEdit = async () => {
     if (!selectedAsset || !supabase) return;
 
     setSaving(true);
     try {
-      // Update based on source table
       if (selectedAsset.source_table === 'media_assets') {
         const { error } = await supabase
           .from('media_assets')
@@ -484,7 +507,6 @@ export default function MediaLibraryPage() {
 
         if (error) throw error;
       } else if (selectedAsset.source_table === 'portfolio_items') {
-        // Update the specific alt_text field in portfolio_items
         const updateField = selectedAsset.source_field === 'thumbnail_alt_text'
           ? { thumbnail_alt_text: editForm.alt_text || null }
           : { image_alt_text: editForm.alt_text || null };
@@ -529,8 +551,6 @@ export default function MediaLibraryPage() {
       }
 
       await fetchAllAssets();
-
-      // Update the selected asset in state
       setSelectedAsset(prev => prev ? {
         ...prev,
         display_name: editForm.display_name,
@@ -546,25 +566,82 @@ export default function MediaLibraryPage() {
     setSaving(false);
   };
 
-  // Delete asset (only for media_assets)
-  const handleDelete = async (id: string) => {
+  // Move to Trash (soft delete)
+  const handleMoveToTrash = async (id: string) => {
     if (!supabase) return;
 
     const asset = assets.find(a => a.id === id);
     if (!asset || asset.source_table !== 'media_assets') {
-      alert('Can only delete files from Media Library. Edit the source (portfolio, review, etc.) to remove other images.');
-      setDeleteConfirm(null);
+      alert('Can only move Media Library files to trash. Edit the source (portfolio, review, etc.) to manage other images.');
+      setTrashConfirm(null);
       return;
     }
 
-    setDeleting(true);
+    setActionLoading(true);
     try {
+      const { error } = await supabase
+        .from('media_assets')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', asset.source_id);
+
+      if (error) throw error;
+
+      await fetchAllAssets();
+      if (selectedAsset?.id === id) {
+        setSelectedAsset(null);
+      }
+    } catch (error) {
+      console.error('Error moving to trash:', error);
+      alert('Error moving file to trash. Please try again.');
+    }
+    setActionLoading(false);
+    setTrashConfirm(null);
+  };
+
+  // Restore from Trash
+  const handleRestore = async (id: string) => {
+    if (!supabase) return;
+
+    const asset = trashedAssets.find(a => a.id === id);
+    if (!asset) return;
+
+    setActionLoading(true);
+    try {
+      const { error } = await supabase
+        .from('media_assets')
+        .update({ deleted_at: null })
+        .eq('id', asset.source_id);
+
+      if (error) throw error;
+
+      await fetchAllAssets();
+      if (selectedAsset?.id === id) {
+        setSelectedAsset(null);
+      }
+    } catch (error) {
+      console.error('Error restoring file:', error);
+      alert('Error restoring file. Please try again.');
+    }
+    setActionLoading(false);
+  };
+
+  // Permanent Delete (from trash only)
+  const handlePermanentDelete = async (id: string) => {
+    if (!supabase) return;
+
+    const asset = trashedAssets.find(a => a.id === id);
+    if (!asset) return;
+
+    setActionLoading(true);
+    try {
+      // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('images')
         .remove([asset.file_path]);
 
       if (storageError) console.warn('Storage delete warning:', storageError);
 
+      // Delete from database
       const { error: dbError } = await supabase
         .from('media_assets')
         .delete()
@@ -577,11 +654,41 @@ export default function MediaLibraryPage() {
         setSelectedAsset(null);
       }
     } catch (error) {
-      console.error('Error deleting asset:', error);
+      console.error('Error deleting file:', error);
       alert('Error deleting file. Please try again.');
     }
-    setDeleting(false);
+    setActionLoading(false);
     setDeleteConfirm(null);
+  };
+
+  // Empty Trash
+  const handleEmptyTrash = async () => {
+    if (!supabase || trashedAssets.length === 0) return;
+
+    setActionLoading(true);
+    try {
+      // Delete all trashed files from storage
+      const filePaths = trashedAssets.map(a => a.file_path);
+      if (filePaths.length > 0) {
+        await supabase.storage.from('images').remove(filePaths);
+      }
+
+      // Delete all trashed records from database
+      const { error } = await supabase
+        .from('media_assets')
+        .delete()
+        .not('deleted_at', 'is', null);
+
+      if (error) throw error;
+
+      await fetchAllAssets();
+      setSelectedAsset(null);
+    } catch (error) {
+      console.error('Error emptying trash:', error);
+      alert('Error emptying trash. Please try again.');
+    }
+    setActionLoading(false);
+    setEmptyTrashConfirm(false);
   };
 
   const copyToClipboard = async (url: string, id: string) => {
@@ -632,6 +739,14 @@ export default function MediaLibraryPage() {
     );
   };
 
+  // Calculate days until auto-delete (30 days)
+  const getDaysUntilDelete = (deletedAt: string) => {
+    const deleted = new Date(deletedAt);
+    const now = new Date();
+    const diffDays = 30 - Math.floor((now.getTime() - deleted.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex">
@@ -644,9 +759,15 @@ export default function MediaLibraryPage() {
                 <Link href="/admin" className="text-slate-500 hover:text-white transition-colors">
                   <ArrowLeft size={20} />
                 </Link>
-                <h1 className="text-3xl font-black text-white uppercase tracking-tight">Media Library</h1>
+                <h1 className="text-3xl font-black text-white uppercase tracking-tight">
+                  {currentView === 'library' ? 'Media Library' : 'Recycle Bin'}
+                </h1>
               </div>
-              <p className="text-slate-400">All images and media from your website</p>
+              <p className="text-slate-400">
+                {currentView === 'library'
+                  ? 'All images and media from your website'
+                  : 'Deleted files are kept for 30 days before permanent deletion'}
+              </p>
             </div>
             <div className="flex gap-3">
               <button
@@ -655,89 +776,138 @@ export default function MediaLibraryPage() {
               >
                 <RefreshCw size={18} />
               </button>
-              <label className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all cursor-pointer">
-                {uploading ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    {uploadProgress}%
-                  </>
-                ) : (
-                  <>
-                    <Upload size={18} />
-                    Upload Files
-                  </>
-                )}
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  disabled={uploading}
-                />
-              </label>
+
+              {currentView === 'library' ? (
+                <label className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                  {uploading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      {uploadProgress}%
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={18} />
+                      Upload Files
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+              ) : trashedAssets.length > 0 && (
+                <button
+                  onClick={() => setEmptyTrashConfirm(true)}
+                  className="flex items-center gap-2 bg-red-500 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-red-600 transition-all"
+                >
+                  <Trash size={18} />
+                  Empty Trash
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Filters & Search */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-              <input
-                type="text"
-                placeholder="Search by name, alt text or source..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all"
-              />
-            </div>
-            <select
-              value={selectedFolder}
-              onChange={(e) => setSelectedFolder(e.target.value)}
-              className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-            >
-              {folderOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'date' | 'name' | 'size')}
-              className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-            >
-              <option value="date">Sort by Date</option>
-              <option value="name">Sort by Name</option>
-              <option value="size">Sort by Size</option>
-            </select>
+          {/* View Tabs */}
+          <div className="flex gap-2 mb-6">
             <button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white hover:bg-slate-800 transition-all"
+              onClick={() => { setCurrentView('library'); setSelectedAsset(null); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                currentView === 'library'
+                  ? 'bg-[#2ecc71] text-slate-950'
+                  : 'bg-slate-800 text-slate-400 hover:text-white border border-white/10'
+              }`}
             >
-              {sortOrder === 'asc' ? <SortAsc size={20} /> : <SortDesc size={20} />}
+              <ImageIcon size={16} />
+              Library ({assets.length})
             </button>
-            <div className="flex bg-slate-900/60 border border-white/10 rounded-xl overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-3 ${viewMode === 'grid' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
-              >
-                <Grid size={20} />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-3 ${viewMode === 'list' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
-              >
-                <List size={20} />
-              </button>
-            </div>
+            <button
+              onClick={() => { setCurrentView('trash'); setSelectedAsset(null); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                currentView === 'trash'
+                  ? 'bg-red-500 text-white'
+                  : 'bg-slate-800 text-slate-400 hover:text-white border border-white/10'
+              }`}
+            >
+              <Trash2 size={16} />
+              Trash ({trashedAssets.length})
+            </button>
           </div>
+
+          {/* Filters & Search - Only show for library view */}
+          {currentView === 'library' && (
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search by name, alt text or source..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all"
+                />
+              </div>
+              <select
+                value={selectedFolder}
+                onChange={(e) => setSelectedFolder(e.target.value)}
+                className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+              >
+                {folderOptions.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'date' | 'name' | 'size')}
+                className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+              >
+                <option value="date">Sort by Date</option>
+                <option value="name">Sort by Name</option>
+                <option value="size">Sort by Size</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="bg-slate-900/60 border border-white/10 rounded-xl py-3 px-4 text-white hover:bg-slate-800 transition-all"
+              >
+                {sortOrder === 'asc' ? <SortAsc size={20} /> : <SortDesc size={20} />}
+              </button>
+              <div className="flex bg-slate-900/60 border border-white/10 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-3 ${viewMode === 'grid' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                >
+                  <Grid size={20} />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-3 ${viewMode === 'list' ? 'bg-[#2ecc71] text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                >
+                  <List size={20} />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Stats */}
           <div className="flex gap-4 mb-6 text-sm text-slate-500">
-            <span>{filteredAssets.length} files</span>
-            <span>|</span>
-            <span>{assets.filter(a => a.source_table === 'media_assets').length} in Media Library</span>
-            <span>|</span>
-            <span>{assets.filter(a => !a.alt_text).length} missing alt text</span>
+            {currentView === 'library' ? (
+              <>
+                <span>{filteredAssets.length} files</span>
+                <span>|</span>
+                <span>{assets.filter(a => a.source_table === 'media_assets').length} in Media Library</span>
+                <span>|</span>
+                <span>{assets.filter(a => !a.alt_text).length} missing alt text</span>
+              </>
+            ) : (
+              <>
+                <span>{trashedAssets.length} files in trash</span>
+                <span>|</span>
+                <span className="text-amber-500">Files are auto-deleted after 30 days</span>
+              </>
+            )}
           </div>
 
           {/* Media Grid/List */}
@@ -747,9 +917,19 @@ export default function MediaLibraryPage() {
             </div>
           ) : filteredAssets.length === 0 ? (
             <div className="text-center py-20">
-              <FolderOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-              <p className="text-slate-500">No media files found</p>
-              <p className="text-slate-600 text-sm mt-1">Upload files or add images to your content</p>
+              {currentView === 'trash' ? (
+                <>
+                  <Trash2 className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+                  <p className="text-slate-500">Trash is empty</p>
+                  <p className="text-slate-600 text-sm mt-1">Deleted files will appear here</p>
+                </>
+              ) : (
+                <>
+                  <FolderOpen className="w-16 h-16 text-slate-700 mx-auto mb-4" />
+                  <p className="text-slate-500">No media files found</p>
+                  <p className="text-slate-600 text-sm mt-1">Upload files or add images to your content</p>
+                </>
+              )}
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -762,7 +942,7 @@ export default function MediaLibraryPage() {
                   onClick={() => handleSelectAsset(asset)}
                   className={`bg-slate-900/60 border rounded-xl overflow-hidden hover:border-[#2ecc71]/30 transition-all group cursor-pointer ${
                     selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
-                  }`}
+                  } ${currentView === 'trash' ? 'opacity-75' : ''}`}
                 >
                   {/* Thumbnail */}
                   <div className="aspect-square relative bg-slate-800 overflow-hidden">
@@ -781,13 +961,16 @@ export default function MediaLibraryPage() {
                     {/* Badges overlay */}
                     <div className="absolute top-2 left-2 right-2 flex justify-between items-start">
                       {getSourceBadge(asset.source_table)}
-                      {!asset.alt_text && (
+                      {currentView === 'trash' && asset.deleted_at ? (
+                        <span className="px-2 py-0.5 bg-red-500/80 rounded text-[10px] font-bold text-white">
+                          {getDaysUntilDelete(asset.deleted_at)}d left
+                        </span>
+                      ) : !asset.alt_text && (
                         <span className="px-2 py-0.5 bg-amber-500/80 rounded text-[10px] font-bold text-slate-950">
                           No Alt
                         </span>
                       )}
                     </div>
-                    {/* Select indicator */}
                     {selectedAsset?.id === asset.id && (
                       <div className="absolute bottom-2 right-2">
                         <ChevronRight className="w-6 h-6 text-[#2ecc71]" />
@@ -818,7 +1001,7 @@ export default function MediaLibraryPage() {
                   onClick={() => handleSelectAsset(asset)}
                   className={`bg-slate-900/60 border rounded-xl p-4 hover:border-[#2ecc71]/30 transition-all flex items-center gap-4 cursor-pointer ${
                     selectedAsset?.id === asset.id ? 'border-[#2ecc71] ring-2 ring-[#2ecc71]/30' : 'border-white/5'
-                  }`}
+                  } ${currentView === 'trash' ? 'opacity-75' : ''}`}
                 >
                   {/* Thumbnail */}
                   <div className="w-16 h-16 rounded-lg bg-slate-800 overflow-hidden flex-shrink-0">
@@ -842,6 +1025,11 @@ export default function MediaLibraryPage() {
                         {asset.display_name || asset.file_name}
                       </p>
                       {getSourceBadge(asset.source_table)}
+                      {currentView === 'trash' && asset.deleted_at && (
+                        <span className="px-2 py-0.5 bg-red-500/20 rounded text-[10px] font-bold text-red-400">
+                          {getDaysUntilDelete(asset.deleted_at)} days left
+                        </span>
+                      )}
                     </div>
                     <p className="text-slate-500 text-sm truncate">
                       {asset.alt_text || <span className="text-amber-500">No alt text</span>}
@@ -850,7 +1038,6 @@ export default function MediaLibraryPage() {
                       {asset.source_name} • {new Date(asset.uploaded_at).toLocaleDateString()}
                     </p>
                   </div>
-                  {/* Arrow */}
                   <ChevronRight className={`w-5 h-5 transition-colors ${
                     selectedAsset?.id === asset.id ? 'text-[#2ecc71]' : 'text-slate-600'
                   }`} />
@@ -872,7 +1059,9 @@ export default function MediaLibraryPage() {
             >
               {/* Panel Header */}
               <div className="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/95 backdrop-blur">
-                <h2 className="text-lg font-bold text-white">Edit Details</h2>
+                <h2 className="text-lg font-bold text-white">
+                  {currentView === 'trash' ? 'Trashed File' : 'Edit Details'}
+                </h2>
                 <button
                   onClick={() => setSelectedAsset(null)}
                   className="p-2 text-slate-500 hover:text-white hover:bg-white/5 rounded-lg transition-all"
@@ -881,7 +1070,7 @@ export default function MediaLibraryPage() {
                 </button>
               </div>
 
-              {/* Panel Content - Scrollable */}
+              {/* Panel Content */}
               <div className="flex-1 overflow-y-auto p-4 space-y-6">
                 {/* Image Preview */}
                 <div className="aspect-video rounded-xl bg-slate-800 overflow-hidden relative">
@@ -906,77 +1095,92 @@ export default function MediaLibraryPage() {
                   </a>
                 </div>
 
+                {/* Trash Warning */}
+                {currentView === 'trash' && selectedAsset.deleted_at && (
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-red-400 font-bold text-sm">File in Trash</p>
+                        <p className="text-red-400/70 text-xs mt-1">
+                          This file will be permanently deleted in {getDaysUntilDelete(selectedAsset.deleted_at)} days.
+                          Restore it to keep using it on your website.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Source Info */}
                 <div className="bg-slate-800/50 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     {getSourceBadge(selectedAsset.source_table)}
                     <span className="text-slate-400 text-sm">{selectedAsset.source_name}</span>
                   </div>
-                  <p className="text-slate-500 text-xs">
-                    File: {selectedAsset.file_name}
-                  </p>
+                  <p className="text-slate-500 text-xs">File: {selectedAsset.file_name}</p>
                   {selectedAsset.file_size && (
-                    <p className="text-slate-500 text-xs">
-                      Size: {formatFileSize(selectedAsset.file_size)}
-                    </p>
+                    <p className="text-slate-500 text-xs">Size: {formatFileSize(selectedAsset.file_size)}</p>
                   )}
                   {selectedAsset.width && selectedAsset.height && (
-                    <p className="text-slate-500 text-xs">
-                      Dimensions: {selectedAsset.width} x {selectedAsset.height}
+                    <p className="text-slate-500 text-xs">Dimensions: {selectedAsset.width} x {selectedAsset.height}</p>
+                  )}
+                  {currentView === 'trash' && selectedAsset.deleted_at && (
+                    <p className="text-red-400 text-xs mt-2">
+                      Deleted: {new Date(selectedAsset.deleted_at).toLocaleString()}
                     </p>
                   )}
                 </div>
 
-                {/* Edit Form */}
-                <div className="space-y-4">
-                  {selectedAsset.source_table === 'media_assets' && (
+                {/* Edit Form - Only show for library view */}
+                {currentView === 'library' && (
+                  <div className="space-y-4">
+                    {selectedAsset.source_table === 'media_assets' && (
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                          Display Name
+                        </label>
+                        <input
+                          type="text"
+                          value={editForm.display_name}
+                          onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                          placeholder="Enter a display name"
+                        />
+                      </div>
+                    )}
+
                     <div>
                       <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        Display Name
-                      </label>
-                      <input
-                        type="text"
-                        value={editForm.display_name}
-                        onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
-                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                        placeholder="Enter a display name"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                      Alt Text (SEO) <span className="text-[#2ecc71]">*Important</span>
-                    </label>
-                    <textarea
-                      value={editForm.alt_text}
-                      onChange={(e) => setEditForm({ ...editForm, alt_text: e.target.value })}
-                      rows={3}
-                      className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 resize-none"
-                      placeholder="Describe this image for search engines and accessibility"
-                    />
-                    <p className="text-slate-600 text-xs mt-1">
-                      Good alt text helps SEO and screen readers. Changes will update everywhere this image is used.
-                    </p>
-                  </div>
-
-                  {(selectedAsset.source_table === 'media_assets' || selectedAsset.source_table === 'portfolio_gallery') && (
-                    <div>
-                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        Caption
+                        Alt Text (SEO) <span className="text-[#2ecc71]">*Important</span>
                       </label>
                       <textarea
-                        value={editForm.caption}
-                        onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })}
-                        rows={2}
+                        value={editForm.alt_text}
+                        onChange={(e) => setEditForm({ ...editForm, alt_text: e.target.value })}
+                        rows={3}
                         className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 resize-none"
-                        placeholder="Optional caption"
+                        placeholder="Describe this image for search engines and accessibility"
                       />
+                      <p className="text-slate-600 text-xs mt-1">
+                        Good alt text helps SEO and screen readers.
+                      </p>
                     </div>
-                  )}
 
-                  {selectedAsset.source_table === 'media_assets' && (
-                    <>
+                    {(selectedAsset.source_table === 'media_assets' || selectedAsset.source_table === 'portfolio_gallery') && (
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                          Caption
+                        </label>
+                        <textarea
+                          value={editForm.caption}
+                          onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })}
+                          rows={2}
+                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 resize-none"
+                          placeholder="Optional caption"
+                        />
+                      </div>
+                    )}
+
+                    {selectedAsset.source_table === 'media_assets' && (
                       <div>
                         <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
                           Tags (comma separated)
@@ -989,62 +1193,129 @@ export default function MediaLibraryPage() {
                           placeholder="e.g., video, portfolio, featured"
                         />
                       </div>
-                    </>
-                  )}
+                    )}
 
-                  {/* URL Copy */}
-                  <div>
-                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                      Public URL
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={selectedAsset.public_url}
-                        readOnly
-                        className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-slate-400 text-xs"
-                      />
-                      <button
-                        onClick={() => copyToClipboard(selectedAsset.public_url, selectedAsset.id)}
-                        className="px-4 bg-slate-800 border border-white/10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all flex-shrink-0"
-                      >
-                        {copiedId === selectedAsset.id ? <Check size={18} className="text-[#2ecc71]" /> : <Copy size={18} />}
-                      </button>
+                    {/* URL Copy */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                        Public URL
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={selectedAsset.public_url}
+                          readOnly
+                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-slate-400 text-xs"
+                        />
+                        <button
+                          onClick={() => copyToClipboard(selectedAsset.public_url, selectedAsset.id)}
+                          className="px-4 bg-slate-800 border border-white/10 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-all flex-shrink-0"
+                        >
+                          {copiedId === selectedAsset.id ? <Check size={18} className="text-[#2ecc71]" /> : <Copy size={18} />}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Panel Footer - Actions */}
               <div className="p-4 border-t border-white/10 bg-slate-900/95 backdrop-blur space-y-3">
-                <button
-                  onClick={handleSaveEdit}
-                  disabled={saving}
-                  className="w-full py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-[#27ae60] transition-all"
-                >
-                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save size={18} /> Save Changes</>}
-                </button>
+                {currentView === 'library' ? (
+                  <>
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={saving}
+                      className="w-full py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-[#27ae60] transition-all"
+                    >
+                      {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save size={18} /> Save Changes</>}
+                    </button>
 
-                {selectedAsset.source_table === 'media_assets' && (
-                  <button
-                    onClick={() => setDeleteConfirm(selectedAsset.id)}
-                    className="w-full py-3 border border-red-500/30 text-red-400 rounded-xl font-medium hover:bg-red-500/10 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Trash2 size={18} /> Delete File
-                  </button>
-                )}
+                    {selectedAsset.source_table === 'media_assets' && (
+                      <button
+                        onClick={() => setTrashConfirm(selectedAsset.id)}
+                        className="w-full py-3 border border-amber-500/30 text-amber-400 rounded-xl font-medium hover:bg-amber-500/10 transition-all flex items-center justify-center gap-2"
+                      >
+                        <Trash2 size={18} /> Move to Trash
+                      </button>
+                    )}
 
-                {selectedAsset.source_table !== 'media_assets' && (
-                  <p className="text-slate-500 text-xs text-center">
-                    To delete this image, edit the original {selectedAsset.source_table.replace('_', ' ')} item.
-                  </p>
+                    {selectedAsset.source_table !== 'media_assets' && (
+                      <p className="text-slate-500 text-xs text-center">
+                        To delete this image, edit the original {selectedAsset.source_table.replace('_', ' ')} item.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleRestore(selectedAsset.id)}
+                      disabled={actionLoading}
+                      className="w-full py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-[#27ae60] transition-all"
+                    >
+                      {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><RotateCcw size={18} /> Restore File</>}
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteConfirm(selectedAsset.id)}
+                      className="w-full py-3 border border-red-500/30 text-red-400 rounded-xl font-medium hover:bg-red-500/10 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Trash2 size={18} /> Delete Permanently
+                    </button>
+                  </>
                 )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Delete Confirmation Modal */}
+        {/* Move to Trash Confirmation Modal */}
+        <AnimatePresence>
+          {trashConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setTrashConfirm(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-amber-500/20 rounded-xl">
+                    <Trash2 size={24} className="text-amber-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Move to Trash?</h3>
+                </div>
+                <p className="text-slate-400 mb-6">
+                  This file will be moved to trash and kept for 30 days. You can restore it anytime before permanent deletion.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setTrashConfirm(null)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleMoveToTrash(trashConfirm)}
+                    disabled={actionLoading}
+                    className="flex-1 py-3 bg-amber-500 text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Move to Trash'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Permanent Delete Confirmation Modal */}
         <AnimatePresence>
           {deleteConfirm && (
             <motion.div
@@ -1058,11 +1329,18 @@ export default function MediaLibraryPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-sm p-6"
+                className="bg-slate-900 border border-red-500/30 rounded-2xl w-full max-w-sm p-6"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-xl font-bold text-white mb-2">Delete File?</h3>
-                <p className="text-slate-400 mb-6">This will permanently delete the file from storage. This action cannot be undone.</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-red-500/20 rounded-xl">
+                    <AlertTriangle size={24} className="text-red-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Delete Permanently?</h3>
+                </div>
+                <p className="text-slate-400 mb-6">
+                  This will permanently delete the file from storage. <strong className="text-red-400">This action cannot be undone.</strong>
+                </p>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setDeleteConfirm(null)}
@@ -1071,11 +1349,58 @@ export default function MediaLibraryPage() {
                     Cancel
                   </button>
                   <button
-                    onClick={() => handleDelete(deleteConfirm)}
-                    disabled={deleting}
+                    onClick={() => handlePermanentDelete(deleteConfirm)}
+                    disabled={actionLoading}
                     className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
                   >
-                    {deleting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Delete'}
+                    {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Delete Forever'}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Empty Trash Confirmation Modal */}
+        <AnimatePresence>
+          {emptyTrashConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setEmptyTrashConfirm(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-red-500/30 rounded-2xl w-full max-w-sm p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-red-500/20 rounded-xl">
+                    <Trash size={24} className="text-red-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Empty Trash?</h3>
+                </div>
+                <p className="text-slate-400 mb-6">
+                  This will permanently delete <strong className="text-white">{trashedAssets.length} files</strong> from storage.
+                  <strong className="text-red-400"> This action cannot be undone.</strong>
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEmptyTrashConfirm(false)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl font-medium hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEmptyTrash}
+                    disabled={actionLoading}
+                    className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Empty Trash'}
                   </button>
                 </div>
               </motion.div>
