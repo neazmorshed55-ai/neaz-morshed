@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     ArrowRight, ArrowLeft, Loader2, Calendar, User,
     ExternalLink, Search, Tag, Clock
@@ -159,10 +160,12 @@ export default function BlogPage() {
                                     <div className="relative h-64 overflow-hidden">
                                         <div className="absolute inset-0 bg-slate-900 animate-pulse" /> {/* Placeholder */}
                                         {blog.cover_image && (
-                                            <img
+                                            <Image
                                                 src={blog.cover_image}
                                                 alt={blog.cover_image_alt_text || blog.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                fill
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                         )}
                                         {/* Overlay */}
@@ -239,7 +242,7 @@ export default function BlogPage() {
                         <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
                     </div>
                     <p className="text-slate-400 text-sm font-medium">
-                        Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+                        Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
                     </p>
                 </div>
             </footer>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Star, Quote, Linkedin, Facebook,
   ExternalLink, ThumbsUp, MessageCircle, Users, User
@@ -285,11 +286,15 @@ export default function ReviewsPage() {
                   {/* Client Image - Top Right - Breaking out of card */}
                   <div className="absolute -top-6 right-6">
                     {review.client_image ? (
-                      <img
-                        src={review.client_image}
-                        alt={review.client_image_alt_text || `${review.client_name} profile photo`}
-                        className="w-20 h-20 rounded-full object-cover border-4 border-[#0b0f1a] ring-2 ring-[#2ecc71]/50 shadow-2xl shadow-[#2ecc71]/30 group-hover:ring-[#2ecc71] group-hover:scale-110 transition-all"
-                      />
+                      <div className="relative w-20 h-20">
+                        <Image
+                          src={review.client_image}
+                          alt={review.client_image_alt_text || `${review.client_name} profile photo`}
+                          fill
+                          sizes="80px"
+                          className="rounded-full object-cover border-4 border-[#0b0f1a] ring-2 ring-[#2ecc71]/50 shadow-2xl shadow-[#2ecc71]/30 group-hover:ring-[#2ecc71] group-hover:scale-110 transition-all"
+                        />
+                      </div>
                     ) : (
                       <div className="w-20 h-20 rounded-full bg-slate-800 border-4 border-[#0b0f1a] ring-2 ring-white/10 flex items-center justify-center group-hover:ring-[#2ecc71]/30 transition-all shadow-xl">
                         <User className="w-10 h-10 text-slate-600" />
@@ -321,10 +326,12 @@ export default function ReviewsPage() {
                       <h4 className="font-black text-white">{review.client_name}</h4>
                       {review.country_code && (
                         <div className="flex items-center gap-1.5 mt-1 mb-2">
-                          <img
+                          <Image
                             src={getFlagUrl(review.country_code)}
                             alt={review.country_name || ''}
-                            className="w-5 h-auto rounded-sm"
+                            width={20}
+                            height={15}
+                            className="rounded-sm"
                           />
                           <span className="text-[11px] text-slate-400">
                             {review.city ? `${review.city}, ` : ''}{review.country_name}
@@ -444,7 +451,7 @@ export default function ReviewsPage() {
             <a href="https://www.facebook.com/neazmorshed001" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
           </div>
           <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
           </p>
         </div>
       </footer>

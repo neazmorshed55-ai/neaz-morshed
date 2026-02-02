@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, Loader2, Clock, CheckCircle2,
@@ -209,7 +210,7 @@ export default function CategoryPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img src={category.cover_image} alt={category.title} className="w-full h-full object-cover opacity-20" />
+          <Image src={category.cover_image} alt={category.title} fill priority sizes="100vw" className="object-cover opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a] via-[#0b0f1a]/80 to-[#0b0f1a]"></div>
         </div>
 
@@ -277,10 +278,12 @@ export default function CategoryPage() {
                   <div className="group relative overflow-hidden rounded-3xl border border-white/5 hover:border-[#2ecc71]/40 transition-all duration-500 bg-slate-900/60 h-full">
                     {/* Image */}
                     <div className="aspect-video relative overflow-hidden">
-                      <img
+                      <Image
                         src={skill.cover_image || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800'}
                         alt={skill.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-transparent opacity-60"></div>
 
@@ -341,7 +344,7 @@ export default function CategoryPage() {
             <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
           </div>
           <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
           </p>
         </div>
       </footer>

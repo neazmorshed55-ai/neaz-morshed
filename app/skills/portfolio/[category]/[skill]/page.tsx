@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, Loader2, Clock, CheckCircle2,
@@ -263,7 +264,7 @@ export default function SkillDetailPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img src={skill.cover_image} alt={skill.title} className="w-full h-full object-cover opacity-30" />
+          <Image src={skill.cover_image} alt={skill.title} fill priority sizes="100vw" className="object-cover opacity-30" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a] via-[#0b0f1a]/90 to-[#0b0f1a]"></div>
         </div>
 
@@ -364,9 +365,9 @@ export default function SkillDetailPage() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="aspect-video rounded-2xl overflow-hidden border border-white/10"
+                        className="aspect-video rounded-2xl overflow-hidden border border-white/10 relative"
                       >
-                        <img src={img} alt={`${skill.title} example ${index + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                        <Image src={img} alt={`${skill.title} example ${index + 1}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover hover:scale-110 transition-transform duration-500" />
                       </motion.div>
                     ))}
                   </div>
@@ -450,7 +451,7 @@ export default function SkillDetailPage() {
             <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
           </div>
           <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
           </p>
         </div>
       </footer>

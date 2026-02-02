@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import NextImage from 'next/image';
 import {
   ArrowLeft, ArrowRight, ChevronRight, ChevronDown, Loader2,
   Video, Palette, PenTool, BookOpen, Briefcase,
@@ -182,8 +183,8 @@ export default function SkillPortfolioPage() {
               className="lg:col-span-3 hidden lg:block"
             >
               <div className="sticky top-32">
-                <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden border-4 border-white/10 bg-slate-900">
-                  <img src={profileImage} alt="Neaz Md. Morshed" className="w-full h-full object-cover" />
+                <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden border-4 border-white/10 bg-slate-900 relative">
+                  <NextImage src={profileImage} alt="Neaz Md. Morshed" fill sizes="25vw" className="object-cover" />
                 </div>
                 <div className="mt-6 p-4 bg-slate-900/50 rounded-2xl border border-white/5">
                   <div className="text-[#2ecc71] text-3xl font-black mb-1">10+</div>
@@ -310,7 +311,7 @@ export default function SkillPortfolioPage() {
             <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
           </div>
           <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
           </p>
         </div>
       </footer>

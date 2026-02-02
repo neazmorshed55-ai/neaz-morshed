@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight, ArrowLeft, Briefcase, Database, Target,
   Layout, Video, Search, Loader2
@@ -117,10 +118,12 @@ export default function ServicesPage() {
                           {/* Cover Image */}
                           {service.cover_image && (
                             <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
-                              <img
+                              <Image
                                 src={service.cover_image}
                                 alt={service.title}
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-cover"
                               />
                             </div>
                           )}
@@ -169,7 +172,7 @@ export default function ServicesPage() {
             <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
           </div>
           <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
           </p>
         </div>
       </footer>

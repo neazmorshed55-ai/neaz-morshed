@@ -1142,11 +1142,12 @@ export default function PortfolioCollectionPage() {
                     {/* Image */}
                     <div className="aspect-video relative overflow-hidden">
                       {item.thumbnail_url || item.image_url ? (
-                        <img
+                        <Image
                           src={item.thumbnail_url || item.image_url || ''}
                           alt={item.thumbnail_alt_text || item.image_alt_text || item.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                          loading="lazy"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                       ) : (
                         <div className="w-full h-full bg-slate-800 flex items-center justify-center">
@@ -1304,11 +1305,13 @@ export default function PortfolioCollectionPage() {
                 </div>
               ) : (selectedItem.image_url || selectedItem.thumbnail_url) && (
                 <div className="aspect-video relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem]">
-                  <img
+                  <Image
                     src={selectedItem.image_url || selectedItem.thumbnail_url || ''}
                     alt={selectedItem.image_alt_text || selectedItem.thumbnail_alt_text || selectedItem.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, 896px"
+                    className="object-cover"
                   />
                 </div>
               )}
@@ -1407,12 +1410,15 @@ export default function PortfolioCollectionPage() {
                               )}
                             </div>
                           ) : (
-                            <img
-                              src={item.url}
-                              alt={item.alt_text || `Gallery image for ${selectedItem.title}`}
-                              className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
-                              loading="lazy"
-                            />
+                            <div className="relative aspect-video">
+                              <Image
+                                src={item.url}
+                                alt={item.alt_text || `Gallery image for ${selectedItem.title}`}
+                                fill
+                                sizes="(max-width: 768px) 100vw, 448px"
+                                className="object-cover hover:scale-105 transition-transform duration-500"
+                              />
+                            </div>
                           )}
                         </div>
                       ))}
@@ -1489,7 +1495,7 @@ export default function PortfolioCollectionPage() {
             <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
           </div>
           <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
           </p>
         </div>
       </footer>

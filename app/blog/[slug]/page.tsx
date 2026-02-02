@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     ArrowLeft, Calendar, User, Tag, Share2, Facebook, Linkedin, Twitter
 } from 'lucide-react';
@@ -123,8 +124,15 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                 <section className="container mx-auto px-6 max-w-4xl">
                     {/* Cover Image */}
                     {blog.cover_image && (
-                        <div className="mb-12 rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl">
-                            <img src={blog.cover_image} alt={blog.cover_image_alt_text || blog.title} className="w-full h-auto" />
+                        <div className="mb-12 rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl relative aspect-video">
+                            <Image
+                                src={blog.cover_image}
+                                alt={blog.cover_image_alt_text || blog.title}
+                                fill
+                                priority
+                                sizes="(max-width: 768px) 100vw, 896px"
+                                className="object-cover"
+                            />
                         </div>
                     )}
 
@@ -194,7 +202,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                         <a href="https://www.facebook.com/neazmorshed001/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Facebook</a>
                     </div>
                     <p className="text-slate-400 text-sm font-medium">
-                        Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-600">Copyright © 2026</span>
+                        Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
                     </p>
                 </div>
             </footer>
