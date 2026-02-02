@@ -68,12 +68,14 @@ export default function MediaLibraryPage() {
   const [selectedAsset, setSelectedAsset] = useState<MediaAsset | null>(null);
   const [editForm, setEditForm] = useState({
     display_name: '',
+    file_name: '', // Original file name (can be renamed)
     alt_text: '',
     title: '',
     caption: '',
     folder: 'general',
     tags: ''
   });
+  const [renaming, setRenaming] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Delete/Trash state
@@ -482,6 +484,7 @@ export default function MediaLibraryPage() {
     setSelectedAsset(asset);
     setEditForm({
       display_name: asset.display_name || asset.file_name,
+      file_name: asset.file_name,
       alt_text: asset.alt_text || '',
       title: asset.title || '',
       caption: asset.caption || '',
@@ -568,6 +571,78 @@ export default function MediaLibraryPage() {
       alert('Error saving changes. Please try again.');
     }
     setSaving(false);
+  };
+
+  // Rename file in storage
+  const handleRenameFile = async () => {
+    if (!selectedAsset || !supabase || selectedAsset.source_table !== 'media_assets') return;
+    if (!editForm.file_name.trim()) {
+      alert('File name cannot be empty');
+      return;
+    }
+
+    // Check if name actually changed
+    if (editForm.file_name === selectedAsset.file_name) {
+      return;
+    }
+
+    setRenaming(true);
+    try {
+      // Get file extension from original
+      const originalExt = selectedAsset.file_name.split('.').pop()?.toLowerCase() || '';
+      let newFileName = editForm.file_name.trim();
+
+      // Ensure extension is preserved
+      const newExt = newFileName.split('.').pop()?.toLowerCase() || '';
+      if (newExt !== originalExt) {
+        // Add original extension if missing or different
+        newFileName = newFileName.replace(/\.[^/.]+$/, '') + '.' + originalExt;
+      }
+
+      // Create new file path
+      const newFilePath = `media/${Date.now()}-${newFileName.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+
+      // Download the existing file
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from('images')
+        .download(selectedAsset.file_path);
+
+      if (downloadError) throw downloadError;
+
+      // Upload with new name
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(newFilePath, fileData, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get new public URL
+      const { data: urlData } = supabase.storage.from('images').getPublicUrl(newFilePath);
+
+      // Update database
+      const { error: dbError } = await supabase
+        .from('media_assets')
+        .update({
+          file_name: newFileName,
+          file_path: newFilePath,
+          public_url: urlData.publicUrl
+        })
+        .eq('id', selectedAsset.source_id);
+
+      if (dbError) throw dbError;
+
+      // Delete old file
+      await supabase.storage.from('images').remove([selectedAsset.file_path]);
+
+      // Refresh
+      await fetchAllAssets();
+      setSelectedAsset(null);
+
+    } catch (error) {
+      console.error('Error renaming file:', error);
+      alert('Error renaming file. Please try again.');
+    }
+    setRenaming(false);
   };
 
   // Move to Trash (soft delete)
@@ -1373,19 +1448,54 @@ export default function MediaLibraryPage() {
                 {/* Edit Form - Only show for library view */}
                 {currentView === 'library' && (
                   <div className="space-y-4">
+                    {/* File Name - Actual storage file name (editable for media_assets) */}
+                    {selectedAsset.source_table === 'media_assets' && (
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                          File Name <span className="text-[#2ecc71]">*Original</span>
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={editForm.file_name}
+                            onChange={(e) => setEditForm({ ...editForm, file_name: e.target.value })}
+                            className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                            placeholder="Enter file name"
+                          />
+                          {editForm.file_name !== selectedAsset.file_name && (
+                            <button
+                              onClick={handleRenameFile}
+                              disabled={renaming}
+                              className="px-4 bg-blue-500 text-white rounded-xl font-bold text-sm hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2"
+                            >
+                              {renaming ? <Loader2 size={16} className="animate-spin" /> : 'Rename'}
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-slate-600 text-xs mt-1">
+                          This is the actual file name in storage. Rename will update the file.
+                        </p>
+                      </div>
+                    )}
+
                     {/* Display Name - Editable for media_assets, read-only info for others */}
                     <div>
                       <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                        Display Name {selectedAsset.source_table === 'media_assets' && <span className="text-[#2ecc71]">*Editable</span>}
+                        Display Name {selectedAsset.source_table === 'media_assets' && <span className="text-slate-500">(Optional)</span>}
                       </label>
                       {selectedAsset.source_table === 'media_assets' ? (
-                        <input
-                          type="text"
-                          value={editForm.display_name}
-                          onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
-                          className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
-                          placeholder="Enter a display name"
-                        />
+                        <>
+                          <input
+                            type="text"
+                            value={editForm.display_name}
+                            onChange={(e) => setEditForm({ ...editForm, display_name: e.target.value })}
+                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
+                            placeholder="Enter a display name"
+                          />
+                          <p className="text-slate-600 text-xs mt-1">
+                            Friendly name shown in the library. Leave empty to use file name.
+                          </p>
+                        </>
                       ) : (
                         <>
                           <input
