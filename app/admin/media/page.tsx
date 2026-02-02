@@ -404,6 +404,40 @@ export default function MediaLibraryPage() {
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
+  // Helper: Sanitize file name for storage (keep original name readable)
+  const sanitizeFileName = (name: string): string => {
+    // Remove extension first
+    const ext = name.split('.').pop() || '';
+    const nameWithoutExt = name.replace(/\.[^/.]+$/, '');
+
+    // Replace spaces and special chars with hyphens, keep it readable
+    const sanitized = nameWithoutExt
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens
+      .replace(/\s+/g, '-')      // Replace spaces with hyphens
+      .replace(/-+/g, '-')       // Replace multiple hyphens with single
+      .trim();
+
+    return `${sanitized}.${ext}`;
+  };
+
+  // Helper: Generate ALT text from file name
+  const generateAltTextFromFileName = (name: string): string => {
+    // Remove extension
+    const nameWithoutExt = name.replace(/\.[^/.]+$/, '');
+
+    // Convert hyphens and underscores to spaces, capitalize each word
+    const altText = nameWithoutExt
+      .replace(/[-_]/g, ' ')           // Replace hyphens/underscores with spaces
+      .replace(/\s+/g, ' ')            // Normalize multiple spaces
+      .trim()
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    return altText;
+  };
+
   // File upload handler
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -417,8 +451,10 @@ export default function MediaLibraryPage() {
 
     for (const file of Array.from(files)) {
       try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        // Keep original file name (sanitized) with timestamp prefix for uniqueness
+        const sanitizedName = sanitizeFileName(file.name);
+        const timestamp = Date.now();
+        const fileName = `${timestamp}-${sanitizedName}`;
         const filePath = `media/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
@@ -437,18 +473,22 @@ export default function MediaLibraryPage() {
           height = dimensions.height;
         }
 
+        // Auto-generate ALT text from original file name
+        const autoAltText = generateAltTextFromFileName(file.name);
+
         const { error: insertError } = await supabase
           .from('media_assets')
           .insert({
-            file_name: file.name,
-            display_name: file.name.replace(/\.[^/.]+$/, ''),
+            file_name: file.name,                              // Original file name
+            display_name: file.name.replace(/\.[^/.]+$/, ''),  // Display name without extension
             file_path: filePath,
             public_url: urlData.publicUrl,
             file_size: file.size,
             mime_type: file.type,
             width,
             height,
-            folder: 'general'
+            folder: 'general',
+            alt_text: autoAltText                              // Auto-generated ALT text
           });
 
         if (insertError) throw insertError;
