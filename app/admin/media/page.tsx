@@ -1333,8 +1333,63 @@ export default function MediaLibraryPage() {
                         </div>
                       )}
 
+                      {/* Action buttons on hover - bottom right */}
+                      <div className={`absolute bottom-2 right-2 flex items-center gap-1 transition-all duration-200 ${
+                        isSelected ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
+                      }`}>
+                        {currentView === 'library' ? (
+                          <>
+                            <a
+                              href={asset.public_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-1.5 bg-black/70 text-white hover:bg-black rounded-lg transition-all"
+                              title="Open"
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                            {asset.source_table === 'media_assets' && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setTrashConfirm(asset.id);
+                                }}
+                                className="p-1.5 bg-black/70 text-white hover:bg-red-500 rounded-lg transition-all"
+                                title="Delete"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRestore(asset.id);
+                              }}
+                              className="p-1.5 bg-black/70 text-white hover:bg-[#2ecc71] rounded-lg transition-all"
+                              title="Restore"
+                            >
+                              <RotateCcw size={14} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeleteConfirm(asset.id);
+                              }}
+                              className="p-1.5 bg-black/70 text-white hover:bg-red-500 rounded-lg transition-all"
+                              title="Delete"
+                            >
+                              <Trash size={14} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+
                       {selectedAsset?.id === asset.id && !isSelected && (
-                        <div className="absolute bottom-2 right-2">
+                        <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-0">
                           <ChevronRight className="w-6 h-6 text-[#2ecc71]" />
                         </div>
                       )}
@@ -1444,9 +1499,91 @@ export default function MediaLibraryPage() {
                       </p>
                     </div>
 
-                    <ChevronRight className={`w-5 h-5 transition-colors ${
-                      selectedAsset?.id === asset.id ? 'text-[#2ecc71]' : 'text-slate-600'
-                    }`} />
+                    {/* Action Buttons - Like Services page */}
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {currentView === 'library' ? (
+                        <>
+                          {/* Open in new tab */}
+                          <a
+                            href={asset.public_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                            title="Open in new tab"
+                          >
+                            <ExternalLink size={18} />
+                          </a>
+
+                          {/* Edit - opens panel */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectAsset(asset);
+                            }}
+                            className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                            title="Edit details"
+                          >
+                            <Pencil size={18} />
+                          </button>
+
+                          {/* Delete/Trash */}
+                          {asset.source_table === 'media_assets' ? (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setTrashConfirm(asset.id);
+                              }}
+                              className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                              title="Move to trash"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          ) : (
+                            <a
+                              href={`/admin/${
+                                asset.source_table === 'portfolio_items' || asset.source_table === 'portfolio_gallery'
+                                  ? 'portfolio'
+                                  : asset.source_table === 'blogs'
+                                  ? 'blog'
+                                  : asset.source_table
+                              }`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg transition-all"
+                              title={`Edit in ${asset.source_table.replace('_', ' ')}`}
+                            >
+                              <ExternalLink size={18} />
+                            </a>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {/* Restore */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRestore(asset.id);
+                            }}
+                            className="p-2 text-slate-500 hover:text-[#2ecc71] hover:bg-[#2ecc71]/10 rounded-lg transition-all"
+                            title="Restore"
+                          >
+                            <RotateCcw size={18} />
+                          </button>
+
+                          {/* Permanent Delete */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirm(asset.id);
+                            }}
+                            className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                            title="Delete permanently"
+                          >
+                            <Trash size={18} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </motion.div>
                 );
               })}
