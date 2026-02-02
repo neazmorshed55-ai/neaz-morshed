@@ -61,7 +61,7 @@ interface Service {
   description: string;
   icon: string;
   cover_image: string | null;
-  cover_image_alt_text: string | null;
+  cover_image_alt_text?: string | null;
 }
 
 interface PortfolioItem {
@@ -70,9 +70,9 @@ interface PortfolioItem {
   title: string;
   description: string;
   thumbnail_url: string | null;
-  thumbnail_alt_text: string | null;
+  thumbnail_alt_text?: string | null;
   image_url: string | null;
-  image_alt_text: string | null;
+  image_alt_text?: string | null;
   video_url: string | null;
   project_url: string | null;
   client_name: string | null;
@@ -88,7 +88,7 @@ interface GalleryItem {
   id: string;
   portfolio_item_id: string;
   url: string;
-  alt_text: string | null;
+  alt_text?: string | null;
   type: 'image' | 'video' | 'link';
   order_index: number;
 }

@@ -16,7 +16,7 @@ interface BlogPost {
     excerpt: string;
     content: string;
     cover_image: string;
-    cover_image_alt_text: string;
+    cover_image_alt_text?: string | null;
     video_url: string;
     external_link: string;
     author: string;
