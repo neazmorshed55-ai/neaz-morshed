@@ -17,6 +17,7 @@ interface Review {
   client_title: string;
   client_company: string;
   client_image: string | null;
+  client_image_alt_text: string | null;
   rating: number;
   review_text: string;
   platform: string;
@@ -119,6 +120,7 @@ export default function ReviewsManagement() {
     client_title: '',
     client_company: '',
     client_image: '',
+    client_image_alt_text: '',
     rating: 5,
     review_text: '',
     platform: 'Fiverr',
@@ -169,6 +171,7 @@ export default function ReviewsManagement() {
         client_title: review.client_title,
         client_company: review.client_company,
         client_image: review.client_image || '',
+        client_image_alt_text: review.client_image_alt_text || '',
         rating: review.rating,
         review_text: review.review_text,
         platform: review.platform,
@@ -186,6 +189,7 @@ export default function ReviewsManagement() {
         client_title: '',
         client_company: '',
         client_image: '',
+        client_image_alt_text: '',
         rating: 5,
         review_text: '',
         platform: 'Fiverr',
@@ -212,6 +216,7 @@ export default function ReviewsManagement() {
     const reviewData = {
       ...formData,
       client_image: formData.client_image || null,
+      client_image_alt_text: formData.client_image_alt_text || null,
       country_code: formData.country_code || null,
       country_name: formData.country_name || null,
       city: formData.city || null
@@ -633,6 +638,15 @@ export default function ReviewsManagement() {
                           />
                         </label>
                         <p className="text-slate-600 text-xs mt-2">Recommended: Square image, min 200x200px</p>
+                        {formData.client_image && (
+                          <input
+                            type="text"
+                            value={formData.client_image_alt_text}
+                            onChange={(e) => setFormData({ ...formData, client_image_alt_text: e.target.value })}
+                            className="w-full bg-slate-800/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#2ecc71]/50 mt-2"
+                            placeholder="Alt Text (SEO): e.g., John Doe profile photo"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

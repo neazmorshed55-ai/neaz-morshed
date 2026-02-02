@@ -21,6 +21,7 @@ interface Review {
   rating: number;
   platform: string;
   client_image?: string;
+  client_image_alt_text?: string;
   date: string;
   is_featured?: boolean;
   order_index?: number;
@@ -286,7 +287,7 @@ export default function ReviewsPage() {
                     {review.client_image ? (
                       <img
                         src={review.client_image}
-                        alt={review.client_name}
+                        alt={review.client_image_alt_text || `${review.client_name} profile photo`}
                         className="w-20 h-20 rounded-full object-cover border-4 border-[#0b0f1a] ring-2 ring-[#2ecc71]/50 shadow-2xl shadow-[#2ecc71]/30 group-hover:ring-[#2ecc71] group-hover:scale-110 transition-all"
                       />
                     ) : (

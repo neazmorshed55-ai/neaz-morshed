@@ -16,7 +16,9 @@ interface PortfolioItem {
   title: string;
   description: string;
   thumbnail_url: string | null;
+  thumbnail_alt_text: string | null;
   image_url: string | null;
+  image_alt_text: string | null;
   video_url: string | null;
   project_url: string | null;
   client_name: string | null;
@@ -38,6 +40,7 @@ interface GalleryItem {
   id: string;
   portfolio_item_id: string;
   url: string;
+  alt_text: string | null;
   type: 'image' | 'video' | 'link';
   order_index: number;
 }
@@ -54,7 +57,7 @@ export default function PortfolioManagement() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', type: 'image' as 'image' | 'video' | 'link' });
+  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' });
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -62,7 +65,9 @@ export default function PortfolioManagement() {
     title: '',
     description: '',
     thumbnail_url: '',
+    thumbnail_alt_text: '',
     image_url: '',
+    image_alt_text: '',
     video_url: '',
     project_url: '',
     client_name: '',
@@ -130,7 +135,9 @@ export default function PortfolioManagement() {
         title: item.title,
         description: item.description || '',
         thumbnail_url: item.thumbnail_url || '',
+        thumbnail_alt_text: item.thumbnail_alt_text || '',
         image_url: item.image_url || '',
+        image_alt_text: item.image_alt_text || '',
         video_url: item.video_url || '',
         project_url: item.project_url || '',
         client_name: item.client_name || '',
@@ -149,7 +156,9 @@ export default function PortfolioManagement() {
         title: '',
         description: '',
         thumbnail_url: '',
+        thumbnail_alt_text: '',
         image_url: '',
+        image_alt_text: '',
         video_url: '',
         project_url: '',
         client_name: '',
@@ -185,7 +194,9 @@ export default function PortfolioManagement() {
       title: formData.title,
       description: formData.description || null,
       thumbnail_url: formData.thumbnail_url || null,
+      thumbnail_alt_text: formData.thumbnail_alt_text || null,
       image_url: formData.image_url || null,
+      image_alt_text: formData.image_alt_text || null,
       video_url: formData.video_url || null,
       project_url: formData.project_url || null,
       client_name: formData.client_name || null,
@@ -326,6 +337,7 @@ export default function PortfolioManagement() {
         .insert({
           portfolio_item_id: editingItem.id,
           url: newGalleryItem.url,
+          alt_text: newGalleryItem.alt_text || null,
           type: newGalleryItem.type,
           order_index: galleryItems.length
         })
@@ -335,7 +347,7 @@ export default function PortfolioManagement() {
       if (error) throw error;
       if (data) {
         setGalleryItems([...galleryItems, data as GalleryItem]);
-        setNewGalleryItem({ url: '', type: 'image' });
+        setNewGalleryItem({ url: '', alt_text: '', type: 'image' });
       }
     } catch (error) {
       console.error('Error adding gallery item:', error);
@@ -358,6 +370,7 @@ export default function PortfolioManagement() {
         .insert({
           portfolio_item_id: editingItem.id,
           url: publicUrl,
+          alt_text: newGalleryItem.alt_text || null,
           type: newGalleryItem.type, // 'image' or 'video'
           order_index: galleryItems.length
         })
@@ -657,6 +670,15 @@ export default function PortfolioManagement() {
                             )}
                           </div>
                           <p className="text-slate-600 text-xs">Upload or paste URL. Auto thumbnail will show if empty.</p>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              value={formData.thumbnail_alt_text}
+                              onChange={(e) => setFormData({ ...formData, thumbnail_alt_text: e.target.value })}
+                              className="w-full bg-slate-800/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#2ecc71]/50"
+                              placeholder="Alt Text (SEO): e.g., Corporate video production for TechStart"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -706,6 +728,15 @@ export default function PortfolioManagement() {
                                 <X size={16} />
                               </button>
                             )}
+                          </div>
+                          <div className="mt-2">
+                            <input
+                              type="text"
+                              value={formData.image_alt_text}
+                              onChange={(e) => setFormData({ ...formData, image_alt_text: e.target.value })}
+                              className="w-full bg-slate-800/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#2ecc71]/50"
+                              placeholder="Alt Text (SEO): Describe the image"
+                            />
                           </div>
                         </div>
                       </div>
@@ -780,15 +811,24 @@ export default function PortfolioManagement() {
                                   : "Paste external link (YouTube, website, etc.)"
                               }
                             />
-                            <button
-                              type="button"
-                              onClick={handleAddGalleryItem}
-                              disabled={addingGalleryItem || !newGalleryItem.url}
-                              className="bg-[#2ecc71] text-slate-950 px-4 rounded-xl font-bold hover:bg-[#27ae60] disabled:opacity-50 h-[46px] w-[46px] flex items-center justify-center flex-shrink-0"
-                            >
-                              {addingGalleryItem && newGalleryItem.url ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
-                            </button>
                           </div>
+                          {newGalleryItem.type === 'image' && (
+                            <input
+                              type="text"
+                              value={newGalleryItem.alt_text}
+                              onChange={(e) => setNewGalleryItem({ ...newGalleryItem, alt_text: e.target.value })}
+                              className="w-full bg-slate-800/50 border border-white/10 rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-[#2ecc71]/50"
+                              placeholder="Alt Text (SEO): Describe this image for search engines"
+                            />
+                          )}
+                          <button
+                            type="button"
+                            onClick={handleAddGalleryItem}
+                            disabled={addingGalleryItem || !newGalleryItem.url}
+                            className="bg-[#2ecc71] text-slate-950 px-4 rounded-xl font-bold hover:bg-[#27ae60] disabled:opacity-50 h-[46px] w-fit flex items-center justify-center gap-2"
+                          >
+                            {addingGalleryItem && newGalleryItem.url ? <Loader2 size={18} className="animate-spin" /> : <><Plus size={18} /> Add</>}
+                          </button>
 
                           {/* OR Divider and File Upload - Only for image/video, not links */}
                           {newGalleryItem.type !== 'link' && (

@@ -61,6 +61,7 @@ interface Service {
   description: string;
   icon: string;
   cover_image: string | null;
+  cover_image_alt_text: string | null;
 }
 
 interface PortfolioItem {
@@ -69,7 +70,9 @@ interface PortfolioItem {
   title: string;
   description: string;
   thumbnail_url: string | null;
+  thumbnail_alt_text: string | null;
   image_url: string | null;
+  image_alt_text: string | null;
   video_url: string | null;
   project_url: string | null;
   client_name: string | null;
@@ -85,6 +88,7 @@ interface GalleryItem {
   id: string;
   portfolio_item_id: string;
   url: string;
+  alt_text: string | null;
   type: 'image' | 'video' | 'link';
   order_index: number;
 }
@@ -1140,7 +1144,7 @@ export default function PortfolioCollectionPage() {
                       {item.thumbnail_url || item.image_url ? (
                         <img
                           src={item.thumbnail_url || item.image_url || ''}
-                          alt={item.title}
+                          alt={item.thumbnail_alt_text || item.image_alt_text || item.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                           loading="lazy"
                         />
@@ -1302,7 +1306,7 @@ export default function PortfolioCollectionPage() {
                 <div className="aspect-video relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem]">
                   <img
                     src={selectedItem.image_url || selectedItem.thumbnail_url || ''}
-                    alt={selectedItem.title}
+                    alt={selectedItem.image_alt_text || selectedItem.thumbnail_alt_text || selectedItem.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
                   />
@@ -1405,7 +1409,7 @@ export default function PortfolioCollectionPage() {
                           ) : (
                             <img
                               src={item.url}
-                              alt="Gallery item"
+                              alt={item.alt_text || `Gallery image for ${selectedItem.title}`}
                               className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
                               loading="lazy"
                             />

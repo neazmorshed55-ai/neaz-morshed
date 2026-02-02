@@ -16,6 +16,7 @@ interface BlogPost {
     excerpt: string;
     content: string;
     cover_image: string;
+    cover_image_alt_text: string;
     video_url: string;
     external_link: string;
     author: string;
@@ -123,7 +124,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                     {/* Cover Image */}
                     {blog.cover_image && (
                         <div className="mb-12 rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl">
-                            <img src={blog.cover_image} alt={blog.title} className="w-full h-auto" />
+                            <img src={blog.cover_image} alt={blog.cover_image_alt_text || blog.title} className="w-full h-auto" />
                         </div>
                     )}
 

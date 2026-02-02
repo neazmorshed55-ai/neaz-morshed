@@ -17,17 +17,18 @@ interface Service {
   description: string;
   icon: string;
   cover_image: string | null;
+  cover_image_alt_text: string | null;
   order_index: number;
 }
 
 const defaultServices: Service[] = [
-  { id: '1', title: 'Video Production', slug: 'video-production', description: 'Professional video editing and production services', icon: 'Video', cover_image: null, order_index: 1 },
-  { id: '2', title: 'Graphic Design', slug: 'graphic-design', description: 'Creative graphic design services', icon: 'Layout', cover_image: null, order_index: 2 },
-  { id: '3', title: 'Content Writing', slug: 'content-writing', description: 'Professional content writing services', icon: 'Briefcase', cover_image: null, order_index: 3 },
-  { id: '4', title: 'eBook Design', slug: 'ebook-design', description: 'Professional eBook formatting and design', icon: 'Database', cover_image: null, order_index: 4 },
-  { id: '5', title: 'Virtual Assistant', slug: 'virtual-assistant', description: 'Comprehensive virtual assistance services', icon: 'Briefcase', cover_image: null, order_index: 5 },
-  { id: '6', title: 'Social Media Marketing', slug: 'social-media-marketing', description: 'Strategic social media marketing services', icon: 'Target', cover_image: null, order_index: 6 },
-  { id: '7', title: 'Web Design', slug: 'web-design', description: 'Professional website design', icon: 'Layout', cover_image: null, order_index: 7 },
+  { id: '1', title: 'Video Production', slug: 'video-production', description: 'Professional video editing and production services', icon: 'Video', cover_image: null, cover_image_alt_text: null, order_index: 1 },
+  { id: '2', title: 'Graphic Design', slug: 'graphic-design', description: 'Creative graphic design services', icon: 'Layout', cover_image: null, cover_image_alt_text: null, order_index: 2 },
+  { id: '3', title: 'Content Writing', slug: 'content-writing', description: 'Professional content writing services', icon: 'Briefcase', cover_image: null, cover_image_alt_text: null, order_index: 3 },
+  { id: '4', title: 'eBook Design', slug: 'ebook-design', description: 'Professional eBook formatting and design', icon: 'Database', cover_image: null, cover_image_alt_text: null, order_index: 4 },
+  { id: '5', title: 'Virtual Assistant', slug: 'virtual-assistant', description: 'Comprehensive virtual assistance services', icon: 'Briefcase', cover_image: null, cover_image_alt_text: null, order_index: 5 },
+  { id: '6', title: 'Social Media Marketing', slug: 'social-media-marketing', description: 'Strategic social media marketing services', icon: 'Target', cover_image: null, cover_image_alt_text: null, order_index: 6 },
+  { id: '7', title: 'Web Design', slug: 'web-design', description: 'Professional website design', icon: 'Layout', cover_image: null, cover_image_alt_text: null, order_index: 7 },
 ];
 
 const iconOptions = ['Video', 'Layout', 'Briefcase', 'Database', 'Target', 'Search', 'Star', 'Wrench'];
@@ -47,6 +48,7 @@ export default function ServicesManagement() {
     description: '',
     icon: 'Briefcase',
     cover_image: '',
+    cover_image_alt_text: '',
     order_index: 0
   });
 
@@ -94,6 +96,7 @@ export default function ServicesManagement() {
         description: service.description,
         icon: service.icon,
         cover_image: service.cover_image || '',
+        cover_image_alt_text: service.cover_image_alt_text || '',
         order_index: service.order_index
       });
     } else {
@@ -104,6 +107,7 @@ export default function ServicesManagement() {
         description: '',
         icon: 'Briefcase',
         cover_image: '',
+        cover_image_alt_text: '',
         order_index: services.length + 1
       });
     }
@@ -119,6 +123,7 @@ export default function ServicesManagement() {
       description: '',
       icon: 'Briefcase',
       cover_image: '',
+      cover_image_alt_text: '',
       order_index: 0
     });
   };
@@ -133,14 +138,15 @@ export default function ServicesManagement() {
       if (editingService) {
         setServices(services.map(s =>
           s.id === editingService.id
-            ? { ...s, ...formData, cover_image: formData.cover_image || null }
+            ? { ...s, ...formData, cover_image: formData.cover_image || null, cover_image_alt_text: formData.cover_image_alt_text || null }
             : s
         ));
       } else {
         const newService: Service = {
           id: Date.now().toString(),
           ...formData,
-          cover_image: formData.cover_image || null
+          cover_image: formData.cover_image || null,
+          cover_image_alt_text: formData.cover_image_alt_text || null
         };
         setServices([...services, newService]);
       }
@@ -159,6 +165,7 @@ export default function ServicesManagement() {
             description: formData.description,
             icon: formData.icon,
             cover_image: formData.cover_image || null,
+            cover_image_alt_text: formData.cover_image_alt_text || null,
             order_index: formData.order_index
           })
           .eq('id', editingService.id);
@@ -173,6 +180,7 @@ export default function ServicesManagement() {
             description: formData.description,
             icon: formData.icon,
             cover_image: formData.cover_image || null,
+            cover_image_alt_text: formData.cover_image_alt_text || null,
             order_index: formData.order_index
           });
 
@@ -407,6 +415,15 @@ export default function ServicesManagement() {
                       className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all"
                       placeholder="https://..."
                     />
+                    {formData.cover_image && (
+                      <input
+                        type="text"
+                        value={formData.cover_image_alt_text}
+                        onChange={(e) => setFormData({ ...formData, cover_image_alt_text: e.target.value })}
+                        className="w-full mt-3 bg-slate-800/50 border border-white/10 rounded-xl py-2 px-4 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all"
+                        placeholder="Alt Text (SEO): e.g., Video production service cover"
+                      />
+                    )}
                   </div>
 
                   <div>

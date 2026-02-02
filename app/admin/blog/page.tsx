@@ -23,6 +23,7 @@ interface BlogPost {
     excerpt: string;
     content: string;
     cover_image: string;
+    cover_image_alt_text: string;
     video_url: string;
     external_link: string;
     author: string;
@@ -133,6 +134,7 @@ export default function BlogAdminPage() {
                 excerpt: '',
                 content: '',
                 cover_image: '',
+                cover_image_alt_text: '',
                 video_url: '',
                 external_link: '',
                 author: 'Neaz Morshed',
@@ -360,9 +362,18 @@ export default function BlogAdminPage() {
                                     </label>
                                 </div>
                                 {currentBlog.cover_image && (
-                                    <div className="mt-4 aspect-video rounded-xl overflow-hidden border border-white/10">
-                                        <img src={currentBlog.cover_image} alt="Preview" className="w-full h-full object-cover" />
-                                    </div>
+                                    <>
+                                        <div className="mt-4 aspect-video rounded-xl overflow-hidden border border-white/10">
+                                            <img src={currentBlog.cover_image} alt="Preview" className="w-full h-full object-cover" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={currentBlog.cover_image_alt_text || ''}
+                                            onChange={(e) => setCurrentBlog({ ...currentBlog, cover_image_alt_text: e.target.value })}
+                                            className="w-full mt-3 bg-slate-950 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-[#2ecc71] outline-none transition-colors"
+                                            placeholder="Alt Text (SEO): Describe this cover image for search engines"
+                                        />
+                                    </>
                                 )}
                             </div>
 

@@ -18,6 +18,7 @@ interface BlogPost {
     excerpt: string;
     content: string;
     cover_image: string;
+    cover_image_alt_text: string;
     video_url: string;
     external_link: string;
     author: string;
@@ -160,7 +161,7 @@ export default function BlogPage() {
                                         {blog.cover_image && (
                                             <img
                                                 src={blog.cover_image}
-                                                alt={blog.title}
+                                                alt={blog.cover_image_alt_text || blog.title}
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                         )}
