@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // SEO: Remove trailing slashes for canonical URLs (site.com/blog not site.com/blog/)
+  trailingSlash: false,
   images: {
     remotePatterns: [
       {

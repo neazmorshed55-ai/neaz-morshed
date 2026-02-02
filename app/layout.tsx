@@ -18,7 +18,7 @@ const inter = Inter({
  */
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://neazmorshed.com'), // Replace with actual domain when live
+  metadataBase: new URL('https://neazmorshed.com'),
   title: {
     default: 'Neaz Md. Morshed | Virtual Assistant & Outsourcing Expert',
     template: '%s | Neaz Md. Morshed'
@@ -27,6 +27,10 @@ export const metadata: Metadata = {
   keywords: ['Virtual Assistant', 'Web Design', 'Video Editing', 'Social Media Marketing', 'Outsourcing', 'Neaz Morshed', 'Virtual Assistant BD'],
   authors: [{ name: 'Neaz Md. Morshed' }],
   creator: 'Neaz Md. Morshed',
+  // Canonical URL - prevents duplicate content issues
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
