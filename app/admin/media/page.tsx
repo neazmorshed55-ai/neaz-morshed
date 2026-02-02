@@ -1134,11 +1134,12 @@ export default function MediaLibraryPage() {
                 {/* Edit Form - Only show for library view */}
                 {currentView === 'library' && (
                   <div className="space-y-4">
-                    {selectedAsset.source_table === 'media_assets' && (
-                      <div>
-                        <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                          Display Name
-                        </label>
+                    {/* Display Name - Editable for media_assets, read-only info for others */}
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                        Display Name {selectedAsset.source_table === 'media_assets' && <span className="text-[#2ecc71]">*Editable</span>}
+                      </label>
+                      {selectedAsset.source_table === 'media_assets' ? (
                         <input
                           type="text"
                           value={editForm.display_name}
@@ -1146,8 +1147,32 @@ export default function MediaLibraryPage() {
                           className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50"
                           placeholder="Enter a display name"
                         />
-                      </div>
-                    )}
+                      ) : (
+                        <>
+                          <input
+                            type="text"
+                            value={selectedAsset.display_name || selectedAsset.file_name}
+                            readOnly
+                            className="w-full bg-slate-800/30 border border-white/5 rounded-xl py-3 px-4 text-slate-400 cursor-not-allowed"
+                          />
+                          <p className="text-amber-400/70 text-xs mt-2 flex items-center gap-1">
+                            <span>Name comes from {selectedAsset.source_table.replace('_', ' ')} title.</span>
+                            <a
+                              href={`/admin/${
+                                selectedAsset.source_table === 'portfolio_items' || selectedAsset.source_table === 'portfolio_gallery'
+                                  ? 'portfolio'
+                                  : selectedAsset.source_table === 'blogs'
+                                  ? 'blog'
+                                  : selectedAsset.source_table
+                              }`}
+                              className="underline hover:text-amber-400"
+                            >
+                              Edit source
+                            </a>
+                          </p>
+                        </>
+                      )}
+                    </div>
 
                     <div>
                       <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
