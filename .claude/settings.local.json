@@ -10,7 +10,8 @@
       "WebFetch(domain:drive.google.com)",
       "Bash(git -C \"c:/Users/Asus/neaz-morshed\" diff --stat)",
       "Bash(timeout:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(node:*)"
     ]
   }
 }

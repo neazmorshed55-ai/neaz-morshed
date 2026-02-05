@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../../lib/supabase';
 import Navbar from '../../../../components/Navbar';
+import SocialEmbed from '../../../../components/SocialEmbed';
 
 // ============ PLATFORM DETECTION ============
 
@@ -498,28 +499,8 @@ export default function PortfolioDetailPage() {
                   className="object-contain"
                 />
               </div>
-            ) : isEmbeddableVideo(selectedGalleryItem.url) ? (
-              <div className={`relative rounded-2xl overflow-hidden bg-black ${isVerticalContent(selectedGalleryItem.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
-                <iframe
-                  src={getEmbedUrl(selectedGalleryItem.url)}
-                  className="w-full h-full"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                />
-              </div>
             ) : (
-              <a
-                href={selectedGalleryItem.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors rounded-2xl aspect-video"
-              >
-                <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
-                  <ExternalLink size={48} />
-                  <span className="text-white font-bold text-lg">Visit External Link</span>
-                  <span className="text-slate-400 text-sm max-w-[80%] truncate">{selectedGalleryItem.url}</span>
-                </div>
-              </a>
+              <SocialEmbed url={selectedGalleryItem.url} className="rounded-2xl" />
             )}
           </div>
         </motion.div>

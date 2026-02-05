@@ -8,7 +8,7 @@ import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, ExternalLink, X, Play,
   Briefcase, Database, Target, Layout, Video, Search,
-  Loader2, Calendar, User, Eye, Clock, CheckCircle2
+  Loader2, Calendar, User, Eye, Clock, CheckCircle2, FileText
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
@@ -116,6 +116,57 @@ const getInstagramEmbedUrl = (url: string) => {
 const isFacebookImage = (url: string) => {
   return url.includes('/photo') || url.includes('fbid=') || url.includes('/photos/');
 };
+
+// Check if URL is a Google Drive link
+const isGoogleDriveUrl = (url: string) => {
+  return url.includes('docs.google.com') || url.includes('drive.google.com');
+};
+
+// Extract Google Drive file ID from URL
+const getGoogleDriveFileId = (url: string) => {
+  // Handle different Google Drive URL formats
+  const patterns = [
+    /\/d\/([a-zA-Z0-9_-]+)/,  // /d/FILE_ID
+    /id=([a-zA-Z0-9_-]+)/,     // id=FILE_ID
+    /\/file\/d\/([a-zA-Z0-9_-]+)/, // /file/d/FILE_ID
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+};
+
+// Get Google Drive thumbnail URL
+const getGoogleDriveThumbnail = (url: string) => {
+  const fileId = getGoogleDriveFileId(url);
+  if (!fileId) return null;
+
+  // Use Google Drive's thumbnail API
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+};
+
+// Get Google Drive embed/preview URL
+const getGoogleDriveEmbedUrl = (url: string) => {
+  const fileId = getGoogleDriveFileId(url);
+  if (!fileId) return url;
+
+  // Check if it's a Google Doc, Sheet, or Slide
+  if (url.includes('docs.google.com/document')) {
+    return `https://docs.google.com/document/d/${fileId}/preview`;
+  } else if (url.includes('docs.google.com/spreadsheets')) {
+    return `https://docs.google.com/spreadsheets/d/${fileId}/preview`;
+  } else if (url.includes('docs.google.com/presentation')) {
+    return `https://docs.google.com/presentation/d/${fileId}/preview`;
+  } else if (url.includes('drive.google.com')) {
+    // Generic Drive file preview
+    return `https://drive.google.com/file/d/${fileId}/preview`;
+  }
+
+  return url;
+};
+
 
 // Convert Facebook share URLs to full post URLs
 const normalizeFacebookUrl = (url: string) => {
@@ -1506,8 +1557,9 @@ export default function PortfolioCollectionPage() {
                         // Check if it's a video file or actual video platform URL (not Facebook images)
                         const isActualVideo = isVideoFile(item.url) ||
                           (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
-                        const isLink = item.type === 'link' || (!isActualVideo && !isFacebookImage(item.url) && item.url.startsWith('http'));
-                        const isImage = !isActualVideo && !isLink;
+                        const isLink = item.type === 'link' || (!isActualVideo && !isFacebookImage(item.url) && !isGoogleDriveUrl(item.url) && item.url.startsWith('http'));
+                        const isGoogleDrive = isGoogleDriveUrl(item.url);
+                        const isImage = !isActualVideo && !isLink && !isGoogleDrive;
 
                         // Get thumbnail source
                         const getThumbnailSrc = () => {
@@ -1543,7 +1595,7 @@ export default function PortfolioCollectionPage() {
                               ) : (
                                 <div className="w-full h-full bg-slate-800 flex items-center justify-center">
                                   <div className="text-slate-600">
-                                    {isActualVideo ? <Play size={48} /> : isLink ? <ExternalLink size={48} /> : <Eye size={48} />}
+                                    {isActualVideo ? <Play size={48} /> : isGoogleDrive ? <FileText size={48} /> : isLink ? <ExternalLink size={48} /> : <Eye size={48} />}
                                   </div>
                                 </div>
                               )}
@@ -1720,7 +1772,19 @@ export default function PortfolioCollectionPage() {
                         )}
                       </div>
                     );
-                  } else if (item.type === 'link' || (item.url.startsWith('http') && !isFacebookImage(item.url))) {
+                  } else if (isGoogleDriveUrl(item.url)) {
+                    return (
+                      <div className="relative aspect-video min-h-[600px]">
+                        <iframe
+                          src={getGoogleDriveEmbedUrl(item.url)}
+                          className="w-full h-full"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          loading="lazy"
+                        />
+                      </div>
+                    );
+                  } else if (item.type === 'link' || (item.url.startsWith('http') && !isFacebookImage(item.url) && !isGoogleDriveUrl(item.url))) {
                     return (
                       <div className="aspect-video flex items-center justify-center p-12 bg-slate-900">
                         <div className="text-center">

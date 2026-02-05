@@ -357,34 +357,37 @@ export default function PortfolioManagement() {
   };
 
   const handleGalleryFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !supabase || !editingItem) return;
+    const files = e.target.files;
+    if (!files || files.length === 0 || !supabase || !editingItem) return;
 
     setAddingGalleryItem(true);
     try {
-      const publicUrl = await uploadFile(file);
+      const uploadPromises = Array.from(files).map(async (file, index) => {
+        const publicUrl = await uploadFile(file);
 
-      // Immediately add to gallery
-      const { data, error } = await supabase
-        .from('portfolio_gallery')
-        .insert({
-          portfolio_item_id: editingItem.id,
-          url: publicUrl,
-          alt_text: newGalleryItem.alt_text || null,
-          type: newGalleryItem.type, // 'image' or 'video'
-          order_index: galleryItems.length
-        })
-        .select()
-        .single();
+        // Add each file to gallery
+        const { data, error } = await supabase
+          .from('portfolio_gallery')
+          .insert({
+            portfolio_item_id: editingItem.id,
+            url: publicUrl,
+            alt_text: newGalleryItem.alt_text || null,
+            type: newGalleryItem.type, // 'image' or 'video'
+            order_index: galleryItems.length + index
+          })
+          .select()
+          .single();
 
-      if (error) throw error;
-      if (data) {
-        setGalleryItems([...galleryItems, data as GalleryItem]);
-        // Reset isn't strictly needed for file input but good practice if we were using state for file
-      }
+        if (error) throw error;
+        return data as GalleryItem;
+      });
+
+      const uploadedItems = await Promise.all(uploadPromises);
+      setGalleryItems([...galleryItems, ...uploadedItems]);
+      setNewGalleryItem({ url: '', alt_text: '', type: 'image' });
     } catch (error) {
-      console.error('Error uploading/adding gallery item:', error);
-      alert('Error uploading gallery item');
+      console.error('Error uploading/adding gallery items:', error);
+      alert('Error uploading gallery items');
     }
     setAddingGalleryItem(false);
     // Reset file input
@@ -850,10 +853,13 @@ export default function PortfolioManagement() {
                                 )}
                                 <div className="text-center">
                                   <span className="text-white font-semibold block">
-                                    Click to upload {newGalleryItem.type === 'image' ? 'Image' : 'Video'}
+                                    Click to upload {newGalleryItem.type === 'image' ? 'Images' : 'Videos'}
                                   </span>
                                   <span className="text-slate-500 text-xs mt-1 block">
                                     {newGalleryItem.type === 'image' ? 'PNG, JPG, WEBP up to 10MB' : 'MP4, WEBM up to 50MB'}
+                                  </span>
+                                  <span className="text-[#2ecc71] text-xs mt-1 block font-semibold">
+                                    Multiple files supported
                                   </span>
                                 </div>
                                 <input
@@ -862,6 +868,7 @@ export default function PortfolioManagement() {
                                   onChange={handleGalleryFileUpload}
                                   className="hidden"
                                   disabled={addingGalleryItem}
+                                  multiple
                                 />
                               </label>
                             </>
