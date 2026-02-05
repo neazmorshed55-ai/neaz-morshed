@@ -1169,6 +1169,26 @@ export default function PortfolioCollectionPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedGalleryIndex, galleryItems.length]);
 
+  // Keyboard navigation for portfolio item modal
+  useEffect(() => {
+    if (!selectedItem) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const currentIndex = portfolioItems.findIndex(item => item.id === selectedItem.id);
+
+      if (e.key === 'ArrowLeft' && currentIndex > 0) {
+        setSelectedItem(portfolioItems[currentIndex - 1]);
+      } else if (e.key === 'ArrowRight' && currentIndex < portfolioItems.length - 1) {
+        setSelectedItem(portfolioItems[currentIndex + 1]);
+      } else if (e.key === 'Escape') {
+        setSelectedItem(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedItem, portfolioItems]);
+
   useEffect(() => {
     async function fetchData() {
       // First try to get from Supabase
@@ -1507,7 +1527,7 @@ export default function PortfolioCollectionPage() {
                 <X size={24} />
               </button>
 
-              {/* Previous Portfolio Item Button */}
+              {/* Previous Portfolio Item Button - Facebook style */}
               {(() => {
                 const currentIndex = portfolioItems.findIndex(item => item.id === selectedItem.id);
                 return currentIndex > 0 && (
@@ -1516,15 +1536,15 @@ export default function PortfolioCollectionPage() {
                       e.stopPropagation();
                       setSelectedItem(portfolioItems[currentIndex - 1]);
                     }}
-                    className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 p-3 md:p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
                     title="Previous project"
                   >
-                    <ArrowLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+                    <ArrowLeft size={24} className="md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" strokeWidth={2.5} />
                   </button>
                 );
               })()}
 
-              {/* Next Portfolio Item Button */}
+              {/* Next Portfolio Item Button - Facebook style */}
               {(() => {
                 const currentIndex = portfolioItems.findIndex(item => item.id === selectedItem.id);
                 return currentIndex < portfolioItems.length - 1 && (
@@ -1533,10 +1553,10 @@ export default function PortfolioCollectionPage() {
                       e.stopPropagation();
                       setSelectedItem(portfolioItems[currentIndex + 1]);
                     }}
-                    className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 p-3 md:p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
                     title="Next project"
                   >
-                    <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight size={24} className="md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" strokeWidth={2.5} />
                   </button>
                 );
               })()}
