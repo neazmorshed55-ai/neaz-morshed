@@ -256,7 +256,46 @@ export default function SkillPortfolioManagement() {
           </div>
         ) : filteredSkills.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-slate-500">No skills found</p>
+            <div className="max-w-2xl mx-auto">
+              <svg className="w-20 h-20 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-xl font-bold text-white mb-2">No Skills Found</h3>
+              <p className="text-slate-400 mb-6">
+                {searchQuery || filterCategory !== 'all'
+                  ? 'Try adjusting your search or filters'
+                  : 'Database e skill categories ba sub-skills nai'}
+              </p>
+              {!searchQuery && filterCategory === 'all' && (
+                <div className="bg-slate-900/60 border border-[#2ecc71]/20 rounded-xl p-6 text-left">
+                  <h4 className="text-base font-bold text-[#2ecc71] mb-4">📋 Quick Setup Guide:</h4>
+                  <div className="space-y-4 text-sm text-slate-300">
+                    <div>
+                      <p className="font-semibold text-white mb-2">Option 1: Use Default Skills (Recommended)</p>
+                      <p className="text-slate-400">
+                        Apnar <code className="text-[#2ecc71] bg-slate-800 px-2 py-1 rounded">/skills/portfolio</code> page e already
+                        default skills ache. Direct shei skills er gallery manage korte paren.
+                      </p>
+                      <a
+                        href="/skills/portfolio"
+                        target="_blank"
+                        className="inline-flex items-center gap-2 mt-2 text-[#2ecc71] hover:underline"
+                      >
+                        View Skills Portfolio →
+                      </a>
+                    </div>
+                    <div className="border-t border-white/10 pt-4">
+                      <p className="font-semibold text-white mb-2">Option 2: Database Setup</p>
+                      <ol className="list-decimal list-inside space-y-1 text-slate-400">
+                        <li>Supabase e <code className="text-[#2ecc71]">skill_categories</code> table e categories add korun</li>
+                        <li><code className="text-[#2ecc71]">sub_skills</code> table e skills add korun</li>
+                        <li>Both tables e <code className="text-[#2ecc71]">is_active = true</code> set korun</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
