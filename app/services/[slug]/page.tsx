@@ -8,7 +8,8 @@ import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, ExternalLink, X, Play,
   Briefcase, Database, Target, Layout, Video, Search,
-  Loader2, Calendar, User, Eye, Clock, CheckCircle2, FileText
+  Loader2, Calendar, User, Eye, Clock, CheckCircle2, FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
@@ -1130,6 +1131,7 @@ export default function PortfolioCollectionPage() {
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
+  const [allGalleryItems, setAllGalleryItems] = useState<GalleryItem[]>([]); // All gallery items from all portfolio items
 
   useEffect(() => {
     async function fetchGallery() {
@@ -1156,9 +1158,12 @@ export default function PortfolioCollectionPage() {
     if (selectedGalleryIndex === null) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Use allGalleryItems for main gallery, galleryItems for portfolio item gallery
+      const items = selectedItem ? galleryItems : allGalleryItems;
+
       if (e.key === 'ArrowLeft' && selectedGalleryIndex > 0) {
         setSelectedGalleryIndex(selectedGalleryIndex - 1);
-      } else if (e.key === 'ArrowRight' && selectedGalleryIndex < galleryItems.length - 1) {
+      } else if (e.key === 'ArrowRight' && selectedGalleryIndex < items.length - 1) {
         setSelectedGalleryIndex(selectedGalleryIndex + 1);
       } else if (e.key === 'Escape') {
         setSelectedGalleryIndex(null);
@@ -1167,7 +1172,7 @@ export default function PortfolioCollectionPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedGalleryIndex, galleryItems.length]);
+  }, [selectedGalleryIndex, galleryItems.length, allGalleryItems.length, selectedItem]);
 
   // Keyboard navigation for portfolio item modal
   useEffect(() => {
@@ -1213,6 +1218,19 @@ export default function PortfolioCollectionPage() {
 
             if (portfolioData && portfolioData.length > 0) {
               setPortfolioItems(portfolioData);
+
+              // Fetch all gallery items for all portfolio items
+              const portfolioIds = portfolioData.map(item => item.id);
+              const { data: galleryData } = await supabase
+                .from('portfolio_gallery')
+                .select('*')
+                .in('portfolio_item_id', portfolioIds)
+                .order('order_index', { ascending: true });
+
+              if (galleryData) {
+                setAllGalleryItems(galleryData as GalleryItem[]);
+              }
+
               setLoading(false);
               return;
             }
@@ -1463,6 +1481,124 @@ export default function PortfolioCollectionPage() {
           )}
         </div>
       </section>
+
+      {/* Gallery Section - All Portfolio Items Gallery */}
+      {allGalleryItems.length > 0 && (
+        <section className="py-20">
+          <div className="container mx-auto px-6 max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-12"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="text-[#2ecc71] p-4 bg-white/5 rounded-2xl border border-white/10">
+                  <ImageIcon size={32} />
+                </div>
+                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em]">Project Gallery</span>
+              </div>
+              <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-none">
+                Media Collection
+              </h2>
+              <p className="text-slate-400 mt-4 max-w-2xl">
+                Browse through our collection of {service.title.toLowerCase()} projects, showcasing images, videos, and documents from our portfolio.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {allGalleryItems.map((item, index) => {
+                // Check if it's a video file or actual video platform URL (not Facebook images)
+                const isActualVideo = isVideoFile(item.url) ||
+                  (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
+
+                // Get thumbnail source
+                const getThumbnailSrc = () => {
+                  // Facebook image posts - extract actual image
+                  if (isFacebookImage(item.url)) {
+                    const fbThumbnail = getFacebookImageThumbnail(item.url);
+                    return fbThumbnail || item.url;
+                  }
+
+                  // Video platforms
+                  if (isActualVideo) {
+                    // YouTube thumbnail
+                    if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
+                      const videoId = item.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?]+)/)?.[1];
+                      return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+                    }
+
+                    // TikTok thumbnail
+                    if (isTikTokUrl(item.url)) {
+                      return getTikTokThumbnail(item.url);
+                    }
+
+                    // For other platforms (Instagram, Facebook videos), use iframe preview
+                    return null;
+                  }
+
+                  // Default: return URL as-is for regular images
+                  return item.url;
+                };
+
+                const thumbnailSrc = getThumbnailSrc();
+                const isLink = item.type === 'link';
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.02 }}
+                    className="rounded-2xl overflow-hidden border border-white/10 bg-black/50 cursor-pointer group hover:border-[#2ecc71]/50 transition-all aspect-square"
+                    onClick={() => setSelectedGalleryIndex(index)}
+                  >
+                    <div className="relative w-full h-full">
+                      {thumbnailSrc ? (
+                        <Image
+                          src={thumbnailSrc}
+                          alt={item.alt_text || 'Gallery item'}
+                          fill
+                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : isActualVideo ? (
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+                          <div className="w-16 h-16 bg-[#2ecc71]/20 rounded-full flex items-center justify-center">
+                            <Play size={28} className="text-[#2ecc71] ml-1" fill="currentColor" />
+                          </div>
+                        </div>
+                      ) : isLink ? (
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+                          {item.url.endsWith('.pdf') || item.url.includes('/documents/') ? (
+                            <FileText size={32} className="text-[#2ecc71]" />
+                          ) : (
+                            <ExternalLink size={32} className="text-[#2ecc71]" />
+                          )}
+                        </div>
+                      ) : (
+                        <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+                          <Eye size={32} className="text-slate-600" />
+                        </div>
+                      )}
+
+                      {/* Play overlay for videos */}
+                      {isActualVideo && thumbnailSrc && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="w-16 h-16 bg-[#2ecc71] rounded-full flex items-center justify-center">
+                            <Play size={28} className="text-slate-900 ml-1" fill="currentColor" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-slate-900/30">
@@ -1808,7 +1944,7 @@ export default function PortfolioCollectionPage() {
 
       {/* Gallery Modal with Navigation */}
       <AnimatePresence>
-        {selectedGalleryIndex !== null && galleryItems[selectedGalleryIndex] && (
+        {selectedGalleryIndex !== null && ((selectedItem ? galleryItems : allGalleryItems)[selectedGalleryIndex]) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1846,7 +1982,7 @@ export default function PortfolioCollectionPage() {
               )}
 
               {/* Next Button - Facebook style */}
-              {selectedGalleryIndex < galleryItems.length - 1 && (
+              {selectedGalleryIndex < (selectedItem ? galleryItems : allGalleryItems).length - 1 && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1862,7 +1998,7 @@ export default function PortfolioCollectionPage() {
               {/* Content */}
               <div className="bg-[#0e1526] rounded-3xl overflow-hidden border border-white/10 max-w-full">
                 {(() => {
-                  const item = galleryItems[selectedGalleryIndex];
+                  const item = (selectedItem ? galleryItems : allGalleryItems)[selectedGalleryIndex];
                   const isActualVideo = isVideoFile(item.url) ||
                     (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
 
@@ -1939,7 +2075,7 @@ export default function PortfolioCollectionPage() {
 
                 {/* Gallery Counter - Facebook style */}
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-black/80 backdrop-blur-md text-white text-base font-bold rounded-full shadow-xl border border-white/20">
-                  {selectedGalleryIndex + 1} / {galleryItems.length}
+                  {selectedGalleryIndex + 1} / {(selectedItem ? galleryItems : allGalleryItems).length}
                 </div>
               </div>
             </motion.div>
