@@ -42,7 +42,7 @@ interface GalleryItem {
   portfolio_item_id: string;
   url: string;
   alt_text: string | null;
-  type: 'image' | 'video' | 'link' | 'document';
+  type: 'image' | 'video' | 'link';
   order_index: number;
   skill_tags?: string[]; // Array of sub_skill IDs
 }
@@ -67,7 +67,7 @@ export default function PortfolioManagement() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' | 'document', skill_tags: [] as string[] });
+  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link', skill_tags: [] as string[] });
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
   const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryItem | null>(null);
   const [showEditGalleryModal, setShowEditGalleryModal] = useState(false);
@@ -471,9 +471,9 @@ export default function PortfolioManagement() {
     setAddingGalleryItem(true);
     try {
       const uploadPromises = Array.from(files).map(async (file, index) => {
-        // Check if it's a document file
-        const isDocument = newGalleryItem.type === 'document';
-        const publicUrl = await uploadFile(file, isDocument);
+        // Upload file - use 'documents' bucket for PDFs and DOCs, 'images' for media
+        const isPDF = file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.docx');
+        const publicUrl = await uploadFile(file, isPDF);
 
         // Add each file to gallery
         const { data, error } = await supabase
@@ -942,13 +942,12 @@ export default function PortfolioManagement() {
                       <div className="flex gap-3 mb-6 items-start">
                         <select
                           value={newGalleryItem.type}
-                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' | 'link' | 'document' })}
+                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' | 'link' })}
                           className="bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 h-[46px]"
                         >
                           <option value="image">Image</option>
                           <option value="video">Video</option>
-                          <option value="document">Document</option>
-                          <option value="link">Link</option>
+                          <option value="link">Link (Documents, External Links)</option>
                         </select>
 
                         <div className="flex-1 flex flex-col gap-2">
@@ -962,10 +961,8 @@ export default function PortfolioManagement() {
                                 newGalleryItem.type === 'image'
                                   ? "Paste Image URL or Upload..."
                                   : newGalleryItem.type === 'video'
-                                  ? "Paste Video URL (YouTube) or Upload..."
-                                  : newGalleryItem.type === 'document'
-                                  ? "Paste Document URL or Upload (PDF, DOC, XLSX)..."
-                                  : "Paste external link (YouTube, website, etc.)"
+                                  ? "Paste Video URL (YouTube, TikTok) or Upload..."
+                                  : "Paste URL (Documents, External Links, etc.)"
                               }
                             />
                           </div>
@@ -1056,14 +1053,12 @@ export default function PortfolioManagement() {
                                 )}
                                 <div className="text-center">
                                   <span className="text-white font-semibold block">
-                                    Click to upload {newGalleryItem.type === 'image' ? 'Images' : newGalleryItem.type === 'video' ? 'Videos' : 'Documents'}
+                                    Click to upload {newGalleryItem.type === 'image' ? 'Images' : 'Videos'}
                                   </span>
                                   <span className="text-slate-500 text-xs mt-1 block">
                                     {newGalleryItem.type === 'image'
                                       ? 'PNG, JPG, WEBP up to 10MB'
-                                      : newGalleryItem.type === 'video'
-                                      ? 'MP4, WEBM up to 50MB'
-                                      : 'PDF, DOC, DOCX, XLS, XLSX up to 10MB'}
+                                      : 'MP4, WEBM up to 50MB'}
                                   </span>
                                   <span className="text-[#2ecc71] text-xs mt-1 block font-semibold">
                                     Multiple files supported
@@ -1074,9 +1069,7 @@ export default function PortfolioManagement() {
                                   accept={
                                     newGalleryItem.type === 'image'
                                       ? "image/*"
-                                      : newGalleryItem.type === 'video'
-                                      ? "video/*"
-                                      : ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                      : "video/*"
                                   }
                                   onChange={handleGalleryFileUpload}
                                   className="hidden"
@@ -1103,19 +1096,6 @@ export default function PortfolioManagement() {
                                       <span className="text-xs">Video</span>
                                     </div>
                                   </div>
-                                ) : item.type === 'document' ? (
-                                  <a
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <div className="text-[#2ecc71] flex flex-col items-center gap-2 p-4">
-                                      <FileText size={32} />
-                                      <span className="text-xs text-slate-400 max-w-[90%] truncate text-center">{item.alt_text || 'Document'}</span>
-                                    </div>
-                                  </a>
                                 ) : (
                                   <a
                                     href={item.url}
@@ -1125,8 +1105,17 @@ export default function PortfolioManagement() {
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     <div className="text-[#2ecc71] flex flex-col items-center gap-2">
-                                      <ExternalLink size={24} />
-                                      <span className="text-xs text-slate-400 max-w-[80%] truncate">{item.url}</span>
+                                      {item.url.endsWith('.pdf') || item.url.includes('/documents/') ? (
+                                        <>
+                                          <FileText size={32} />
+                                          <span className="text-xs text-slate-400 max-w-[90%] truncate text-center">{item.alt_text || 'Document'}</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ExternalLink size={24} />
+                                          <span className="text-xs text-slate-400 max-w-[80%] truncate">{item.url}</span>
+                                        </>
+                                      )}
                                     </div>
                                   </a>
                                 )}
