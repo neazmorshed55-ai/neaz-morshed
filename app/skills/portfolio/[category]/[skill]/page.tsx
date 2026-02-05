@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, Loader2, Clock, CheckCircle2,
-  Star, Users, Briefcase, ExternalLink
+  Star, Users, Briefcase, ExternalLink, X
 } from 'lucide-react';
 import { supabase } from '../../../../../lib/supabase';
 import Navbar from '../../../../../components/Navbar';
@@ -202,6 +202,7 @@ export default function SkillDetailPage() {
   const [category, setCategory] = useState<SkillCategory | null>(null);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -258,6 +259,38 @@ export default function SkillDetailPage() {
 
     fetchData();
   }, [categorySlug, skillSlug]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedGalleryIndex === null) return;
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNextGallery();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrevGallery();
+      } else if (e.key === 'Escape') {
+        setSelectedGalleryIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedGalleryIndex, galleryItems]);
+
+  const handleNextGallery = () => {
+    if (selectedGalleryIndex === null) return;
+    const nextIndex = (selectedGalleryIndex + 1) % galleryItems.length;
+    setSelectedGalleryIndex(nextIndex);
+  };
+
+  const handlePrevGallery = () => {
+    if (selectedGalleryIndex === null) return;
+    const prevIndex = selectedGalleryIndex === 0 ? galleryItems.length - 1 : selectedGalleryIndex - 1;
+    setSelectedGalleryIndex(prevIndex);
+  };
 
   if (loading) {
     return (
@@ -382,7 +415,7 @@ export default function SkillDetailPage() {
                   <h3 className="text-2xl font-black uppercase tracking-tight mb-6">Gallery</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Database gallery items (priority) */}
-                    {galleryItems.map((item) => {
+                    {galleryItems.map((item, index) => {
                       // Helper functions
                       const isRegularImage = item.type === 'image' &&
                         !item.url.includes('youtube.com') &&
@@ -419,6 +452,7 @@ export default function SkillDetailPage() {
                           whileInView={{ opacity: 1, scale: 1 }}
                           viewport={{ once: true }}
                           className="group cursor-pointer"
+                          onClick={() => setSelectedGalleryIndex(index)}
                         >
                           <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all relative aspect-video">
                             {isRegularImage ? (
@@ -579,6 +613,70 @@ export default function SkillDetailPage() {
           </Link>
         </div>
       </section>
+
+      {/* Gallery Modal */}
+      <AnimatePresence>
+        {selectedGalleryIndex !== null && galleryItems[selectedGalleryIndex] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
+            onClick={() => setSelectedGalleryIndex(null)}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedGalleryIndex(null)}
+              className="absolute top-6 right-6 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Previous Button */}
+            {galleryItems.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrevGallery();
+                }}
+                className="absolute left-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+              >
+                <ArrowLeft size={28} />
+              </button>
+            )}
+
+            {/* Next Button */}
+            {galleryItems.length > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNextGallery();
+                }}
+                className="absolute right-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+              >
+                <ArrowRight size={28} />
+              </button>
+            )}
+
+            {/* Gallery Content */}
+            <div className="max-w-6xl w-full" onClick={(e) => e.stopPropagation()}>
+              <SocialEmbed url={galleryItems[selectedGalleryIndex].url} className="rounded-2xl shadow-2xl" />
+
+              {/* Caption */}
+              {galleryItems[selectedGalleryIndex].alt_text && (
+                <p className="text-white text-center mt-4 text-lg">
+                  {galleryItems[selectedGalleryIndex].alt_text}
+                </p>
+              )}
+
+              {/* Counter */}
+              <p className="text-slate-400 text-center mt-2 text-sm">
+                {selectedGalleryIndex + 1} / {galleryItems.length}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <footer className="py-8 border-t border-white/5">
