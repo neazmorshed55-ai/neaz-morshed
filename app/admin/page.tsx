@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   Briefcase, Award, MessageSquare, Wrench, Star,
   TrendingUp, ExternalLink, Plus, ArrowRight, Loader2, BookOpen,
-  BarChart3, Users
+  BarChart3, Users, Image
 } from 'lucide-react';
 import ProtectedRoute from '../../components/admin/ProtectedRoute';
 import { supabase } from '../../lib/supabase';
@@ -88,6 +88,7 @@ export default function AdminDashboard() {
   const analyticsCards = [
     { name: 'Analytics', description: 'View visitor stats & locations', icon: BarChart3, href: '/admin/analytics', color: '#00d4ff' },
     { name: 'Leads', description: 'Manage chatbot leads', icon: Users, href: '/admin/leads', color: '#ff6b6b' },
+    { name: 'Skill Portfolio Gallery', description: 'Manage skill portfolio galleries', icon: Image, href: '/admin/skill-portfolio', color: '#2ecc71' },
   ];
 
   const quickActions = [
@@ -147,8 +148,8 @@ export default function AdminDashboard() {
 
         {/* Analytics & Leads */}
         <div className="mb-10">
-          <h2 className="text-xl font-bold text-white mb-4">Analytics & Leads</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h2 className="text-xl font-bold text-white mb-4">Management Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {analyticsCards.map((card, index) => {
               const Icon = card.icon;
               return (

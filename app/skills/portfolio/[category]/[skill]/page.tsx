@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../../../../lib/supabase';
 import Navbar from '../../../../../components/Navbar';
+import SocialEmbed from '../../../../../components/SocialEmbed';
 
 interface SubSkill {
   id: string;
@@ -29,6 +30,15 @@ interface SkillCategory {
   id: string;
   title: string;
   slug: string;
+}
+
+interface GalleryItem {
+  id: string;
+  sub_skill_id: string;
+  url: string;
+  alt_text: string | null;
+  type: 'image' | 'video' | 'link';
+  order_index: number;
 }
 
 const defaultSkillData: { [key: string]: { [key: string]: SubSkill } } = {
@@ -190,6 +200,7 @@ export default function SkillDetailPage() {
 
   const [skill, setSkill] = useState<SubSkill | null>(null);
   const [category, setCategory] = useState<SkillCategory | null>(null);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -225,6 +236,17 @@ export default function SkillDetailPage() {
 
           if (skillData) {
             setSkill(skillData);
+
+            // Fetch gallery items
+            const { data: galleryData } = await supabase
+              .from('skill_gallery')
+              .select('*')
+              .eq('sub_skill_id', skillData.id)
+              .order('order_index', { ascending: true });
+
+            if (galleryData) {
+              setGalleryItems(galleryData as GalleryItem[]);
+            }
           }
         }
       } catch (error) {
@@ -355,11 +377,37 @@ export default function SkillDetailPage() {
               </div>
 
               {/* Gallery */}
-              {skill.gallery_images && skill.gallery_images.length > 0 && (
+              {(galleryItems.length > 0 || (skill.gallery_images && skill.gallery_images.length > 0)) && (
                 <div className="mt-12">
                   <h3 className="text-2xl font-black uppercase tracking-tight mb-6">Gallery</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {skill.gallery_images.map((img, index) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Database gallery items (priority) */}
+                    {galleryItems.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900"
+                      >
+                        {item.type === 'image' && !item.url.includes('youtube.com') && !item.url.includes('drive.google.com') && !item.url.includes('facebook.com') && !item.url.includes('instagram.com') ? (
+                          <div className="aspect-video relative">
+                            <Image
+                              src={item.url}
+                              alt={item.alt_text || `${skill.title} example`}
+                              fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              className="object-cover hover:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                        ) : (
+                          <SocialEmbed url={item.url} className="rounded-2xl" />
+                        )}
+                      </motion.div>
+                    ))}
+
+                    {/* Fallback to default gallery_images if no database items */}
+                    {galleryItems.length === 0 && skill.gallery_images && skill.gallery_images.map((img, index) => (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, scale: 0.9 }}
