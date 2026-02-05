@@ -382,29 +382,121 @@ export default function SkillDetailPage() {
                   <h3 className="text-2xl font-black uppercase tracking-tight mb-6">Gallery</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Database gallery items (priority) */}
-                    {galleryItems.map((item) => (
-                      <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900"
-                      >
-                        {item.type === 'image' && !item.url.includes('youtube.com') && !item.url.includes('drive.google.com') && !item.url.includes('facebook.com') && !item.url.includes('instagram.com') ? (
-                          <div className="aspect-video relative">
-                            <Image
-                              src={item.url}
-                              alt={item.alt_text || `${skill.title} example`}
-                              fill
-                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                              className="object-cover hover:scale-110 transition-transform duration-500"
-                            />
+                    {galleryItems.map((item) => {
+                      // Helper functions
+                      const isRegularImage = item.type === 'image' &&
+                        !item.url.includes('youtube.com') &&
+                        !item.url.includes('youtu.be') &&
+                        !item.url.includes('drive.google.com') &&
+                        !item.url.includes('facebook.com') &&
+                        !item.url.includes('instagram.com') &&
+                        !item.url.includes('tiktok.com') &&
+                        !item.url.includes('vimeo.com');
+
+                      const getYouTubeThumbnail = (url: string) => {
+                        const patterns = [
+                          /youtube\.com\/watch\?v=([^&]+)/,
+                          /youtu\.be\/([^?]+)/,
+                          /youtube\.com\/shorts\/([^?]+)/,
+                        ];
+                        for (const pattern of patterns) {
+                          const match = url.match(pattern);
+                          if (match) return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+                        }
+                        return null;
+                      };
+
+                      const isYouTube = item.url.includes('youtube.com') || item.url.includes('youtu.be');
+                      const isTikTok = item.url.includes('tiktok.com');
+                      const isFacebook = item.url.includes('facebook.com');
+                      const isInstagram = item.url.includes('instagram.com');
+                      const isGoogleDrive = item.url.includes('drive.google.com') || item.url.includes('docs.google.com');
+
+                      return (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          className="group cursor-pointer"
+                        >
+                          <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all relative aspect-video">
+                            {isRegularImage ? (
+                              <Image
+                                src={item.url}
+                                alt={item.alt_text || `${skill.title} example`}
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                              />
+                            ) : isYouTube ? (
+                              <>
+                                <Image
+                                  src={getYouTubeThumbnail(item.url) || 'https://via.placeholder.com/640x360?text=YouTube+Video'}
+                                  alt={item.alt_text || 'YouTube video'}
+                                  fill
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                  className="object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
+                                  <div className="w-20 h-20 rounded-full bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                    <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                  </div>
+                                </div>
+                              </>
+                            ) : isTikTok ? (
+                              <div className="w-full h-full bg-gradient-to-br from-[#00f2ea] via-[#ff0050] to-[#000] flex items-center justify-center">
+                                <div className="text-center text-white">
+                                  <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                                  </svg>
+                                  <span className="font-bold text-sm">TikTok Video</span>
+                                </div>
+                              </div>
+                            ) : isFacebook ? (
+                              <div className="w-full h-full bg-[#1877f2] flex items-center justify-center">
+                                <div className="text-center text-white">
+                                  <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                  </svg>
+                                  <span className="font-bold text-sm">Facebook Post</span>
+                                </div>
+                              </div>
+                            ) : isInstagram ? (
+                              <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
+                                <div className="text-center text-white">
+                                  <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                  </svg>
+                                  <span className="font-bold text-sm">Instagram Post</span>
+                                </div>
+                              </div>
+                            ) : isGoogleDrive ? (
+                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+                                <div className="text-center text-[#2ecc71]">
+                                  <svg className="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                  <span className="font-bold text-sm text-white">Google Drive</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+                                <div className="text-center text-[#2ecc71]">
+                                  <ExternalLink className="w-16 h-16 mx-auto mb-3" />
+                                  <span className="font-bold text-sm text-white">External Link</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <SocialEmbed url={item.url} className="rounded-2xl" />
-                        )}
-                      </motion.div>
-                    ))}
+                          {item.alt_text && (
+                            <p className="text-slate-400 text-sm mt-2">{item.alt_text}</p>
+                          )}
+                        </motion.div>
+                      );
+                    })}
 
                     {/* Fallback to default gallery_images if no database items */}
                     {galleryItems.length === 0 && skill.gallery_images && skill.gallery_images.map((img, index) => (
