@@ -41,7 +41,10 @@ const isEmbeddableVideo = (url: string) => {
 
 // Check if content should use vertical aspect ratio
 const isVerticalContent = (url: string) => {
-  return isTikTokUrl(url) || (isInstagramUrl(url) && (url.includes('/reel/') || url.includes('/reels/')));
+  return isTikTokUrl(url) ||
+    (isInstagramUrl(url) && (url.includes('/reel/') || url.includes('/reels/'))) ||
+    (isFacebookUrl(url) && url.includes('/reel/')) ||
+    url.includes('youtube.com/shorts');
 };
 
 // ============ EMBED URL CONVERTERS ============
@@ -90,22 +93,37 @@ const getInstagramEmbedUrl = (url: string) => {
   // Handle /p/, /reel/, /reels/, /tv/ URLs
   const postMatch = url.match(/instagram\.com\/(p|reel|reels|tv)\/([^/?]+)/);
   if (postMatch) {
-    return `https://www.instagram.com/${postMatch[1]}/${postMatch[2]}/embed/`;
+    return `https://www.instagram.com/${postMatch[1]}/${postMatch[2]}/embed/captioned/`;
   }
-  return url;
+  return url + (url.includes('?') ? '&' : '?') + 'embed=true';
+};
+
+// Check if Facebook URL is for an image/photo
+const isFacebookImage = (url: string) => {
+  return url.includes('/photo') || url.includes('fbid=') || url.includes('/photos/');
 };
 
 // Convert Facebook URLs to embed format
 const getFacebookEmbedUrl = (url: string) => {
-  // Facebook video embed
-  if (url.includes('/videos/') || url.includes('/watch') || url.includes('fb.watch')) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+  const encodedUrl = encodeURIComponent(url);
+
+  // Facebook video/reel embed
+  if (url.includes('/videos/') || url.includes('/watch') || url.includes('fb.watch') || url.includes('/reel/')) {
+    return `https://www.facebook.com/plugins/video.php?href=${encodedUrl}&show_text=false&width=560&height=314&appId`;
   }
+
+  // Facebook photo/image embed - use post plugin with larger width
+  if (isFacebookImage(url)) {
+    return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=false&width=500&height=500&appId`;
+  }
+
   // Facebook post embed
-  if (url.includes('/posts/') || url.includes('/photo')) {
-    return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=false`;
+  if (url.includes('/posts/')) {
+    return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=false&width=500&appId`;
   }
-  return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+
+  // Default to post plugin for other Facebook URLs
+  return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=false&width=500&appId`;
 };
 
 // Get the appropriate embed URL based on platform
@@ -1366,6 +1384,8 @@ export default function PortfolioCollectionPage() {
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       loading="lazy"
+                      sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts allow-top-navigation allow-same-origin allow-forms allow-presentation"
+                      referrerPolicy="no-referrer-when-downgrade"
                     />
                   )}
                 </div>
@@ -1428,54 +1448,62 @@ export default function PortfolioCollectionPage() {
                   <div className="mb-8">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Project Gallery</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {galleryItems.map((item) => (
-                        <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
-                          {item.type === 'video' || item.type === 'link' ? (
-                            <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
-                              {isVideoFile(item.url) ? (
-                                <video
+                      {galleryItems.map((item) => {
+                        // Check if URL is from social media (needs iframe embed)
+                        const isSocialMediaUrl = isEmbeddableVideo(item.url);
+                        const needsEmbed = item.type === 'video' || item.type === 'link' || isSocialMediaUrl;
+
+                        return (
+                          <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+                            {needsEmbed ? (
+                              <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16]' : isFacebookImage(item.url) ? 'aspect-square' : 'aspect-video'}`}>
+                                {isVideoFile(item.url) ? (
+                                  <video
+                                    src={item.url}
+                                    className="w-full h-full object-cover"
+                                    controls
+                                    playsInline
+                                    preload="none"
+                                  />
+                                ) : isSocialMediaUrl ? (
+                                  <iframe
+                                    src={getEmbedUrl(item.url)}
+                                    className="w-full h-full"
+                                    allowFullScreen
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    loading="lazy"
+                                    sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts allow-top-navigation allow-same-origin allow-forms allow-presentation"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                  />
+                                ) : (
+                                  <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                                  >
+                                    <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                                      <ExternalLink size={32} />
+                                      <span className="text-white font-bold">View External Link</span>
+                                      <span className="text-slate-400 text-sm max-w-[80%] truncate">{item.url}</span>
+                                    </div>
+                                  </a>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="relative aspect-video">
+                                <Image
                                   src={item.url}
-                                  className="w-full h-full object-cover"
-                                  controls
-                                  playsInline
-                                  preload="none"
+                                  alt={item.alt_text || `Gallery image for ${selectedItem.title}`}
+                                  fill
+                                  sizes="(max-width: 768px) 100vw, 448px"
+                                  className="object-cover hover:scale-105 transition-transform duration-500"
                                 />
-                              ) : isEmbeddableVideo(item.url) ? (
-                                <iframe
-                                  src={getEmbedUrl(item.url)}
-                                  className="w-full h-full"
-                                  allowFullScreen
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <a
-                                  href={item.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
-                                >
-                                  <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
-                                    <ExternalLink size={32} />
-                                    <span className="text-white font-bold">View External Link</span>
-                                    <span className="text-slate-400 text-sm max-w-[80%] truncate">{item.url}</span>
-                                  </div>
-                                </a>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="relative aspect-video">
-                              <Image
-                                src={item.url}
-                                alt={item.alt_text || `Gallery image for ${selectedItem.title}`}
-                                fill
-                                sizes="(max-width: 768px) 100vw, 448px"
-                                className="object-cover hover:scale-105 transition-transform duration-500"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
