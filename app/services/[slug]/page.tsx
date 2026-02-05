@@ -16,70 +16,109 @@ const isVideoFile = (url: string) => {
   return url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
 };
 
+// ============ PLATFORM DETECTION ============
+
+const isYouTubeUrl = (url: string) => {
+  return url.includes('youtube.com') || url.includes('youtu.be');
+};
+
+const isTikTokUrl = (url: string) => {
+  return url.includes('tiktok.com');
+};
+
+const isInstagramUrl = (url: string) => {
+  return url.includes('instagram.com');
+};
+
+const isFacebookUrl = (url: string) => {
+  return url.includes('facebook.com') || url.includes('fb.watch');
+};
+
+// Check if URL is embeddable from any supported platform
+const isEmbeddableVideo = (url: string) => {
+  return isYouTubeUrl(url) || isTikTokUrl(url) || isInstagramUrl(url) || isFacebookUrl(url) || url.includes('vimeo.com');
+};
+
+// Check if content should use vertical aspect ratio
+const isVerticalContent = (url: string) => {
+  return isTikTokUrl(url) || (isInstagramUrl(url) && (url.includes('/reel/') || url.includes('/reels/')));
+};
+
+// ============ EMBED URL CONVERTERS ============
+
 // Convert YouTube URLs to embed format
 const getYouTubeEmbedUrl = (url: string) => {
-  // Handle different YouTube URL formats
-  // youtube.com/watch?v=VIDEO_ID
-  // youtu.be/VIDEO_ID
-  // youtube.com/embed/VIDEO_ID (already embed format)
-
   if (url.includes('youtube.com/embed/')) {
-    return url; // Already in embed format
+    return url;
   }
 
   let videoId = '';
 
-  // Match youtube.com/watch?v=VIDEO_ID
   const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
   if (watchMatch) {
     videoId = watchMatch[1];
   }
 
-  // Match youtu.be/VIDEO_ID
   const shortMatch = url.match(/youtu\.be\/([^?]+)/);
   if (shortMatch) {
     videoId = shortMatch[1];
+  }
+
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([^?]+)/);
+  if (shortsMatch) {
+    videoId = shortsMatch[1];
   }
 
   if (videoId) {
     return `https://www.youtube.com/embed/${videoId}`;
   }
 
-  // Return original URL if no match (might be Vimeo or other)
   return url;
-};
-
-// Check if URL is a YouTube or embeddable video
-const isEmbeddableVideo = (url: string) => {
-  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com') || url.includes('tiktok.com');
-};
-
-// Check if URL is a TikTok video
-const isTikTokVideo = (url: string) => {
-  return url.includes('tiktok.com');
 };
 
 // Convert TikTok URLs to embed format
 const getTikTokEmbedUrl = (url: string) => {
-  // Handle different TikTok URL formats
-  // https://www.tiktok.com/@username/video/VIDEO_ID
-  // https://vm.tiktok.com/XXXXXXX
-
-  // Extract video ID from standard TikTok URL
   const videoMatch = url.match(/\/video\/(\d+)/);
   if (videoMatch) {
     return `https://www.tiktok.com/embed/v2/${videoMatch[1]}`;
   }
-
-  // For short URLs, we'll try to use the path as the ID
-  const shortMatch = url.match(/vm\.tiktok\.com\/([^/?]+)/);
-  if (shortMatch) {
-    // Short URLs need to redirect, so we'll use the full URL in iframe
-    return url;
-  }
-
   return url;
 };
+
+// Convert Instagram URLs to embed format
+const getInstagramEmbedUrl = (url: string) => {
+  // Handle /p/, /reel/, /reels/, /tv/ URLs
+  const postMatch = url.match(/instagram\.com\/(p|reel|reels|tv)\/([^/?]+)/);
+  if (postMatch) {
+    return `https://www.instagram.com/${postMatch[1]}/${postMatch[2]}/embed/`;
+  }
+  return url;
+};
+
+// Convert Facebook URLs to embed format
+const getFacebookEmbedUrl = (url: string) => {
+  // Facebook video embed
+  if (url.includes('/videos/') || url.includes('/watch') || url.includes('fb.watch')) {
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+  }
+  // Facebook post embed
+  if (url.includes('/posts/') || url.includes('/photo')) {
+    return `https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&show_text=false`;
+  }
+  return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+};
+
+// Get the appropriate embed URL based on platform
+const getEmbedUrl = (url: string) => {
+  if (isYouTubeUrl(url)) return getYouTubeEmbedUrl(url);
+  if (isTikTokUrl(url)) return getTikTokEmbedUrl(url);
+  if (isInstagramUrl(url)) return getInstagramEmbedUrl(url);
+  if (isFacebookUrl(url)) return getFacebookEmbedUrl(url);
+  return url;
+};
+
+// Legacy function for backward compatibility
+const isTikTokVideo = isTikTokUrl;
 
 interface Service {
   id: string;
@@ -1311,7 +1350,7 @@ export default function PortfolioCollectionPage() {
 
               {/* Image/Video */}
               {selectedItem.video_url ? (
-                <div className={`relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem] bg-black ${isTikTokVideo(selectedItem.video_url) ? 'aspect-[9/16] max-w-[400px] mx-auto' : 'aspect-video'}`}>
+                <div className={`relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem] bg-black ${isVerticalContent(selectedItem.video_url) ? 'aspect-[9/16] max-w-[400px] mx-auto' : 'aspect-video'}`}>
                   {isVideoFile(selectedItem.video_url) ? (
                     <video
                       src={selectedItem.video_url}
@@ -1320,20 +1359,12 @@ export default function PortfolioCollectionPage() {
                       playsInline
                       preload="none"
                     />
-                  ) : isTikTokVideo(selectedItem.video_url) ? (
+                  ) : (
                     <iframe
-                      src={getTikTokEmbedUrl(selectedItem.video_url)}
+                      src={getEmbedUrl(selectedItem.video_url)}
                       className="w-full h-full"
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <iframe
-                      src={getYouTubeEmbedUrl(selectedItem.video_url)}
-                      className="w-full h-full"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       loading="lazy"
                     />
                   )}
@@ -1399,8 +1430,8 @@ export default function PortfolioCollectionPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {galleryItems.map((item) => (
                         <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
-                          {item.type === 'video' ? (
-                            <div className={`relative ${isTikTokVideo(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
+                          {item.type === 'video' || item.type === 'link' ? (
+                            <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
                               {isVideoFile(item.url) ? (
                                 <video
                                   src={item.url}
@@ -1409,40 +1440,12 @@ export default function PortfolioCollectionPage() {
                                   playsInline
                                   preload="none"
                                 />
-                              ) : isTikTokVideo(item.url) ? (
-                                <iframe
-                                  src={getTikTokEmbedUrl(item.url)}
-                                  className="w-full h-full"
-                                  allowFullScreen
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  loading="lazy"
-                                />
-                              ) : (
-                                <iframe
-                                  src={getYouTubeEmbedUrl(item.url)}
-                                  className="w-full h-full"
-                                  allowFullScreen
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  loading="lazy"
-                                />
-                              )}
-                            </div>
-                          ) : item.type === 'link' ? (
-                            <div className={`relative ${isTikTokVideo(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
-                              {isTikTokVideo(item.url) ? (
-                                <iframe
-                                  src={getTikTokEmbedUrl(item.url)}
-                                  className="w-full h-full"
-                                  allowFullScreen
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                  loading="lazy"
-                                />
                               ) : isEmbeddableVideo(item.url) ? (
                                 <iframe
-                                  src={getYouTubeEmbedUrl(item.url)}
+                                  src={getEmbedUrl(item.url)}
                                   className="w-full h-full"
                                   allowFullScreen
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                   loading="lazy"
                                 />
                               ) : (
