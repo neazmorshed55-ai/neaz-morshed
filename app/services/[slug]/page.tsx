@@ -1610,7 +1610,7 @@ export default function PortfolioCollectionPage() {
                                 </div>
                               )}
 
-                              {/* Overlay with icon based on type */}
+                              {/* Overlay with icon based on type - Only show on hover */}
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <div className="w-16 h-16 bg-[#2ecc71] rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform shadow-lg shadow-[#2ecc71]/30">
                                   {isActualVideo ? (
@@ -1621,17 +1621,6 @@ export default function PortfolioCollectionPage() {
                                     <Eye size={28} className="text-slate-900" />
                                   )}
                                 </div>
-                              </div>
-
-                              {/* Type indicator badge */}
-                              <div className="absolute top-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-[9px] font-bold rounded-full flex items-center gap-1 uppercase">
-                                {isActualVideo ? (
-                                  <><Play size={10} /> Video</>
-                                ) : isLink ? (
-                                  <><ExternalLink size={10} /> Link</>
-                                ) : (
-                                  <><Eye size={10} /> Image</>
-                                )}
                               </div>
                             </div>
                           </div>
