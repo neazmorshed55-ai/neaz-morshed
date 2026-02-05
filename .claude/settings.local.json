@@ -8,7 +8,8 @@
       "Bash(tree:*)",
       "WebFetch(domain:docs.google.com)",
       "WebFetch(domain:drive.google.com)",
-      "Bash(git -C \"c:/Users/Asus/neaz-morshed\" diff --stat)"
+      "Bash(git -C \"c:/Users/Asus/neaz-morshed\" diff --stat)",
+      "Bash(timeout:*)"
     ]
   }
 }

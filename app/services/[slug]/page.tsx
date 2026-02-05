@@ -51,7 +51,34 @@ const getYouTubeEmbedUrl = (url: string) => {
 
 // Check if URL is a YouTube or embeddable video
 const isEmbeddableVideo = (url: string) => {
-  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com');
+  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('vimeo.com') || url.includes('tiktok.com');
+};
+
+// Check if URL is a TikTok video
+const isTikTokVideo = (url: string) => {
+  return url.includes('tiktok.com');
+};
+
+// Convert TikTok URLs to embed format
+const getTikTokEmbedUrl = (url: string) => {
+  // Handle different TikTok URL formats
+  // https://www.tiktok.com/@username/video/VIDEO_ID
+  // https://vm.tiktok.com/XXXXXXX
+
+  // Extract video ID from standard TikTok URL
+  const videoMatch = url.match(/\/video\/(\d+)/);
+  if (videoMatch) {
+    return `https://www.tiktok.com/embed/v2/${videoMatch[1]}`;
+  }
+
+  // For short URLs, we'll try to use the path as the ID
+  const shortMatch = url.match(/vm\.tiktok\.com\/([^/?]+)/);
+  if (shortMatch) {
+    // Short URLs need to redirect, so we'll use the full URL in iframe
+    return url;
+  }
+
+  return url;
 };
 
 interface Service {
@@ -1284,7 +1311,7 @@ export default function PortfolioCollectionPage() {
 
               {/* Image/Video */}
               {selectedItem.video_url ? (
-                <div className="aspect-video relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem] bg-black">
+                <div className={`relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem] bg-black ${isTikTokVideo(selectedItem.video_url) ? 'aspect-[9/16] max-w-[400px] mx-auto' : 'aspect-video'}`}>
                   {isVideoFile(selectedItem.video_url) ? (
                     <video
                       src={selectedItem.video_url}
@@ -1292,6 +1319,14 @@ export default function PortfolioCollectionPage() {
                       controls
                       playsInline
                       preload="none"
+                    />
+                  ) : isTikTokVideo(selectedItem.video_url) ? (
+                    <iframe
+                      src={getTikTokEmbedUrl(selectedItem.video_url)}
+                      className="w-full h-full"
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      loading="lazy"
                     />
                   ) : (
                     <iframe
@@ -1365,7 +1400,7 @@ export default function PortfolioCollectionPage() {
                       {galleryItems.map((item) => (
                         <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
                           {item.type === 'video' ? (
-                            <div className="aspect-video relative">
+                            <div className={`relative ${isTikTokVideo(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
                               {isVideoFile(item.url) ? (
                                 <video
                                   src={item.url}
@@ -1373,6 +1408,14 @@ export default function PortfolioCollectionPage() {
                                   controls
                                   playsInline
                                   preload="none"
+                                />
+                              ) : isTikTokVideo(item.url) ? (
+                                <iframe
+                                  src={getTikTokEmbedUrl(item.url)}
+                                  className="w-full h-full"
+                                  allowFullScreen
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                  loading="lazy"
                                 />
                               ) : (
                                 <iframe
@@ -1385,8 +1428,16 @@ export default function PortfolioCollectionPage() {
                               )}
                             </div>
                           ) : item.type === 'link' ? (
-                            <div className="aspect-video relative">
-                              {isEmbeddableVideo(item.url) ? (
+                            <div className={`relative ${isTikTokVideo(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
+                              {isTikTokVideo(item.url) ? (
+                                <iframe
+                                  src={getTikTokEmbedUrl(item.url)}
+                                  className="w-full h-full"
+                                  allowFullScreen
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                  loading="lazy"
+                                />
+                              ) : isEmbeddableVideo(item.url) ? (
                                 <iframe
                                   src={getYouTubeEmbedUrl(item.url)}
                                   className="w-full h-full"
