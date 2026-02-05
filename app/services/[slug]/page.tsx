@@ -31,7 +31,12 @@ const isInstagramUrl = (url: string) => {
 };
 
 const isFacebookUrl = (url: string) => {
-  return url.includes('facebook.com') || url.includes('fb.watch');
+  return url.includes('facebook.com') || url.includes('fb.watch') || url.includes('fb.com');
+};
+
+// Check if URL needs special handling (no sandbox)
+const needsNoSandbox = (url: string) => {
+  return isFacebookUrl(url) || isInstagramUrl(url);
 };
 
 // Check if URL is embeddable from any supported platform
@@ -103,27 +108,33 @@ const isFacebookImage = (url: string) => {
   return url.includes('/photo') || url.includes('fbid=') || url.includes('/photos/');
 };
 
+// Convert Facebook share URLs to full post URLs
+const normalizeFacebookUrl = (url: string) => {
+  // Handle share URLs like facebook.com/share/p/CODE or facebook.com/share/r/CODE
+  if (url.includes('/share/p/') || url.includes('/share/r/')) {
+    // These short URLs can't be embedded directly, return as-is and let Facebook handle redirect
+    return url;
+  }
+  return url;
+};
+
 // Convert Facebook URLs to embed format
 const getFacebookEmbedUrl = (url: string) => {
-  const encodedUrl = encodeURIComponent(url);
+  const normalizedUrl = normalizeFacebookUrl(url);
+  const encodedUrl = encodeURIComponent(normalizedUrl);
 
   // Facebook video/reel embed
-  if (url.includes('/videos/') || url.includes('/watch') || url.includes('fb.watch') || url.includes('/reel/')) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodedUrl}&show_text=false&width=560&height=314&appId`;
+  if (url.includes('/videos/') || url.includes('/watch') || url.includes('fb.watch') || url.includes('/reel/') || url.includes('/share/r/')) {
+    return `https://www.facebook.com/plugins/video.php?href=${encodedUrl}&show_text=false&width=560`;
   }
 
-  // Facebook photo/image embed - use post plugin with larger width
+  // Facebook photo/image embed
   if (isFacebookImage(url)) {
-    return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=false&width=500&height=500&appId`;
+    return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=true&width=500`;
   }
 
-  // Facebook post embed
-  if (url.includes('/posts/')) {
-    return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=false&width=500&appId`;
-  }
-
-  // Default to post plugin for other Facebook URLs
-  return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=false&width=500&appId`;
+  // Facebook post/share embed - use show_text=true for better display
+  return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=true&width=500`;
 };
 
 // Get the appropriate embed URL based on platform
@@ -1384,8 +1395,8 @@ export default function PortfolioCollectionPage() {
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       loading="lazy"
-                      sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts allow-top-navigation allow-same-origin allow-forms allow-presentation"
                       referrerPolicy="no-referrer-when-downgrade"
+                      scrolling="no"
                     />
                   )}
                 </div>
@@ -1472,8 +1483,8 @@ export default function PortfolioCollectionPage() {
                                     allowFullScreen
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                     loading="lazy"
-                                    sandbox="allow-popups allow-popups-to-escape-sandbox allow-scripts allow-top-navigation allow-same-origin allow-forms allow-presentation"
                                     referrerPolicy="no-referrer-when-downgrade"
+                                    scrolling="no"
                                   />
                                 ) : (
                                   <a
