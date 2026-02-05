@@ -377,15 +377,21 @@ export default function PortfolioDetailPage() {
                   <h2 className="text-2xl font-black uppercase tracking-tight mb-6">Project Gallery</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {galleryItems.map((item) => {
-                      // Helper functions for thumbnail detection
-                      const isRegularImage = item.type === 'image' &&
-                        !item.url.includes('youtube.com') &&
-                        !item.url.includes('youtu.be') &&
-                        !item.url.includes('drive.google.com') &&
-                        !item.url.includes('facebook.com') &&
-                        !item.url.includes('instagram.com') &&
-                        !item.url.includes('tiktok.com') &&
-                        !item.url.includes('vimeo.com');
+                      // Check if URL is a direct image (including CDN images from Facebook, etc.)
+                      const isImageUrl = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(item.url) ||
+                                        item.url.includes('fbcdn.net') ||
+                                        item.url.includes('cdninstagram.com');
+
+                      // Check URL type
+                      const isYouTube = item.url.includes('youtube.com') || item.url.includes('youtu.be');
+                      const isTikTokPost = item.url.includes('tiktok.com') && item.url.includes('/video/');
+                      const isFacebookPost = item.url.includes('facebook.com') && !item.url.includes('fbcdn.net');
+                      const isInstagramPost = item.url.includes('instagram.com') && !item.url.includes('cdninstagram.com');
+                      const isGoogleDrive = item.url.includes('drive.google.com') || item.url.includes('docs.google.com');
+                      const isVimeo = item.url.includes('vimeo.com');
+
+                      // Regular image: direct image URL OR image file extension
+                      const isRegularImage = isImageUrl && !isTikTokPost && !isFacebookPost && !isInstagramPost;
 
                       const getYouTubeThumbnail = (url: string) => {
                         const patterns = [
@@ -399,12 +405,6 @@ export default function PortfolioDetailPage() {
                         }
                         return null;
                       };
-
-                      const isYouTube = item.url.includes('youtube.com') || item.url.includes('youtu.be');
-                      const isTikTok = item.url.includes('tiktok.com');
-                      const isFacebook = item.url.includes('facebook.com');
-                      const isInstagram = item.url.includes('instagram.com');
-                      const isGoogleDrive = item.url.includes('drive.google.com') || item.url.includes('docs.google.com');
 
                       return (
                         <motion.div
@@ -439,7 +439,7 @@ export default function PortfolioDetailPage() {
                                   </div>
                                 </div>
                               </>
-                            ) : isTikTok ? (
+                            ) : isTikTokPost ? (
                               <div className="w-full h-full bg-gradient-to-br from-[#00f2ea] via-[#ff0050] to-[#000] flex items-center justify-center">
                                 <div className="text-center text-white">
                                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
@@ -448,7 +448,7 @@ export default function PortfolioDetailPage() {
                                   <span className="font-bold text-xs">TikTok</span>
                                 </div>
                               </div>
-                            ) : isFacebook ? (
+                            ) : isFacebookPost ? (
                               <div className="w-full h-full bg-[#1877f2] flex items-center justify-center">
                                 <div className="text-center text-white">
                                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
@@ -457,7 +457,7 @@ export default function PortfolioDetailPage() {
                                   <span className="font-bold text-xs">Facebook</span>
                                 </div>
                               </div>
-                            ) : isInstagram ? (
+                            ) : isInstagramPost ? (
                               <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
                                 <div className="text-center text-white">
                                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
