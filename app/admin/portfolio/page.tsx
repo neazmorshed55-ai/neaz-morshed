@@ -68,6 +68,8 @@ export default function PortfolioManagement() {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' | 'document', skill_tags: [] as string[] });
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
+  const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryItem | null>(null);
+  const [showEditGalleryModal, setShowEditGalleryModal] = useState(false);
 
   const [formData, setFormData] = useState({
     service_id: '',
@@ -334,7 +336,53 @@ export default function PortfolioManagement() {
     if (error) {
       console.error('Error fetching gallery items:', error);
     } else if (data) {
-      setGalleryItems(data as GalleryItem[]);
+      // Fetch tags for each gallery item
+      const itemsWithTags = await Promise.all(data.map(async (item) => {
+        const { data: tags } = await supabase
+          .from('portfolio_gallery_skill_tags')
+          .select('sub_skill_id')
+          .eq('portfolio_gallery_id', item.id);
+
+        return {
+          ...item,
+          skill_tags: tags?.map(t => t.sub_skill_id) || []
+        };
+      }));
+
+      setGalleryItems(itemsWithTags as GalleryItem[]);
+    }
+  };
+
+  const handleEditGalleryItem = (item: GalleryItem) => {
+    setEditingGalleryItem(item);
+    setShowEditGalleryModal(true);
+  };
+
+  const handleUpdateGalleryItemTags = async () => {
+    if (!supabase || !editingGalleryItem) return;
+
+    try {
+      // First, delete existing tags
+      await supabase
+        .from('portfolio_gallery_skill_tags')
+        .delete()
+        .eq('portfolio_gallery_id', editingGalleryItem.id);
+
+      // Then, add new tags
+      if (editingGalleryItem.skill_tags && editingGalleryItem.skill_tags.length > 0) {
+        await addSkillTagsToGalleryItem(editingGalleryItem.id, editingGalleryItem.skill_tags);
+      }
+
+      // Refresh gallery items
+      if (editingItem) {
+        await fetchGalleryItems(editingItem.id);
+      }
+
+      setShowEditGalleryModal(false);
+      setEditingGalleryItem(null);
+    } catch (error) {
+      console.error('Error updating gallery item tags:', error);
+      alert('Error updating tags');
     }
   };
 
@@ -988,49 +1036,79 @@ export default function PortfolioManagement() {
                       {galleryItems.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {galleryItems.map((item) => (
-                            <div key={item.id} className="relative group aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/10">
-                              {item.type === 'image' ? (
-                                <img src={item.url} alt="Gallery item" className="w-full h-full object-cover" />
-                              ) : item.type === 'video' ? (
-                                <div className="w-full h-full flex items-center justify-center bg-slate-900">
-                                  <div className="text-slate-500 flex flex-col items-center">
-                                    <span className="text-xs">Video</span>
+                            <div key={item.id} className="relative flex flex-col">
+                              <div className="relative group aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/10">
+                                {item.type === 'image' ? (
+                                  <img src={item.url} alt="Gallery item" className="w-full h-full object-cover" />
+                                ) : item.type === 'video' ? (
+                                  <div className="w-full h-full flex items-center justify-center bg-slate-900">
+                                    <div className="text-slate-500 flex flex-col items-center">
+                                      <span className="text-xs">Video</span>
+                                    </div>
                                   </div>
+                                ) : item.type === 'document' ? (
+                                  <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <div className="text-[#2ecc71] flex flex-col items-center gap-2 p-4">
+                                      <FileText size={32} />
+                                      <span className="text-xs text-slate-400 max-w-[90%] truncate text-center">{item.alt_text || 'Document'}</span>
+                                    </div>
+                                  </a>
+                                ) : (
+                                  <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <div className="text-[#2ecc71] flex flex-col items-center gap-2">
+                                      <ExternalLink size={24} />
+                                      <span className="text-xs text-slate-400 max-w-[80%] truncate">{item.url}</span>
+                                    </div>
+                                  </a>
+                                )}
+
+                                {/* Action buttons */}
+                                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditGalleryItem(item)}
+                                    className="p-1.5 bg-[#2ecc71] text-slate-900 rounded-lg hover:bg-[#27ae60] transition-colors"
+                                  >
+                                    <Edit2 size={14} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteGalleryItem(item.id)}
+                                    className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
                                 </div>
-                              ) : item.type === 'document' ? (
-                                <a
-                                  href={item.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div className="text-[#2ecc71] flex flex-col items-center gap-2 p-4">
-                                    <FileText size={32} />
-                                    <span className="text-xs text-slate-400 max-w-[90%] truncate text-center">{item.alt_text || 'Document'}</span>
-                                  </div>
-                                </a>
-                              ) : (
-                                <a
-                                  href={item.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <div className="text-[#2ecc71] flex flex-col items-center gap-2">
-                                    <ExternalLink size={24} />
-                                    <span className="text-xs text-slate-400 max-w-[80%] truncate">{item.url}</span>
-                                  </div>
-                                </a>
+                              </div>
+
+                              {/* Tags display */}
+                              {item.skill_tags && item.skill_tags.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1">
+                                  {item.skill_tags.map((tagId) => {
+                                    const skill = subSkills.find(s => s.id === tagId);
+                                    return skill ? (
+                                      <span
+                                        key={tagId}
+                                        className="px-2 py-0.5 bg-[#2ecc71]/20 text-[#2ecc71] text-[10px] font-semibold rounded"
+                                      >
+                                        {skill.title}
+                                      </span>
+                                    ) : null;
+                                  })}
+                                </div>
                               )}
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteGalleryItem(item.id)}
-                                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <Trash2 size={14} />
-                              </button>
                             </div>
                           ))}
                         </div>
@@ -1062,6 +1140,102 @@ export default function PortfolioManagement() {
                     className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Save size={18} /> Save</>}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Edit Gallery Item Tags Modal */}
+        <AnimatePresence>
+          {showEditGalleryModal && editingGalleryItem && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowEditGalleryModal(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold text-white mb-4">Edit Skill Tags</h3>
+
+                {/* Preview */}
+                <div className="mb-4 aspect-video rounded-lg overflow-hidden border border-white/10">
+                  {editingGalleryItem.type === 'image' ? (
+                    <img src={editingGalleryItem.url} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-500">
+                      {editingGalleryItem.type}
+                    </div>
+                  )}
+                </div>
+
+                {/* Tag Selection */}
+                <div className="space-y-2 mb-6">
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                    Select Skills (Max 3)
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {subSkills.map((skill) => {
+                      const isSelected = editingGalleryItem.skill_tags?.includes(skill.id);
+                      const canSelect = (editingGalleryItem.skill_tags?.length || 0) < 3;
+
+                      return (
+                        <button
+                          key={skill.id}
+                          type="button"
+                          onClick={() => {
+                            const currentTags = editingGalleryItem.skill_tags || [];
+                            if (isSelected) {
+                              setEditingGalleryItem({
+                                ...editingGalleryItem,
+                                skill_tags: currentTags.filter(id => id !== skill.id)
+                              });
+                            } else if (canSelect) {
+                              setEditingGalleryItem({
+                                ...editingGalleryItem,
+                                skill_tags: [...currentTags, skill.id]
+                              });
+                            }
+                          }}
+                          disabled={!isSelected && !canSelect}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            isSelected
+                              ? 'bg-[#2ecc71] text-slate-950'
+                              : canSelect
+                              ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white'
+                              : 'bg-slate-900/50 text-slate-600 cursor-not-allowed'
+                          }`}
+                        >
+                          {skill.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-slate-600 text-xs">
+                    Selected: {editingGalleryItem.skill_tags?.length || 0}/3
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowEditGalleryModal(false)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateGalleryItemTags}
+                    className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold hover:bg-[#27ae60]"
+                  >
+                    Save Tags
                   </button>
                 </div>
               </motion.div>
