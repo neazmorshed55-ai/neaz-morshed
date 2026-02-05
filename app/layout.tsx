@@ -2,6 +2,7 @@ import './globals.css';
 import React from 'react';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import VisitorTracker from '../components/VisitorTracker';
 import AIChatbot from '../components/AIChatbot';
 
@@ -77,6 +78,23 @@ export default function RootLayout({
         <VisitorTracker />
         {children}
         <AIChatbot />
+
+        {/* Social Media Embed Scripts */}
+        <Script
+          src="https://www.instagram.com/embed.js"
+          strategy="lazyOnload"
+        />
+        <Script
+          src="https://www.tiktok.com/embed.js"
+          strategy="lazyOnload"
+        />
+        <Script
+          async
+          defer
+          crossOrigin="anonymous"
+          src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

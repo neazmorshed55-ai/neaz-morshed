@@ -15,12 +15,36 @@ import Navbar from '../../../../components/Navbar';
 
 // ============ PLATFORM DETECTION ============
 
+const isImageFile = (url: string) => {
+  const lowerUrl = url.toLowerCase();
+  return lowerUrl.endsWith('.jpg') || 
+         lowerUrl.endsWith('.jpeg') || 
+         lowerUrl.endsWith('.png') || 
+         lowerUrl.endsWith('.gif') || 
+         lowerUrl.endsWith('.webp') || 
+         lowerUrl.endsWith('.svg') ||
+         lowerUrl.includes('format=jpg') ||
+         lowerUrl.includes('format=png') ||
+         lowerUrl.includes('format=webp');
+};
+
 const isVideoFile = (url: string) => {
+  // If it's a known image file, it's not a video
+  if (isImageFile(url)) return false;
+  
+  // Checking for supabase.co is risky if we store images there too, 
+  // so we should rely more on extensions or explicit video indicators if possible.
+  // But preserving existing logic with the safety check above:
   return url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
 };
 
 const isYouTubeUrl = (url: string) => {
   return url.includes('youtube.com') || url.includes('youtu.be');
+};
+
+// Check if YouTube URL is a channel (not embeddable)
+const isYouTubeChannel = (url: string) => {
+  return url.includes('/@') || url.includes('/channel/') || url.includes('/c/') || url.includes('/user/');
 };
 
 const isTikTokUrl = (url: string) => {
@@ -36,6 +60,13 @@ const isFacebookUrl = (url: string) => {
 };
 
 const isEmbeddableVideo = (url: string) => {
+  // If it's an image file, it's not an embeddable video even if it comes from FB/Insta
+  if (isImageFile(url)) return false;
+
+  // YouTube channel URLs cannot be embedded - only video URLs can
+  if (isYouTubeUrl(url) && isYouTubeChannel(url)) {
+    return false;
+  }
   return isYouTubeUrl(url) || isTikTokUrl(url) || isInstagramUrl(url) || isFacebookUrl(url) || url.includes('vimeo.com');
 };
 
@@ -294,7 +325,7 @@ export default function PortfolioDetailPage() {
                       controls
                       playsInline
                     />
-                  ) : (
+                  ) : isEmbeddableVideo(portfolio.video_url) ? (
                     <iframe
                       src={getEmbedUrl(portfolio.video_url)}
                       className="w-full h-full"
@@ -302,6 +333,19 @@ export default function PortfolioDetailPage() {
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       loading="lazy"
                     />
+                  ) : (
+                    <a
+                      href={portfolio.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                    >
+                      <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                        <ExternalLink size={48} />
+                        <span className="text-white font-bold text-lg">Visit External Link</span>
+                        <span className="text-slate-400 text-sm max-w-[80%] truncate">{portfolio.video_url}</span>
+                      </div>
+                    </a>
                   )}
                 </div>
               ) : (portfolio.image_url || portfolio.thumbnail_url) && (
@@ -454,7 +498,7 @@ export default function PortfolioDetailPage() {
                   className="object-contain"
                 />
               </div>
-            ) : (
+            ) : isEmbeddableVideo(selectedGalleryItem.url) ? (
               <div className={`relative rounded-2xl overflow-hidden bg-black ${isVerticalContent(selectedGalleryItem.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
                 <iframe
                   src={getEmbedUrl(selectedGalleryItem.url)}
@@ -463,6 +507,19 @@ export default function PortfolioDetailPage() {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 />
               </div>
+            ) : (
+              <a
+                href={selectedGalleryItem.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors rounded-2xl aspect-video"
+              >
+                <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                  <ExternalLink size={48} />
+                  <span className="text-white font-bold text-lg">Visit External Link</span>
+                  <span className="text-slate-400 text-sm max-w-[80%] truncate">{selectedGalleryItem.url}</span>
+                </div>
+              </a>
             )}
           </div>
         </motion.div>

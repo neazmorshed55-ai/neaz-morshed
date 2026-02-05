@@ -62,15 +62,15 @@ export default function ServicesPage() {
       <Navbar />
 
       <main className="pb-24">
-        {/* Hero Section */}
-        <section className="pt-32 pb-20 relative overflow-hidden min-h-[55vh] flex flex-col justify-center">
-          <VideoBackground type="services" opacity={0.8} />
+        {/* Hero Section - Improved for better readability */}
+        <section className="pt-32 pb-16 relative overflow-hidden min-h-[45vh] flex flex-col justify-center">
+          <VideoBackground type="services" opacity={0.5} />
 
-          {/* Additional decorative elements */}
-          <div className="absolute top-[10%] left-[5%] w-[600px] h-[600px] bg-[#2ecc71]/5 rounded-full blur-[180px] pointer-events-none"></div>
+          {/* Softer decorative elements */}
+          <div className="absolute top-[10%] left-[5%] w-[500px] h-[500px] bg-[#2ecc71]/3 rounded-full blur-[150px] pointer-events-none"></div>
 
           <div className="container mx-auto px-6 max-w-7xl relative z-10">
-            <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all mb-8 group">
+            <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all mb-10 group">
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm font-bold uppercase tracking-wider">Back to Home</span>
             </Link>
@@ -80,20 +80,41 @@ export default function ServicesPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">What I Offer</span>
-              <h1 className="text-6xl lg:text-8xl font-black uppercase tracking-tighter leading-none mb-8">
-                My <span className="text-slate-600">Services</span>
+              <span className="text-[#2ecc71] text-xs font-black uppercase tracking-[0.4em] mb-6 block">What I Offer</span>
+              <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tight leading-[1.1] mb-6">
+                My <span className="text-[#2ecc71]">Services</span>
               </h1>
-              <p className="text-slate-400 text-xl max-w-2xl leading-relaxed">
+              <p className="text-slate-300 text-lg lg:text-xl max-w-2xl leading-relaxed font-medium">
                 Explore my portfolio collections for each service. Click on any service to see my work samples and case studies.
               </p>
             </motion.div>
           </div>
         </section>
 
-        {/* Services Grid */}
-        <section className="py-20 bg-slate-900/20">
+        {/* Services Grid - Enhanced for better visual hierarchy and eye comfort */}
+        <section className="py-24 bg-gradient-to-b from-transparent via-slate-900/10 to-transparent">
           <div className="container mx-auto px-6 max-w-7xl">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-3xl lg:text-4xl font-black uppercase tracking-tight mb-4"
+              >
+                Browse All <span className="text-[#2ecc71]">Services</span>
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="text-slate-400 text-base max-w-2xl mx-auto"
+              >
+                Select a service category to view detailed portfolio and past work
+              </motion.p>
+            </div>
+
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
@@ -103,21 +124,22 @@ export default function ServicesPage() {
                 <p className="text-slate-400 text-lg">No services available yet.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {services.map((service, index) => (
                   <motion.div
                     key={service.id}
                     initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
                     <Link href={`/services/${service.slug}`}>
                       <div className="group relative h-full">
-                        {/* Card */}
-                        <div className="p-10 bg-slate-900/60 border border-white/5 rounded-[3rem] hover:border-[#2ecc71]/40 hover:bg-slate-900 transition-all duration-500 h-full flex flex-col relative overflow-hidden">
-                          {/* Cover Image */}
+                        {/* Card with better contrast and spacing */}
+                        <div className="p-8 lg:p-10 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-3xl hover:border-[#2ecc71]/50 hover:bg-slate-900 hover:shadow-2xl hover:shadow-[#2ecc71]/10 transition-all duration-500 h-full flex flex-col relative overflow-hidden">
+                          {/* Cover Image with reduced opacity for better readability */}
                           {service.cover_image && (
-                            <div className="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity">
                               <Image
                                 src={service.cover_image}
                                 alt={service.title}
@@ -129,26 +151,29 @@ export default function ServicesPage() {
                           )}
 
                           <div className="relative z-10">
-                            {/* Icon */}
-                            <div className="text-[#2ecc71] mb-8 group-hover:scale-110 group-hover:rotate-6 transition-transform inline-flex p-5 bg-white/5 rounded-[2rem] border border-white/5">
+                            {/* Icon with better prominence */}
+                            <div className="text-[#2ecc71] mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 inline-flex p-4 bg-[#2ecc71]/10 rounded-2xl border border-[#2ecc71]/20 shadow-lg shadow-[#2ecc71]/5">
                               {iconMap[service.icon] || <Briefcase className="w-12 h-12" />}
                             </div>
 
-                            {/* Title */}
-                            <h3 className="text-2xl font-black mb-4 uppercase tracking-tighter leading-tight group-hover:text-[#2ecc71] transition-colors">
+                            {/* Title with improved contrast */}
+                            <h3 className="text-2xl lg:text-3xl font-black mb-4 uppercase tracking-tight leading-tight text-white group-hover:text-[#2ecc71] transition-colors duration-300">
                               {service.title}
                             </h3>
 
-                            {/* Description */}
-                            <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-grow">
+                            {/* Description with better readability */}
+                            <p className="text-slate-300 text-base leading-relaxed mb-8 flex-grow">
                               {service.description}
                             </p>
 
-                            {/* View Portfolio Link */}
-                            <div className="flex items-center gap-3 text-[#2ecc71] text-[11px] font-black uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                              View Portfolio <ArrowRight size={16} />
+                            {/* View Portfolio Link with better visibility */}
+                            <div className="flex items-center gap-3 text-[#2ecc71] text-xs font-black uppercase tracking-wider group-hover:gap-5 transition-all duration-300">
+                              View Portfolio <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                             </div>
                           </div>
+
+                          {/* Subtle glow effect on hover */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-[#2ecc71]/0 to-[#2ecc71]/0 group-hover:from-[#2ecc71]/5 group-hover:to-transparent rounded-3xl transition-all duration-500 pointer-events-none"></div>
                         </div>
                       </div>
                     </Link>

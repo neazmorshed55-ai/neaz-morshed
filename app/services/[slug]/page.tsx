@@ -22,6 +22,11 @@ const isYouTubeUrl = (url: string) => {
   return url.includes('youtube.com') || url.includes('youtu.be');
 };
 
+// Check if YouTube URL is a channel (not embeddable)
+const isYouTubeChannel = (url: string) => {
+  return url.includes('/@') || url.includes('/channel/') || url.includes('/c/') || url.includes('/user/');
+};
+
 const isTikTokUrl = (url: string) => {
   return url.includes('tiktok.com');
 };
@@ -41,6 +46,10 @@ const needsNoSandbox = (url: string) => {
 
 // Check if URL is embeddable from any supported platform
 const isEmbeddableVideo = (url: string) => {
+  // YouTube channel URLs cannot be embedded - only video URLs can
+  if (isYouTubeUrl(url) && isYouTubeChannel(url)) {
+    return false;
+  }
   return isYouTubeUrl(url) || isTikTokUrl(url) || isInstagramUrl(url) || isFacebookUrl(url) || url.includes('vimeo.com');
 };
 
@@ -1408,7 +1417,7 @@ export default function PortfolioCollectionPage() {
                       playsInline
                       preload="none"
                     />
-                  ) : (
+                  ) : isEmbeddableVideo(selectedItem.video_url) ? (
                     <iframe
                       src={getEmbedUrl(selectedItem.video_url)}
                       className="w-full h-full"
@@ -1418,6 +1427,19 @@ export default function PortfolioCollectionPage() {
                       referrerPolicy="no-referrer-when-downgrade"
                       scrolling="no"
                     />
+                  ) : (
+                    <a
+                      href={selectedItem.video_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                    >
+                      <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                        <ExternalLink size={48} />
+                        <span className="text-white font-bold text-lg">Visit External Link</span>
+                        <span className="text-slate-400 text-sm max-w-[80%] truncate">{selectedItem.video_url}</span>
+                      </div>
+                    </a>
                   )}
                 </div>
               ) : (selectedItem.image_url || selectedItem.thumbnail_url) && (
