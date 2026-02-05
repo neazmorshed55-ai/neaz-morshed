@@ -1561,16 +1561,18 @@ export default function PortfolioCollectionPage() {
                         const isGoogleDrive = isGoogleDriveUrl(item.url);
                         const isImage = !isActualVideo && !isLink && !isGoogleDrive;
 
-                        // Get thumbnail source
+                        // Get thumbnail source - generate thumbnails for all video platforms
                         const getThumbnailSrc = () => {
                           if (isFacebookImage(item.url)) {
-                            // For Facebook images, extract the image URL
                             return item.url;
                           } else if (isActualVideo) {
-                            // For videos, show a placeholder or first frame
-                            return item.url.includes('youtube.com') || item.url.includes('youtu.be')
-                              ? `https://img.youtube.com/vi/${item.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?]+)/)?.[1]}/maxresdefault.jpg`
-                              : null;
+                            // YouTube thumbnail
+                            if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
+                              const videoId = item.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?]+)/)?.[1];
+                              return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+                            }
+                            // For other platforms, use a generic video thumbnail or return null to show iframe
+                            return null;
                           }
                           return item.url;
                         };
@@ -1592,10 +1594,18 @@ export default function PortfolioCollectionPage() {
                                   sizes="(max-width: 768px) 100vw, 448px"
                                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
+                              ) : isActualVideo ? (
+                                // Show iframe preview for videos without thumbnail (TikTok, Facebook, Instagram)
+                                <iframe
+                                  src={getEmbedUrl(item.url)}
+                                  className="w-full h-full pointer-events-none"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  loading="lazy"
+                                />
                               ) : (
                                 <div className="w-full h-full bg-slate-800 flex items-center justify-center">
                                   <div className="text-slate-600">
-                                    {isActualVideo ? <Play size={48} /> : isGoogleDrive ? <FileText size={48} /> : isLink ? <ExternalLink size={48} /> : <Eye size={48} />}
+                                    {isGoogleDrive ? <FileText size={48} /> : isLink ? <ExternalLink size={48} /> : <Eye size={48} />}
                                   </div>
                                 </div>
                               )}
