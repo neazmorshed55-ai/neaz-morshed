@@ -388,10 +388,21 @@ export default function PortfolioManagement() {
   };
 
   const handleAddGalleryItem = async () => {
-    if (!supabase || !editingItem) return;
+    if (!supabase || !editingItem) {
+      alert('Please save the portfolio item first before adding gallery items');
+      return;
+    }
+
+    if (!editingItem.id) {
+      alert('Portfolio item must be saved before adding gallery items');
+      return;
+    }
 
     // Allow adding if URL is present OR if we are about to upload (handled separately? No, let's make it so you select file OR enter URL)
-    if (!newGalleryItem.url) return;
+    if (!newGalleryItem.url) {
+      alert('Please enter a URL or upload a file');
+      return;
+    }
 
     setAddingGalleryItem(true);
     try {
@@ -407,7 +418,11 @@ export default function PortfolioManagement() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
+
       if (data) {
         // Add skill tags if selected
         if (newGalleryItem.skill_tags.length > 0) {
@@ -417,9 +432,10 @@ export default function PortfolioManagement() {
         setGalleryItems([...galleryItems, { ...data, skill_tags: newGalleryItem.skill_tags } as GalleryItem]);
         setNewGalleryItem({ url: '', alt_text: '', type: 'image', skill_tags: [] });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding gallery item:', error);
-      alert('Error adding gallery item');
+      const errorMessage = error?.message || error?.error_description || 'Unknown error';
+      alert(`Error adding gallery item: ${errorMessage}. Check the console for details.`);
     }
     setAddingGalleryItem(false);
   };
@@ -447,6 +463,11 @@ export default function PortfolioManagement() {
     const files = e.target.files;
     if (!files || files.length === 0 || !supabase || !editingItem) return;
 
+    if (!editingItem.id) {
+      alert('Portfolio item must be saved before adding gallery items');
+      return;
+    }
+
     setAddingGalleryItem(true);
     try {
       const uploadPromises = Array.from(files).map(async (file, index) => {
@@ -467,7 +488,10 @@ export default function PortfolioManagement() {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error details:', error);
+          throw error;
+        }
 
         // Add skill tags if selected
         if (newGalleryItem.skill_tags.length > 0 && data) {
@@ -480,9 +504,10 @@ export default function PortfolioManagement() {
       const uploadedItems = await Promise.all(uploadPromises);
       setGalleryItems([...galleryItems, ...uploadedItems]);
       setNewGalleryItem({ url: '', alt_text: '', type: 'image', skill_tags: [] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading/adding gallery items:', error);
-      alert('Error uploading gallery items');
+      const errorMessage = error?.message || error?.error_description || 'Unknown error';
+      alert(`Error uploading gallery items: ${errorMessage}. Check the console for details.`);
     }
     setAddingGalleryItem(false);
     // Reset file input
