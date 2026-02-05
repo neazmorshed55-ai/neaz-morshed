@@ -1502,13 +1502,13 @@ export default function PortfolioCollectionPage() {
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Project Gallery</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {galleryItems.map((item) => {
-                        // Check if URL is from social media (needs iframe embed)
-                        const isSocialMediaUrl = isEmbeddableVideo(item.url);
-                        const needsEmbed = item.type === 'video' || item.type === 'link' || isSocialMediaUrl;
+                        // Check if it's a video file or actual video platform URL (not Facebook images)
+                        const isActualVideo = isVideoFile(item.url) ||
+                          (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
 
                         return (
                           <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
-                            {needsEmbed ? (
+                            {isActualVideo ? (
                               <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16]' : isFacebookImage(item.url) ? 'aspect-square' : 'aspect-video'}`}>
                                 {isVideoFile(item.url) ? (
                                   <video
