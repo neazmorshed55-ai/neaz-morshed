@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   Plus, Edit2, Trash2, Search, Loader2, X,
-  Star, ArrowLeft, Save, Image, ExternalLink, Upload
+  Star, ArrowLeft, Save, Image, ExternalLink, Upload, FileText
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -41,7 +41,7 @@ interface GalleryItem {
   portfolio_item_id: string;
   url: string;
   alt_text: string | null;
-  type: 'image' | 'video' | 'link';
+  type: 'image' | 'video' | 'link' | 'document';
   order_index: number;
 }
 
@@ -57,7 +57,7 @@ export default function PortfolioManagement() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' });
+  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' | 'document' });
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -255,18 +255,21 @@ export default function PortfolioManagement() {
     setDeleteConfirm(null);
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (file: File, isDocument = false) => {
     const fileExt = file.name.split('.').pop();
     const fileName = `portfolio-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `portfolio/${fileName}`;
 
+    // Use 'documents' bucket for documents, 'images' bucket for media
+    const bucketName = isDocument ? 'documents' : 'images';
+
     const { error: uploadError } = await supabase!.storage
-      .from('images')
+      .from(bucketName)
       .upload(filePath, file, { upsert: true });
 
     if (uploadError) throw uploadError;
 
-    const { data } = supabase!.storage.from('images').getPublicUrl(filePath);
+    const { data } = supabase!.storage.from(bucketName).getPublicUrl(filePath);
     return data.publicUrl;
   };
 
@@ -363,7 +366,9 @@ export default function PortfolioManagement() {
     setAddingGalleryItem(true);
     try {
       const uploadPromises = Array.from(files).map(async (file, index) => {
-        const publicUrl = await uploadFile(file);
+        // Check if it's a document file
+        const isDocument = newGalleryItem.type === 'document';
+        const publicUrl = await uploadFile(file, isDocument);
 
         // Add each file to gallery
         const { data, error } = await supabase
@@ -371,8 +376,8 @@ export default function PortfolioManagement() {
           .insert({
             portfolio_item_id: editingItem.id,
             url: publicUrl,
-            alt_text: newGalleryItem.alt_text || null,
-            type: newGalleryItem.type, // 'image' or 'video'
+            alt_text: newGalleryItem.alt_text || file.name, // Use filename as alt_text for documents
+            type: newGalleryItem.type, // 'image', 'video', or 'document'
             order_index: galleryItems.length + index
           })
           .select()
@@ -791,11 +796,12 @@ export default function PortfolioManagement() {
                       <div className="flex gap-3 mb-6 items-start">
                         <select
                           value={newGalleryItem.type}
-                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' | 'link' })}
+                          onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' | 'link' | 'document' })}
                           className="bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 h-[46px]"
                         >
                           <option value="image">Image</option>
                           <option value="video">Video</option>
+                          <option value="document">Document</option>
                           <option value="link">Link</option>
                         </select>
 
@@ -811,6 +817,8 @@ export default function PortfolioManagement() {
                                   ? "Paste Image URL or Upload..."
                                   : newGalleryItem.type === 'video'
                                   ? "Paste Video URL (YouTube) or Upload..."
+                                  : newGalleryItem.type === 'document'
+                                  ? "Paste Document URL or Upload (PDF, DOC, XLSX)..."
                                   : "Paste external link (YouTube, website, etc.)"
                               }
                             />
@@ -833,7 +841,7 @@ export default function PortfolioManagement() {
                             {addingGalleryItem && newGalleryItem.url ? <Loader2 size={18} className="animate-spin" /> : <><Plus size={18} /> Add</>}
                           </button>
 
-                          {/* OR Divider and File Upload - Only for image/video, not links */}
+                          {/* OR Divider and File Upload - Only for image/video/document, not links */}
                           {newGalleryItem.type !== 'link' && (
                             <>
                               <div className="flex items-center gap-3 my-2">
@@ -853,10 +861,14 @@ export default function PortfolioManagement() {
                                 )}
                                 <div className="text-center">
                                   <span className="text-white font-semibold block">
-                                    Click to upload {newGalleryItem.type === 'image' ? 'Images' : 'Videos'}
+                                    Click to upload {newGalleryItem.type === 'image' ? 'Images' : newGalleryItem.type === 'video' ? 'Videos' : 'Documents'}
                                   </span>
                                   <span className="text-slate-500 text-xs mt-1 block">
-                                    {newGalleryItem.type === 'image' ? 'PNG, JPG, WEBP up to 10MB' : 'MP4, WEBM up to 50MB'}
+                                    {newGalleryItem.type === 'image'
+                                      ? 'PNG, JPG, WEBP up to 10MB'
+                                      : newGalleryItem.type === 'video'
+                                      ? 'MP4, WEBM up to 50MB'
+                                      : 'PDF, DOC, DOCX, XLS, XLSX up to 10MB'}
                                   </span>
                                   <span className="text-[#2ecc71] text-xs mt-1 block font-semibold">
                                     Multiple files supported
@@ -864,7 +876,13 @@ export default function PortfolioManagement() {
                                 </div>
                                 <input
                                   type="file"
-                                  accept={newGalleryItem.type === 'image' ? "image/*" : "video/*"}
+                                  accept={
+                                    newGalleryItem.type === 'image'
+                                      ? "image/*"
+                                      : newGalleryItem.type === 'video'
+                                      ? "video/*"
+                                      : ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                                  }
                                   onChange={handleGalleryFileUpload}
                                   className="hidden"
                                   disabled={addingGalleryItem}
@@ -889,6 +907,19 @@ export default function PortfolioManagement() {
                                     <span className="text-xs">Video</span>
                                   </div>
                                 </div>
+                              ) : item.type === 'document' ? (
+                                <a
+                                  href={item.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <div className="text-[#2ecc71] flex flex-col items-center gap-2 p-4">
+                                    <FileText size={32} />
+                                    <span className="text-xs text-slate-400 max-w-[90%] truncate text-center">{item.alt_text || 'Document'}</span>
+                                  </div>
+                                </a>
                               ) : (
                                 <a
                                   href={item.url}
