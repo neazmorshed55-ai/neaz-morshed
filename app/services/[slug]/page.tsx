@@ -1047,6 +1047,7 @@ export default function PortfolioCollectionPage() {
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchGallery() {
@@ -1501,65 +1502,83 @@ export default function PortfolioCollectionPage() {
                   <div className="mb-8">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Project Gallery</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {galleryItems.map((item) => {
+                      {galleryItems.map((item, index) => {
                         // Check if it's a video file or actual video platform URL (not Facebook images)
                         const isActualVideo = isVideoFile(item.url) ||
                           (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
+                        const isLink = item.type === 'link' || (!isActualVideo && !isFacebookImage(item.url) && item.url.startsWith('http'));
+                        const isImage = !isActualVideo && !isLink;
+
+                        // Get thumbnail source
+                        const getThumbnailSrc = () => {
+                          if (isFacebookImage(item.url)) {
+                            // For Facebook images, extract the image URL
+                            return item.url;
+                          } else if (isActualVideo) {
+                            // For videos, show a placeholder or first frame
+                            return item.url.includes('youtube.com') || item.url.includes('youtu.be')
+                              ? `https://img.youtube.com/vi/${item.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?]+)/)?.[1]}/maxresdefault.jpg`
+                              : null;
+                          }
+                          return item.url;
+                        };
+
+                        const thumbnailSrc = getThumbnailSrc();
 
                         return (
-                          <div key={item.id} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
-                            {isActualVideo ? (
-                              <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16]' : isFacebookImage(item.url) ? 'aspect-square' : 'aspect-video'}`}>
-                                {isVideoFile(item.url) ? (
-                                  <video
-                                    src={item.url}
-                                    className="w-full h-full object-cover"
-                                    controls
-                                    playsInline
-                                    preload="none"
-                                  />
-                                ) : isSocialMediaUrl ? (
-                                  <iframe
-                                    src={getEmbedUrl(item.url)}
-                                    className="w-full h-full"
-                                    allowFullScreen
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                    scrolling="no"
-                                  />
-                                ) : (
-                                  <a
-                                    href={item.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
-                                  >
-                                    <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
-                                      <ExternalLink size={32} />
-                                      <span className="text-white font-bold">View External Link</span>
-                                      <span className="text-slate-400 text-sm max-w-[80%] truncate">{item.url}</span>
-                                    </div>
-                                  </a>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="relative aspect-video">
+                          <div
+                            key={item.id}
+                            className="rounded-2xl overflow-hidden border border-white/10 bg-black/50 cursor-pointer group hover:border-[#2ecc71]/50 transition-all"
+                            onClick={() => setSelectedGalleryIndex(index)}
+                          >
+                            <div className="relative aspect-video">
+                              {thumbnailSrc ? (
                                 <Image
-                                  src={item.url}
-                                  alt={item.alt_text || `Gallery image for ${selectedItem.title}`}
+                                  src={thumbnailSrc}
+                                  alt={item.alt_text || `Gallery item for ${selectedItem.title}`}
                                   fill
                                   sizes="(max-width: 768px) 100vw, 448px"
-                                  className="object-cover hover:scale-105 transition-transform duration-500"
+                                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
+                              ) : (
+                                <div className="w-full h-full bg-slate-800 flex items-center justify-center">
+                                  <div className="text-slate-600">
+                                    {isActualVideo ? <Play size={48} /> : isLink ? <ExternalLink size={48} /> : <Eye size={48} />}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Overlay with icon based on type */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div className="w-16 h-16 bg-[#2ecc71] rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform shadow-lg shadow-[#2ecc71]/30">
+                                  {isActualVideo ? (
+                                    <Play size={28} className="text-slate-900 ml-1" fill="currentColor" />
+                                  ) : isLink ? (
+                                    <ExternalLink size={28} className="text-slate-900" />
+                                  ) : (
+                                    <Eye size={28} className="text-slate-900" />
+                                  )}
+                                </div>
                               </div>
-                            )}
+
+                              {/* Type indicator badge */}
+                              <div className="absolute top-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm text-white text-[9px] font-bold rounded-full flex items-center gap-1 uppercase">
+                                {isActualVideo ? (
+                                  <><Play size={10} /> Video</>
+                                ) : isLink ? (
+                                  <><ExternalLink size={10} /> Link</>
+                                ) : (
+                                  <><Eye size={10} /> Image</>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
                 )}
+
 
                 {/* Tools Used */}
                 {selectedItem.tools_used && selectedItem.tools_used.length > 0 && (
@@ -1619,6 +1638,134 @@ export default function PortfolioCollectionPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Gallery Modal with Navigation */}
+      <AnimatePresence>
+        {selectedGalleryIndex !== null && galleryItems[selectedGalleryIndex] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
+            onClick={() => setSelectedGalleryIndex(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="relative w-full max-w-6xl max-h-[90vh] flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedGalleryIndex(null)}
+                className="absolute top-4 right-4 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+              >
+                <X size={24} />
+              </button>
+
+              {/* Previous Button */}
+              {selectedGalleryIndex > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedGalleryIndex(selectedGalleryIndex - 1);
+                  }}
+                  className="absolute left-4 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                >
+                  <ArrowLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+                </button>
+              )}
+
+              {/* Next Button */}
+              {selectedGalleryIndex < galleryItems.length - 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedGalleryIndex(selectedGalleryIndex + 1);
+                  }}
+                  className="absolute right-4 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                >
+                  <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
+
+              {/* Content */}
+              <div className="bg-[#0e1526] rounded-3xl overflow-hidden border border-white/10 max-w-full">
+                {(() => {
+                  const item = galleryItems[selectedGalleryIndex];
+                  const isActualVideo = isVideoFile(item.url) ||
+                    (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
+
+                  if (isActualVideo) {
+                    return (
+                      <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16] max-w-[500px] mx-auto' : 'aspect-video'}`}>
+                        {isVideoFile(item.url) ? (
+                          <video
+                            src={item.url}
+                            className="w-full h-full object-cover"
+                            controls
+                            autoPlay
+                            playsInline
+                          />
+                        ) : (
+                          <iframe
+                            src={getEmbedUrl(item.url)}
+                            className="w-full h-full"
+                            allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                          />
+                        )}
+                      </div>
+                    );
+                  } else if (item.type === 'link' || (item.url.startsWith('http') && !isFacebookImage(item.url))) {
+                    return (
+                      <div className="aspect-video flex items-center justify-center p-12 bg-slate-900">
+                        <div className="text-center">
+                          <div className="w-24 h-24 mx-auto mb-6 bg-[#2ecc71] rounded-full flex items-center justify-center">
+                            <ExternalLink size={48} className="text-slate-900" />
+                          </div>
+                          <h3 className="text-2xl font-black text-white mb-4">External Link</h3>
+                          <p className="text-slate-400 mb-6 max-w-md break-all">{item.url}</p>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-wider"
+                          >
+                            Open Link <ExternalLink size={18} />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="relative max-w-full">
+                        <Image
+                          src={item.url}
+                          alt={item.alt_text || 'Gallery image'}
+                          width={1200}
+                          height={675}
+                          className="object-contain max-h-[80vh] w-auto mx-auto"
+                          priority
+                        />
+                      </div>
+                    );
+                  }
+                })()}
+
+                {/* Gallery Counter */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/70 backdrop-blur-sm text-white text-sm font-bold rounded-full">
+                  {selectedGalleryIndex + 1} / {galleryItems.length}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
       {/* Footer */}
       <footer className="py-8 border-t border-white/5">
