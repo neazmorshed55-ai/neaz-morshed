@@ -43,11 +43,20 @@ interface GalleryItem {
   alt_text: string | null;
   type: 'image' | 'video' | 'link' | 'document';
   order_index: number;
+  skill_tags?: string[]; // Array of sub_skill IDs
+}
+
+interface SubSkill {
+  id: string;
+  title: string;
+  slug: string;
+  category_id: string;
 }
 
 export default function PortfolioManagement() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [subSkills, setSubSkills] = useState<SubSkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterService, setFilterService] = useState<string>('all');
@@ -57,7 +66,7 @@ export default function PortfolioManagement() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' | 'document' });
+  const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link' | 'document', skill_tags: [] as string[] });
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -90,13 +99,15 @@ export default function PortfolioManagement() {
     }
 
     try {
-      const [itemsRes, servicesRes] = await Promise.all([
+      const [itemsRes, servicesRes, subSkillsRes] = await Promise.all([
         supabase.from('portfolio_items').select('*').order('order_index', { ascending: true }),
-        supabase.from('services').select('id, title, slug').order('title', { ascending: true })
+        supabase.from('services').select('id, title, slug').order('title', { ascending: true }),
+        supabase.from('sub_skills').select('id, title, slug, category_id').eq('is_active', true).order('title', { ascending: true })
       ]);
 
       if (itemsRes.data) setPortfolioItems(itemsRes.data);
       if (servicesRes.data) setServices(servicesRes.data);
+      if (subSkillsRes.data) setSubSkills(subSkillsRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -349,14 +360,38 @@ export default function PortfolioManagement() {
 
       if (error) throw error;
       if (data) {
-        setGalleryItems([...galleryItems, data as GalleryItem]);
-        setNewGalleryItem({ url: '', alt_text: '', type: 'image' });
+        // Add skill tags if selected
+        if (newGalleryItem.skill_tags.length > 0) {
+          await addSkillTagsToGalleryItem(data.id, newGalleryItem.skill_tags);
+        }
+
+        setGalleryItems([...galleryItems, { ...data, skill_tags: newGalleryItem.skill_tags } as GalleryItem]);
+        setNewGalleryItem({ url: '', alt_text: '', type: 'image', skill_tags: [] });
       }
     } catch (error) {
       console.error('Error adding gallery item:', error);
       alert('Error adding gallery item');
     }
     setAddingGalleryItem(false);
+  };
+
+  const addSkillTagsToGalleryItem = async (galleryId: string, skillIds: string[]) => {
+    if (!supabase || skillIds.length === 0) return;
+
+    try {
+      const tagInserts = skillIds.map(skillId => ({
+        portfolio_gallery_id: galleryId,
+        sub_skill_id: skillId
+      }));
+
+      const { error } = await supabase
+        .from('portfolio_gallery_skill_tags')
+        .insert(tagInserts);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error adding skill tags:', error);
+    }
   };
 
   const handleGalleryFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -384,12 +419,18 @@ export default function PortfolioManagement() {
           .single();
 
         if (error) throw error;
-        return data as GalleryItem;
+
+        // Add skill tags if selected
+        if (newGalleryItem.skill_tags.length > 0 && data) {
+          await addSkillTagsToGalleryItem(data.id, newGalleryItem.skill_tags);
+        }
+
+        return { ...data, skill_tags: newGalleryItem.skill_tags } as GalleryItem;
       });
 
       const uploadedItems = await Promise.all(uploadPromises);
       setGalleryItems([...galleryItems, ...uploadedItems]);
-      setNewGalleryItem({ url: '', alt_text: '', type: 'image' });
+      setNewGalleryItem({ url: '', alt_text: '', type: 'image', skill_tags: [] });
     } catch (error) {
       console.error('Error uploading/adding gallery items:', error);
       alert('Error uploading gallery items');
@@ -832,6 +873,55 @@ export default function PortfolioManagement() {
                               placeholder="Alt Text (SEO): Describe this image for search engines"
                             />
                           )}
+
+                          {/* Skill Tags Selection - Max 3 */}
+                          <div className="space-y-2">
+                            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                              Add to Skill Portfolio (Max 3)
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                              {subSkills.map((skill) => {
+                                const isSelected = newGalleryItem.skill_tags.includes(skill.id);
+                                const canSelect = newGalleryItem.skill_tags.length < 3;
+
+                                return (
+                                  <button
+                                    key={skill.id}
+                                    type="button"
+                                    onClick={() => {
+                                      if (isSelected) {
+                                        // Remove tag
+                                        setNewGalleryItem({
+                                          ...newGalleryItem,
+                                          skill_tags: newGalleryItem.skill_tags.filter(id => id !== skill.id)
+                                        });
+                                      } else if (canSelect) {
+                                        // Add tag
+                                        setNewGalleryItem({
+                                          ...newGalleryItem,
+                                          skill_tags: [...newGalleryItem.skill_tags, skill.id]
+                                        });
+                                      }
+                                    }}
+                                    disabled={!isSelected && !canSelect}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                      isSelected
+                                        ? 'bg-[#2ecc71] text-slate-950'
+                                        : canSelect
+                                        ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white'
+                                        : 'bg-slate-900/50 text-slate-600 cursor-not-allowed'
+                                    }`}
+                                  >
+                                    {skill.title}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <p className="text-slate-600 text-xs">
+                              Selected: {newGalleryItem.skill_tags.length}/3 - Image will auto-sync to selected skill galleries
+                            </p>
+                          </div>
+
                           <button
                             type="button"
                             onClick={handleAddGalleryItem}
