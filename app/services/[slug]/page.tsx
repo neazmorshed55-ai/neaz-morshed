@@ -162,7 +162,7 @@ interface Service {
 interface PortfolioItem {
   id: string;
   service_slug: string;
-  slug: string;
+  slug?: string;
   title: string;
   description: string;
   thumbnail_url: string | null;
