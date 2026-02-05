@@ -1489,6 +1489,40 @@ export default function PortfolioCollectionPage() {
                 <X size={24} />
               </button>
 
+              {/* Previous Portfolio Item Button */}
+              {(() => {
+                const currentIndex = portfolioItems.findIndex(item => item.id === selectedItem.id);
+                return currentIndex > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedItem(portfolioItems[currentIndex - 1]);
+                    }}
+                    className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                    title="Previous project"
+                  >
+                    <ArrowLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+                  </button>
+                );
+              })()}
+
+              {/* Next Portfolio Item Button */}
+              {(() => {
+                const currentIndex = portfolioItems.findIndex(item => item.id === selectedItem.id);
+                return currentIndex < portfolioItems.length - 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedItem(portfolioItems[currentIndex + 1]);
+                    }}
+                    className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                    title="Next project"
+                  >
+                    <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                  </button>
+                );
+              })()}
+
               {/* Image/Video */}
               {selectedItem.video_url ? (
                 <div className={`relative overflow-hidden rounded-t-[2rem] md:rounded-t-[3rem] bg-black ${isVerticalContent(selectedItem.video_url) ? 'aspect-[9/16] max-w-[400px] mx-auto' : 'aspect-video'}`}>
