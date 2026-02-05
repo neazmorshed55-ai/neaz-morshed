@@ -1151,6 +1151,24 @@ export default function PortfolioCollectionPage() {
     fetchGallery();
   }, [selectedItem]);
 
+  // Keyboard navigation for gallery modal
+  useEffect(() => {
+    if (selectedGalleryIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' && selectedGalleryIndex > 0) {
+        setSelectedGalleryIndex(selectedGalleryIndex - 1);
+      } else if (e.key === 'ArrowRight' && selectedGalleryIndex < galleryItems.length - 1) {
+        setSelectedGalleryIndex(selectedGalleryIndex + 1);
+      } else if (e.key === 'Escape') {
+        setSelectedGalleryIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedGalleryIndex, galleryItems.length]);
+
   useEffect(() => {
     async function fetchData() {
       // First try to get from Supabase
@@ -1788,34 +1806,36 @@ export default function PortfolioCollectionPage() {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedGalleryIndex(null)}
-                className="absolute top-4 right-4 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+                className="absolute top-4 right-4 z-10 p-3 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all shadow-xl"
               >
                 <X size={24} />
               </button>
 
-              {/* Previous Button */}
+              {/* Previous Button - Facebook style */}
               {selectedGalleryIndex > 0 && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedGalleryIndex(selectedGalleryIndex - 1);
                   }}
-                  className="absolute left-4 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
+                  title="Previous image"
                 >
-                  <ArrowLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+                  <ArrowLeft size={32} className="group-hover:-translate-x-1 transition-transform" strokeWidth={2.5} />
                 </button>
               )}
 
-              {/* Next Button */}
+              {/* Next Button - Facebook style */}
               {selectedGalleryIndex < galleryItems.length - 1 && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedGalleryIndex(selectedGalleryIndex + 1);
                   }}
-                  className="absolute right-4 z-10 p-4 bg-white/10 backdrop-blur-sm rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all group"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
+                  title="Next image"
                 >
-                  <ArrowRight size={28} className="group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight size={32} className="group-hover:translate-x-1 transition-transform" strokeWidth={2.5} />
                 </button>
               )}
 
@@ -1897,8 +1917,8 @@ export default function PortfolioCollectionPage() {
                   }
                 })()}
 
-                {/* Gallery Counter */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/70 backdrop-blur-sm text-white text-sm font-bold rounded-full">
+                {/* Gallery Counter - Facebook style */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-black/80 backdrop-blur-md text-white text-base font-bold rounded-full shadow-xl border border-white/20">
                   {selectedGalleryIndex + 1} / {galleryItems.length}
                 </div>
               </div>
