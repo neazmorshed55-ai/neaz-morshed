@@ -94,27 +94,6 @@ export default function ServicesPage() {
         {/* Services Grid - Enhanced for better visual hierarchy and eye comfort */}
         <section className="py-24 bg-gradient-to-b from-transparent via-slate-900/10 to-transparent">
           <div className="container mx-auto px-6 max-w-7xl">
-            {/* Section Header */}
-            <div className="text-center mb-16">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl lg:text-4xl font-black uppercase tracking-tight mb-4"
-              >
-                Browse All <span className="text-[#2ecc71]">Services</span>
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="text-slate-400 text-base max-w-2xl mx-auto"
-              >
-                Select a service category to view detailed portfolio and past work
-              </motion.p>
-            </div>
-
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
