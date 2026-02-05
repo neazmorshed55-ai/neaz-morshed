@@ -162,6 +162,7 @@ interface Service {
 interface PortfolioItem {
   id: string;
   service_slug: string;
+  slug: string;
   title: string;
   description: string;
   thumbnail_url: string | null;
@@ -1224,15 +1225,8 @@ export default function PortfolioCollectionPage() {
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {portfolioItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  onClick={() => setSelectedItem(item)}
-                  className="cursor-pointer group"
-                >
+              {portfolioItems.map((item, index) => {
+                const cardContent = (
                   <div className="relative overflow-hidden rounded-3xl border border-white/5 hover:border-[#2ecc71]/40 transition-all duration-500 bg-slate-900/60 h-full flex flex-col">
                     {/* Image */}
                     <div className="aspect-video relative overflow-hidden">
@@ -1307,8 +1301,34 @@ export default function PortfolioCollectionPage() {
                       )}
                     </div>
                   </div>
-                </motion.div>
-              ))}
+                );
+
+                // If item has a slug, link to individual page; otherwise open modal
+                return item.slug ? (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="group"
+                  >
+                    <Link href={`/services/${slug}/${item.slug}`} className="block h-full">
+                      {cardContent}
+                    </Link>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    onClick={() => setSelectedItem(item)}
+                    className="cursor-pointer group"
+                  >
+                    {cardContent}
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>
