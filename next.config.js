@@ -51,6 +51,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'graph.facebook.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: '*.tiktokcdn.com',
         pathname: '/**',
       },

@@ -117,6 +117,37 @@ const isFacebookImage = (url: string) => {
   return url.includes('/photo') || url.includes('fbid=') || url.includes('/photos/');
 };
 
+// Extract Facebook photo ID to get image thumbnail
+const getFacebookImageId = (url: string) => {
+  const fbidMatch = url.match(/fbid=(\d+)/);
+  if (fbidMatch) return fbidMatch[1];
+
+  const photoMatch = url.match(/\/photo\.php\?fbid=(\d+)/);
+  if (photoMatch) return photoMatch[1];
+
+  const photosMatch = url.match(/\/photos\/[^/]+\/(\d+)/);
+  if (photosMatch) return photosMatch[1];
+
+  return null;
+};
+
+// Get Facebook image thumbnail URL
+const getFacebookImageThumbnail = (url: string) => {
+  const imageId = getFacebookImageId(url);
+  if (!imageId) return null;
+
+  // Use Facebook's Graph API endpoint for image (works for public posts)
+  // Note: For better quality, use the embed URL
+  return `https://graph.facebook.com/${imageId}/picture?type=large`;
+};
+
+// Get TikTok video thumbnail
+const getTikTokThumbnail = (url: string) => {
+  // TikTok doesn't provide a direct thumbnail API, but we can try to extract from embed
+  // For now, return null to use iframe preview
+  return null;
+};
+
 // Check if URL is a Google Drive link
 const isGoogleDriveUrl = (url: string) => {
   return url.includes('docs.google.com') || url.includes('drive.google.com');
@@ -1563,17 +1594,30 @@ export default function PortfolioCollectionPage() {
 
                         // Get thumbnail source - generate thumbnails for all video platforms
                         const getThumbnailSrc = () => {
+                          // Facebook image posts - extract actual image
                           if (isFacebookImage(item.url)) {
-                            return item.url;
-                          } else if (isActualVideo) {
+                            const fbThumbnail = getFacebookImageThumbnail(item.url);
+                            return fbThumbnail || item.url;
+                          }
+
+                          // Video platforms
+                          if (isActualVideo) {
                             // YouTube thumbnail
                             if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
                               const videoId = item.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?]+)/)?.[1];
                               return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
                             }
-                            // For other platforms, use a generic video thumbnail or return null to show iframe
+
+                            // TikTok thumbnail
+                            if (isTikTokUrl(item.url)) {
+                              return getTikTokThumbnail(item.url);
+                            }
+
+                            // For other platforms (Instagram, Facebook videos), use iframe preview
                             return null;
                           }
+
+                          // Default: return URL as-is for regular images
                           return item.url;
                         };
 

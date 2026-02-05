@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   Plus, Edit2, Trash2, Search, Loader2, X,
-  Star, ArrowLeft, Save, Image, ExternalLink, Upload, FileText
+  Star, ArrowLeft, Save, Image, ExternalLink, Upload, FileText,
+  ChevronUp, ChevronDown
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -501,6 +502,37 @@ export default function PortfolioManagement() {
     } catch (error) {
       console.error('Error deleting gallery item:', error);
       alert('Error deleting gallery item');
+    }
+  };
+
+  const handleMoveGalleryItem = async (index: number, direction: 'up' | 'down') => {
+    if (!supabase || !editingItem) return;
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= galleryItems.length) return;
+
+    // Create a copy of the array and swap items
+    const newGalleryItems = [...galleryItems];
+    [newGalleryItems[index], newGalleryItems[newIndex]] = [newGalleryItems[newIndex], newGalleryItems[index]];
+
+    // Update order_index for both items
+    try {
+      await Promise.all([
+        supabase
+          .from('portfolio_gallery')
+          .update({ order_index: newIndex })
+          .eq('id', galleryItems[index].id),
+        supabase
+          .from('portfolio_gallery')
+          .update({ order_index: index })
+          .eq('id', galleryItems[newIndex].id)
+      ]);
+
+      // Update local state
+      setGalleryItems(newGalleryItems.map((item, idx) => ({ ...item, order_index: idx })));
+    } catch (error) {
+      console.error('Error reordering gallery items:', error);
+      alert('Error reordering gallery items');
     }
   };
 
@@ -1035,7 +1067,7 @@ export default function PortfolioManagement() {
                       {/* Gallery Grid */}
                       {galleryItems.length > 0 ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {galleryItems.map((item) => (
+                          {galleryItems.map((item, index) => (
                             <div key={item.id} className="relative flex flex-col">
                               <div className="relative group aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/10">
                                 {item.type === 'image' ? (
@@ -1074,7 +1106,31 @@ export default function PortfolioManagement() {
                                   </a>
                                 )}
 
-                                {/* Action buttons */}
+                                {/* Reorder buttons - Left side */}
+                                <div className="absolute top-2 left-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {index > 0 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMoveGalleryItem(index, 'up')}
+                                      className="p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                      title="Move left"
+                                    >
+                                      <ChevronUp size={14} className="rotate-[-90deg]" />
+                                    </button>
+                                  )}
+                                  {index < galleryItems.length - 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMoveGalleryItem(index, 'down')}
+                                      className="p-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                      title="Move right"
+                                    >
+                                      <ChevronDown size={14} className="rotate-[-90deg]" />
+                                    </button>
+                                  )}
+                                </div>
+
+                                {/* Action buttons - Right side */}
                                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <button
                                     type="button"
