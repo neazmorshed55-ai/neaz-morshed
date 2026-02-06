@@ -203,9 +203,16 @@ export default function PortfolioManagement() {
       tags = ['blog', ...tags];
     }
 
+    // Generate slug from title
+    const slug = formData.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+
     const itemData = {
       service_id: isBlogPost ? null : formData.service_id,
       title: formData.title,
+      slug: slug,
       description: formData.description || null,
       thumbnail_url: formData.thumbnail_url || null,
       thumbnail_alt_text: formData.thumbnail_alt_text || null,
