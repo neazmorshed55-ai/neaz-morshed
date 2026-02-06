@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import {
-  ArrowLeft, ExternalLink, X,
+  ArrowLeft, ArrowRight, ExternalLink, X,
   Briefcase, Loader2, Calendar, User, Clock, CheckCircle2,
   Play
 } from 'lucide-react';
@@ -165,7 +165,20 @@ export default function PortfolioDetailPage() {
   const [service, setService] = useState<Service | null>(null);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
+  const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
+
+  // Navigation handlers for gallery
+  const handleNextGallery = () => {
+    if (selectedGalleryIndex !== null && galleryItems.length > 0) {
+      setSelectedGalleryIndex((selectedGalleryIndex + 1) % galleryItems.length);
+    }
+  };
+
+  const handlePrevGallery = () => {
+    if (selectedGalleryIndex !== null && galleryItems.length > 0) {
+      setSelectedGalleryIndex((selectedGalleryIndex - 1 + galleryItems.length) % galleryItems.length);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -376,7 +389,7 @@ export default function PortfolioDetailPage() {
                 <div>
                   <h2 className="text-2xl font-black uppercase tracking-tight mb-6">Project Gallery</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {galleryItems.map((item) => {
+                    {galleryItems.map((item, index) => {
                       // Check if URL is a direct image (including CDN images from Facebook, etc.)
                       const isImageUrl = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(item.url) ||
                         item.url.includes('fbcdn.net') ||
@@ -412,7 +425,7 @@ export default function PortfolioDetailPage() {
                           initial={{ opacity: 0, scale: 0.9 }}
                           whileInView={{ opacity: 1, scale: 1 }}
                           viewport={{ once: true }}
-                          onClick={() => setSelectedGalleryItem(item)}
+                          onClick={() => setSelectedGalleryIndex(index)}
                           className="cursor-pointer group"
                         >
                           <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all ${isVerticalContent(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
@@ -551,34 +564,92 @@ export default function PortfolioDetailPage() {
       </section>
 
       {/* Gallery Modal */}
-      {selectedGalleryItem && (
+      {selectedGalleryIndex !== null && galleryItems[selectedGalleryIndex] && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl"
-          onClick={() => setSelectedGalleryItem(null)}
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl"
+          onClick={() => setSelectedGalleryIndex(null)}
         >
+          {/* Close Button */}
           <button
-            onClick={() => setSelectedGalleryItem(null)}
+            onClick={() => setSelectedGalleryIndex(null)}
             className="absolute top-6 right-6 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
           >
             <X size={24} />
           </button>
 
-          <div className={`max-w-4xl w-full ${isVerticalContent(selectedGalleryItem.url) ? 'max-w-[400px]' : ''}`} onClick={(e) => e.stopPropagation()}>
-            {selectedGalleryItem.type === 'image' && !isEmbeddableVideo(selectedGalleryItem.url) ? (
-              <div className="relative aspect-video rounded-2xl overflow-hidden">
-                <Image
-                  src={selectedGalleryItem.url}
-                  alt={selectedGalleryItem.alt_text || 'Gallery image'}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            ) : (
-              <SocialEmbed url={selectedGalleryItem.url} className="rounded-2xl" />
+          {/* Previous Button */}
+          {galleryItems.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePrevGallery();
+              }}
+              className="absolute left-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+            >
+              <ArrowLeft size={28} />
+            </button>
+          )}
+
+          {/* Next Button */}
+          {galleryItems.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNextGallery();
+              }}
+              className="absolute right-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+            >
+              <ArrowRight size={28} />
+            </button>
+          )}
+
+          {/* Gallery Content */}
+          <div className="max-w-6xl w-full px-4" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const item = galleryItems[selectedGalleryIndex];
+              const isRegularImage = item.type === 'image' &&
+                !item.url.includes('youtube.com') &&
+                !item.url.includes('youtu.be') &&
+                !item.url.includes('drive.google.com') &&
+                !item.url.includes('facebook.com') &&
+                !item.url.includes('instagram.com') &&
+                !item.url.includes('tiktok.com') &&
+                !item.url.includes('vimeo.com');
+
+              if (isRegularImage) {
+                return (
+                  <div className="relative w-full h-[80vh] flex items-center justify-center">
+                    <Image
+                      src={item.url}
+                      alt={item.alt_text || 'Gallery image'}
+                      fill
+                      className="object-contain"
+                      sizes="100vw"
+                      priority
+                    />
+                  </div>
+                );
+              }
+
+              return (
+                <SocialEmbed url={item.url} className="rounded-2xl shadow-2xl w-full mx-auto" />
+              );
+            })()}
+
+            {/* Caption */}
+            {galleryItems[selectedGalleryIndex].alt_text && (
+              <p className="text-white text-center mt-4 text-lg font-medium">
+                {galleryItems[selectedGalleryIndex].alt_text}
+              </p>
             )}
+
+            {/* Counter */}
+            <p className="text-slate-400 text-center mt-2 text-sm">
+              {selectedGalleryIndex + 1} / {galleryItems.length}
+            </p>
           </div>
         </motion.div>
       )}
