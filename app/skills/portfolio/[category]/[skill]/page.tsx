@@ -243,7 +243,7 @@ export default function SkillDetailPage() {
               cover_image: skillData.cover_image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1200',
               gallery_images: skillData.gallery_images || [],
               tools_used: skillData.tools_used || [],
-              experience_years: skillData.experience_years || 'Coming Soon',
+              experience_years: skillData.experience_years || '5+ Years',
               project_count: skillData.project_count || 0
             });
 
