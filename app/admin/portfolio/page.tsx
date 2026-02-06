@@ -482,14 +482,18 @@ export default function PortfolioManagement() {
         const isPDF = file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.docx');
         const publicUrl = await uploadFile(file, isPDF);
 
+        // Determine file type based on extension
+        const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov|avi)$/i.test(file.name);
+        const fileType = isVideo ? 'video' : (isPDF ? 'link' : 'image');
+
         // Add each file to gallery
         const { data, error } = await supabase
           .from('portfolio_gallery')
           .insert({
             portfolio_item_id: editingItem.id,
             url: publicUrl,
-            alt_text: newGalleryItem.alt_text || file.name, // Use filename as alt_text for documents
-            type: newGalleryItem.type, // 'image', 'video', or 'document'
+            alt_text: newGalleryItem.alt_text || file.name,
+            type: fileType, // 'image', 'video', or 'link' (documents as links)
             order_index: galleryItems.length + index
           })
           .select()
