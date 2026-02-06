@@ -1420,7 +1420,7 @@ export default function PortfolioCollectionPage() {
 
                     {/* Content */}
                     <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="text-xl font-black mb-2 group-hover:text-[#2ecc71] transition-colors uppercase tracking-tight">
+                      <h3 className="text-xl font-black mb-2 group-hover:text-[#2ecc71] transition-colors capitalize tracking-tight">
                         {item.title}
                       </h3>
 
