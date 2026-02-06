@@ -236,7 +236,16 @@ export default function SkillDetailPage() {
             .single();
 
           if (skillData) {
-            setSkill(skillData);
+            setSkill({
+              ...skillData,
+              description: skillData.description || 'Professional service description coming soon.',
+              long_description: skillData.long_description || 'Detailed service description is currently being updated.',
+              cover_image: skillData.cover_image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1200',
+              gallery_images: skillData.gallery_images || [],
+              tools_used: skillData.tools_used || [],
+              experience_years: skillData.experience_years || 'Coming Soon',
+              project_count: skillData.project_count || 0
+            });
 
             // Fetch gallery items
             const { data: galleryData } = await supabase
