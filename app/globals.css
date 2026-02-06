@@ -17,6 +17,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
 }
 
 /* Custom scrollbar to match the brand aesthetic */
@@ -32,4 +33,61 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #27ae60;
+}
+
+/* Gradient text effect */
+.text-gradient {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 0.05;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(1.05);
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 8s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 0.8s infinite;
+  color: #2ecc71;
+}
+
+/* Responsive utilities */
+@layer utilities {
+  .text-responsive-hero {
+    @apply text-4xl sm:text-5xl lg:text-6xl xl:text-7xl;
+  }
+
+  .padding-responsive {
+    @apply py-12 sm:py-16 lg:py-24 xl:py-32;
+  }
+
+  .gap-responsive {
+    @apply gap-4 sm:gap-6 lg:gap-8;
+  }
+}
+
+/* Fix for mobile touch targets */
+@media (max-width: 640px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

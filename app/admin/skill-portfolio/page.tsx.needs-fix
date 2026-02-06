@@ -639,87 +639,85 @@ function StructureManager({ onClose, categories: initialCategories, subSkills: i
     setLoading(false);
   };
 
-  setLoading(false);
-};
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0 || !supabase) return;
+    setUploadingImage(true);
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `skill-cover-${Date.now()}.${fileExt}`;
+    const filePath = `skills/${fileName}`;
 
-const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files || e.target.files.length === 0 || !supabase) return;
-  setUploadingImage(true);
-  const file = e.target.files[0];
-  const fileExt = file.name.split('.').pop();
-  const fileName = `skill-cover-${Date.now()}.${fileExt}`;
-  const filePath = `skills/${fileName}`;
-
-  try {
-    const { error } = await supabase.storage.from('images').upload(filePath, file);
-    if (error) throw error;
-    const { data } = supabase.storage.from('images').getPublicUrl(filePath);
-    setSkillForm({ ...skillForm, cover_image: data.publicUrl });
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    alert('Error uploading image');
-  }
-  setUploadingImage(false);
-};
-const handleSaveSkill = async () => {
-  if (!skillForm.title || !skillForm.category_id || !supabase) return;
-  setLoading(true);
-
-  const slug = skillForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-  try {
-    if (editingId) {
-      await supabase
-        .from('sub_skills')
-        .update({
-          title: skillForm.title,
-          category_id: skillForm.category_id,
-          is_active: skillForm.is_active,
-          order_index: skillForm.order_index,
-          cover_image: skillForm.cover_image,
-          slug
-        })
-        .eq('id', editingId);
-    } else {
-      await supabase
-        .from('sub_skills')
-        .insert({
-          title: skillForm.title,
-          category_id: skillForm.category_id,
-          is_active: skillForm.is_active,
-          order_index: subSkills.filter(s => s.category_id === skillForm.category_id).length + 1,
-          cover_image: skillForm.cover_image,
-          slug
-        });
+    try {
+      const { error } = await supabase.storage.from('images').upload(filePath, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+      setSkillForm({ ...skillForm, cover_image: data.publicUrl });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image');
     }
-    await refreshData();
-    setSkillForm({ ...skillForm, title: '', order_index: 0, cover_image: '' }); // keep category selected
-    setEditingId(null);
-  } catch (e) {
-    console.error(e);
-    alert('Error saving skill');
-  }
-  setLoading(false);
-};
+    setUploadingImage(false);
+  };
 
-const handleDeleteSkill = async (id: string) => {
-  if (!confirm('Delete this skill?') || !supabase) return;
-  setLoading(true);
-  try {
-    await supabase.from('sub_skills').delete().eq('id', id);
-    await refreshData();
-  } catch (e) { console.error(e); }
-  setLoading(false);
-};
+  const handleSaveSkill = async () => {
+    if (!skillForm.title || !skillForm.category_id || !supabase) return;
+    setLoading(true);
 
-return (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    onClick={onClose}
-  >
+    const slug = skillForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    try {
+      if (editingId) {
+        await supabase
+          .from('sub_skills')
+          .update({
+            title: skillForm.title,
+            category_id: skillForm.category_id,
+            is_active: skillForm.is_active,
+            order_index: skillForm.order_index,
+            cover_image: skillForm.cover_image,
+            slug
+          })
+          .eq('id', editingId);
+      } else {
+        await supabase
+          .from('sub_skills')
+          .insert({
+            title: skillForm.title,
+            category_id: skillForm.category_id,
+            is_active: skillForm.is_active,
+            order_index: subSkills.filter(s => s.category_id === skillForm.category_id).length + 1,
+            cover_image: skillForm.cover_image,
+            slug
+          });
+      }
+      await refreshData();
+      setSkillForm({ ...skillForm, title: '', order_index: 0, cover_image: '' }); // keep category selected
+      setEditingId(null);
+    } catch (e) {
+      console.error(e);
+      alert('Error saving skill');
+    }
+    setLoading(false);
+  };
+
+  const handleDeleteSkill = async (id: string) => {
+    if (!confirm('Delete this skill?') || !supabase) return;
+    setLoading(true);
+    try {
+      await supabase.from('sub_skills').delete().eq('id', id);
+      await refreshData();
+    } catch (e) { console.error(e); }
+    setLoading(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
