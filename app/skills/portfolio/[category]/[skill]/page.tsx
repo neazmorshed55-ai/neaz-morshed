@@ -246,7 +246,12 @@ export default function SkillDetailPage() {
               .order('order_index', { ascending: true });
 
             if (galleryData) {
-              setGalleryItems(galleryData as GalleryItem[]);
+              const uniqueGallery = (galleryData as GalleryItem[]).filter((item, index, self) =>
+                index === self.findIndex((t) => (
+                  t.url === item.url
+                ))
+              );
+              setGalleryItems(uniqueGallery);
             }
           }
         }
