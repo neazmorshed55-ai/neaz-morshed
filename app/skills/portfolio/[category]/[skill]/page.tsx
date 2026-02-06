@@ -539,9 +539,6 @@ export default function SkillDetailPage() {
                               </div>
                             )}
                           </div>
-                          {item.alt_text && (
-                            <p className="text-slate-400 text-sm mt-2">{item.alt_text}</p>
-                          )}
                         </motion.div>
                       );
                     })}
