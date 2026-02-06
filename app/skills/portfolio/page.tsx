@@ -76,7 +76,7 @@ export default function SkillPortfolioPage() {
   const [loading, setLoading] = useState(true);
   // Start with first category expanded
   const [expandedCategory, setExpandedCategory] = useState<string>('1');
-  const [profileImage, setProfileImage] = useState('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -104,11 +104,10 @@ export default function SkillPortfolioPage() {
           setExpandedCategory(catData[0].id);
         }
 
+        // Load profile image
         const { data: imgData } = supabase.storage.from('images').getPublicUrl('profile.jpg');
         if (imgData?.publicUrl) {
-          const img = new Image();
-          img.onload = () => setProfileImage(imgData.publicUrl);
-          img.src = imgData.publicUrl;
+          setProfileImage(imgData.publicUrl);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -176,22 +175,24 @@ export default function SkillPortfolioPage() {
           {/* Main Grid - Profile + Skills */}
           <div className="grid lg:grid-cols-12 gap-8 items-start">
             {/* Profile Image */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:col-span-3 hidden lg:block"
-            >
-              <div className="sticky top-32">
-                <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden border-4 border-white/10 bg-slate-900 relative">
-                  <NextImage src={profileImage} alt="Neaz Md. Morshed" fill sizes="25vw" className="object-cover" />
+            {profileImage && (
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="lg:col-span-3 hidden lg:block"
+              >
+                <div className="sticky top-32">
+                  <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden border-4 border-white/10 bg-slate-900 relative">
+                    <NextImage src={profileImage} alt="Neaz Md. Morshed" fill sizes="25vw" className="object-cover" priority />
+                  </div>
+                  <div className="mt-6 p-4 bg-slate-900/50 rounded-2xl border border-white/5">
+                    <div className="text-[#2ecc71] text-3xl font-black mb-1">10+</div>
+                    <div className="text-slate-400 text-xs uppercase tracking-wider">Years Experience</div>
+                  </div>
                 </div>
-                <div className="mt-6 p-4 bg-slate-900/50 rounded-2xl border border-white/5">
-                  <div className="text-[#2ecc71] text-3xl font-black mb-1">10+</div>
-                  <div className="text-slate-400 text-xs uppercase tracking-wider">Years Experience</div>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
 
             {/* Skills Accordion */}
             <motion.div
