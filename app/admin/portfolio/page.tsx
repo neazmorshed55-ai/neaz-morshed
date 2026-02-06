@@ -492,7 +492,7 @@ export default function PortfolioManagement() {
           .insert({
             portfolio_item_id: editingItem.id,
             url: publicUrl,
-            alt_text: newGalleryItem.alt_text || file.name,
+            alt_text: newGalleryItem.alt_text || null,
             type: fileType, // 'image', 'video', or 'link' (documents as links)
             order_index: galleryItems.length + index
           })
