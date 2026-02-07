@@ -1211,6 +1211,7 @@ export default function PortfolioManagement() {
                             </>
                           )}
                         </div>
+                      </div>
                       )}
 
                       {/* Gallery Grid */}
