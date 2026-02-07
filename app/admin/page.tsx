@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   Briefcase, Award, MessageSquare, Wrench, Star,
   TrendingUp, ExternalLink, Plus, ArrowRight, Loader2, BookOpen,
-  BarChart3, Users, Image
+  BarChart3, Users, Image, LayoutTemplate
 } from 'lucide-react';
 import ProtectedRoute from '../../components/admin/ProtectedRoute';
 import { supabase } from '../../lib/supabase';
@@ -89,6 +89,7 @@ export default function AdminDashboard() {
     { name: 'Analytics', description: 'View visitor stats & locations', icon: BarChart3, href: '/admin/analytics', color: '#00d4ff' },
     { name: 'Leads', description: 'Manage chatbot leads', icon: Users, href: '/admin/leads', color: '#ff6b6b' },
     { name: 'Skill Portfolio Gallery', description: 'Manage skill portfolio galleries', icon: Image, href: '/admin/skill-portfolio', color: '#2ecc71' },
+    { name: 'Homepage', description: 'Manage homepage content', icon: LayoutTemplate, href: '/admin/homepage', color: '#f39c12' },
   ];
 
   const quickActions = [
