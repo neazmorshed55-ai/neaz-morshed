@@ -519,7 +519,7 @@ export default function PortfolioDetailPage() {
                           onClick={() => setSelectedGalleryIndex(index)}
                           className="cursor-pointer group"
                         >
-                          <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all ${isVerticalContent(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
+                          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all aspect-square">
                             {isRegularImage ? (
                               <Image
                                 src={item.url}
