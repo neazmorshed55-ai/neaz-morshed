@@ -10,6 +10,7 @@ import { Button, TypewriterEffect, StatCard, Container } from '@/components/ui';
 interface HeroSectionProps {
   name: string;
   title: string;
+  subtitle: string;
   typewriterTexts: string[];
   description: string;
   stats: Array<{ label: string; value: number; suffix?: string }>;
@@ -18,6 +19,7 @@ interface HeroSectionProps {
 export default function HeroSection({
   name,
   title,
+  subtitle,
   typewriterTexts,
   description,
   stats,
@@ -51,7 +53,7 @@ export default function HeroSection({
           >
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-[#2ecc71]/10 border border-[#2ecc71]/20 text-[#2ecc71] text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-6 sm:mb-10">
               <TrendingUp size={14} className="text-[#2ecc71]" />
-              <span className="hidden sm:inline">Powering Global Business Growth Since 2014</span>
+              <span className="hidden sm:inline">{subtitle}</span>
               <span className="sm:hidden">Since 2014</span>
             </div>
 

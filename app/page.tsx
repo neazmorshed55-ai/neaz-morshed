@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { Briefcase, Database, Target, Layout } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Briefcase, Database, Target, Layout, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import {
   HeroSection,
@@ -9,65 +9,114 @@ import {
   ServicesSection,
   ContactSection,
 } from '@/components/sections';
+import { supabase } from '@/lib/supabase';
+
+// Setup fallback data just in case DB is empty or fails
+const defaultHero = {
+  hero_subtitle: 'Powering Global Business Growth Since 2014',
+  hero_title_prefix: 'I AM',
+  hero_name: 'Neaz Md. Morshed',
+  hero_description: 'I handle the heavy lifting of business operations so you can focus on scale. Powered by modern tech stack.',
+  hero_typewriter_texts: [
+    'Virtual Assistant Expert',
+    'Lead Generation Specialist',
+    'CRM & Data Management Pro',
+    'Next.js & Supabase Developer',
+    'Business Process Optimizer',
+    'Top Rated Freelancer',
+  ],
+  hero_stats: [
+    { label: 'Job Success', value: 100, suffix: '%' },
+    { label: 'Global Clients', value: 1000, suffix: '+' },
+    { label: 'Hours Completed', value: 10000, suffix: '+' },
+  ]
+};
 
 export default function HomePage() {
-  // Configuration
-  const config = {
-    name: 'NEAZ MD. MORSHED',
-    title: 'Expert Virtual Assistant & Professional Outsourcer',
-    description: 'I handle the heavy lifting of business operations so you can focus on scale. Powered by modern tech stack.',
-    typewriterTexts: [
-      'Virtual Assistant Expert',
-      'Lead Generation Specialist',
-      'CRM & Data Management Pro',
-      'Next.js & Supabase Developer',
-      'Business Process Optimizer',
-      'Top Rated Freelancer',
-    ],
-    stats: [
-      { label: 'Job Success', value: 100, suffix: '%' },
-      { label: 'Global Clients', value: 1000, suffix: '+' },
-      { label: 'Hours Completed', value: 10000, suffix: '+' },
-    ],
-    skills: [
-      { name: 'Lead Research', level: 98 },
-      { name: 'CRM Management', level: 95 },
-      { name: 'Data Mining', level: 97 },
-      { name: 'Admin Support', level: 99 },
-      { name: 'Video Production', level: 95 },
-      { name: 'Web Development', level: 92 },
-    ],
-    services: [
-      {
-        id: 1,
-        title: 'Virtual Assistant',
-        slug: 'virtual-assistant',
-        icon: <Briefcase className="w-8 h-8 sm:w-10 sm:h-10" />,
-        desc: 'High-level administrative support, including email filtering, scheduling, and custom business workflows.',
-      },
-      {
-        id: 2,
-        title: 'Data & CRM Mastery',
-        slug: 'data-crm',
-        icon: <Database className="w-8 h-8 sm:w-10 sm:h-10" />,
-        desc: 'Expert data mining, cleaning, and management across HubSpot, Salesforce, and Zoho.',
-      },
-      {
-        id: 3,
-        title: 'Lead Generation',
-        slug: 'lead-generation',
-        icon: <Target className="w-8 h-8 sm:w-10 sm:h-10" />,
-        desc: 'B2B prospect research with verified contact details to fuel your sales pipeline.',
-      },
-      {
-        id: 4,
-        title: 'Web & Tech Support',
-        slug: 'web-tech-support',
-        icon: <Layout className="w-8 h-8 sm:w-10 sm:h-10" />,
-        desc: 'WordPress customization, Wix site management, and technical troubleshooting for your digital presence.',
-      },
-    ],
+  const [loading, setLoading] = useState(true);
+  const [heroContent, setHeroContent] = useState(defaultHero);
+  const [skills, setSkills] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch Hero Content
+        const { data: heroData } = await supabase
+          .from('homepage_content')
+          .select('*')
+          .single();
+
+        if (heroData) {
+          setHeroContent(heroData);
+        }
+
+        // Fetch Skills (Top 6 by order)
+        const { data: skillsData } = await supabase
+          .from('skills')
+          .select('*')
+          .order('order_index', { ascending: true })
+          .limit(6);
+
+        if (skillsData) {
+          setSkills(skillsData.map(s => ({
+            name: s.name,
+            level: s.proficiency
+          })));
+        }
+
+        // Fetch Services
+        const { data: servicesData } = await supabase
+          .from('services')
+          .select('*')
+          .order('order_index', { ascending: true });
+
+        if (servicesData) {
+          setServices(servicesData.map(s => ({
+            id: s.id,
+            title: s.title,
+            slug: s.slug,
+            // Map icon string to component if needed, or update ServicesSection to handle this
+            // For now passing basic data, ServicesSection might need adjustment if it expects React Nodes
+            icon: getIcon(s.icon),
+            desc: s.description
+          })));
+        }
+
+      } catch (error) {
+        console.error('Error fetching homepage data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // Helper to map icon string to React Node
+  const getIcon = (iconName: string) => {
+    const props = { className: "w-8 h-8 sm:w-10 sm:h-10" };
+    switch (iconName) {
+      case 'Briefcase': return <Briefcase {...props} />;
+      case 'Database': return <Database {...props} />;
+      case 'Target': return <Target {...props} />;
+      case 'Layout': return <Layout {...props} />;
+      default: return <Briefcase {...props} />;
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="bg-[#0b0f1a] min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#2ecc71] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#0b0f1a] text-white selection:bg-[#2ecc71] selection:text-slate-900 min-h-screen">
@@ -75,16 +124,17 @@ export default function HomePage() {
 
       <main>
         <HeroSection
-          name={config.name}
-          title={config.title}
-          typewriterTexts={config.typewriterTexts}
-          description={config.description}
-          stats={config.stats}
+          name={heroContent.hero_name}
+          title={heroContent.hero_title_prefix}
+          subtitle={heroContent.hero_subtitle}
+          typewriterTexts={heroContent.hero_typewriter_texts}
+          description={heroContent.hero_description}
+          stats={heroContent.hero_stats}
         />
 
-        <SkillsSection skills={config.skills} />
+        {skills.length > 0 && <SkillsSection skills={skills} />}
 
-        <ServicesSection services={config.services} />
+        {services.length > 0 && <ServicesSection services={services} />}
 
         <ContactSection />
       </main>

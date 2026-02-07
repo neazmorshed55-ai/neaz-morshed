@@ -15,6 +15,7 @@ export default function HomePage() {
   const config = {
     name: 'NEAZ MD. MORSHED',
     title: 'Expert Virtual Assistant & Professional Outsourcer',
+    subtitle: 'Powering Global Business Growth Since 2014',
     description: 'I handle the heavy lifting of business operations so you can focus on scale. Powered by modern tech stack.',
     typewriterTexts: [
       'Virtual Assistant Expert',
@@ -77,6 +78,7 @@ export default function HomePage() {
         <HeroSection
           name={config.name}
           title={config.title}
+          subtitle={config.subtitle}
           typewriterTexts={config.typewriterTexts}
           description={config.description}
           stats={config.stats}
