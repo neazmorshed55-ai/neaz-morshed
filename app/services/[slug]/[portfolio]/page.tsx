@@ -203,12 +203,41 @@ const getGoogleDriveEmbedUrl = (url: string) => {
   return url;
 };
 
+const isCanvaUrl = (url: string) => {
+  return url.includes('canva.com');
+};
+
+const getCanvaEmbedUrl = (url: string) => {
+  // Extract design ID from Canva URL
+  // Format: https://www.canva.com/design/DESIGN_ID/view
+  const designMatch = url.match(/canva\.com\/design\/([a-zA-Z0-9_-]+)/);
+
+  if (designMatch) {
+    const designId = designMatch[1];
+    // Canva embed URL format with autoplay and loop for videos
+    return `https://www.canva.com/design/${designId}/view?embed`;
+  }
+
+  // If already an embed URL, return as is
+  if (url.includes('?embed') || url.includes('&embed')) {
+    return url;
+  }
+
+  // Try to add embed parameter to existing URL
+  if (url.includes('?')) {
+    return `${url}&embed`;
+  } else {
+    return `${url}?embed`;
+  }
+};
+
 const getEmbedUrl = (url: string) => {
   if (isYouTubeUrl(url)) return getYouTubeEmbedUrl(url);
   if (isTikTokUrl(url)) return getTikTokEmbedUrl(url);
   if (isInstagramUrl(url)) return getInstagramEmbedUrl(url);
   if (isFacebookUrl(url)) return getFacebookEmbedUrl(url);
   if (isGoogleDriveUrl(url)) return getGoogleDriveEmbedUrl(url);
+  if (isCanvaUrl(url)) return getCanvaEmbedUrl(url);
   return url;
 };
 
@@ -493,6 +522,7 @@ export default function PortfolioDetailPage() {
                       const isInstagramPost = item.url.includes('instagram.com') && !item.url.includes('cdninstagram.com');
                       const isGoogleDrive = item.url.includes('drive.google.com') || item.url.includes('docs.google.com');
                       const isVimeo = item.url.includes('vimeo.com');
+                      const isCanva = item.url.includes('canva.com');
 
                       // Regular image: direct image URL OR image file extension
                       const isRegularImage = isImageUrl && !isTikTokPost && !isFacebookPost && !isInstagramPost;
@@ -589,6 +619,22 @@ export default function PortfolioDetailPage() {
                                   )}
                                   <span className="font-bold text-sm block">{getFileTypeLabel(item.url)}</span>
                                   <span className="text-xs opacity-75 mt-1 block">Click to view</span>
+                                </div>
+                              </div>
+                            ) : isCanva ? (
+                              <div className="w-full h-full bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center relative overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/50 via-blue-600/50 to-cyan-500/50 backdrop-blur-sm"></div>
+                                <div className="text-center text-white relative z-10">
+                                  <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M7.5 7.5h9v9h-9v-9zM3 3v18h18V3H3zm16.5 16.5h-15v-15h15v15z"/>
+                                  </svg>
+                                  <span className="font-bold text-sm block">Canva Design</span>
+                                  <span className="text-xs opacity-90 mt-1 block">Click to view</span>
+                                </div>
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                    <Play size={24} className="text-white ml-1" />
+                                  </div>
                                 </div>
                               </div>
                             ) : (
@@ -728,9 +774,11 @@ export default function PortfolioDetailPage() {
                 !item.url.includes('facebook.com') &&
                 !item.url.includes('instagram.com') &&
                 !item.url.includes('tiktok.com') &&
-                !item.url.includes('vimeo.com');
+                !item.url.includes('vimeo.com') &&
+                !item.url.includes('canva.com');
 
               const isGoogleDriveDocument = isGoogleDriveUrl(item.url);
+              const isCanvaDesign = isCanvaUrl(item.url);
 
               if (isRegularImage) {
                 return (
@@ -769,6 +817,35 @@ export default function PortfolioDetailPage() {
                       >
                         <ExternalLink size={18} />
                         Open in Google Drive
+                      </a>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (isCanvaDesign) {
+                const embedUrl = getCanvaEmbedUrl(item.url);
+                return (
+                  <div className="w-full">
+                    <div className="relative w-full h-[85vh] bg-white rounded-2xl overflow-hidden shadow-2xl">
+                      <iframe
+                        src={embedUrl}
+                        className="w-full h-full border-0"
+                        allow="autoplay"
+                        loading="lazy"
+                        allowFullScreen
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-center gap-4">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#2ecc71] text-slate-900 font-bold rounded-xl hover:scale-105 transition-transform"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink size={18} />
+                        Open in Canva
                       </a>
                     </div>
                   </div>
