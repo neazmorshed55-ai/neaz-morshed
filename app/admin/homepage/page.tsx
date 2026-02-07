@@ -48,15 +48,20 @@ export default function HomepageManagement() {
     }, []);
 
     async function fetchContent() {
-        try {
-            // Fetch from our new API route to ensure fresh data (bypassing client cache)
-            const response = await fetch('/api/homepage', {
-                cache: 'no-store',
-                headers: { 'Pragma': 'no-cache' }
-            });
-            const data = await response.json();
+        if (!supabase) {
+            setLoading(false);
+            return;
+        }
 
-            if (data && !data.error) {
+        try {
+            const { data, error } = await supabase
+                .from('homepage_content')
+                .select('*')
+                .single();
+
+            if (error) throw error;
+
+            if (data) {
                 console.log('Fetched fresh content:', data);
                 setContent(data);
                 setFormData(data);
@@ -74,39 +79,32 @@ export default function HomepageManagement() {
         console.log('Saving homepage content...', formData);
         setSaving(true);
         try {
-            // Get the current session to send auth token
-            const { data: { session } } = await supabase.auth.getSession();
-
-            if (!session) {
-                throw new Error('No active session. Please login again.');
-            }
-
-            // Use API route to save with auth token
-            const response = await fetch('/api/homepage', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}`
-                },
-                body: JSON.stringify({
-                    id: content.id,
+            // Direct Supabase update (RLS policy will handle authentication)
+            const { data, error } = await supabase
+                .from('homepage_content')
+                .update({
                     hero_subtitle: formData.hero_subtitle,
                     hero_title_prefix: formData.hero_title_prefix,
                     hero_name: formData.hero_name,
                     hero_description: formData.hero_description,
                     hero_typewriter_texts: formData.hero_typewriter_texts,
-                    hero_stats: formData.hero_stats
+                    hero_stats: formData.hero_stats,
+                    updated_at: new Date().toISOString()
                 })
-            });
+                .eq('id', content.id)
+                .select();
 
-            const result = await response.json();
-
-            if (!response.ok || result.error) {
-                throw new Error(result.error || result.details || 'Failed to save');
+            if (error) {
+                console.error('Supabase update error:', error);
+                throw error;
             }
 
-            console.log('Save successful');
+            console.log('Save successful', data);
             alert('Homepage updated successfully!');
+
+            // Trigger a cache revalidation by calling the API
+            fetch('/api/homepage', { cache: 'no-store' }).catch(console.error);
+
             await fetchContent(); // Re-fetch to confirm changes
 
         } catch (error: any) {
