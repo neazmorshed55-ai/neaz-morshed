@@ -1,21 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-// Create a Supabase client with the service role key to bypass RLS
-const supabase = supabaseUrl && supabaseServiceKey
-    ? createClient(supabaseUrl, supabaseServiceKey)
-    : null;
-
-// GET method to fetch homepage content
+// GET method to fetch homepage content (public access)
 export async function GET() {
     try {
-        if (!supabase) {
-            console.error('Supabase not configured');
-            return NextResponse.json({ error: 'Database configuration error' }, { status: 500 });
-        }
+        // Use anon key for public read access
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
         const { data, error } = await supabase
             .from('homepage_content')
@@ -47,10 +40,21 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
     try {
-        if (!supabase) {
-            console.error('Supabase not configured with Service Role Key');
-            return NextResponse.json({ error: 'Database configuration error' }, { status: 500 });
+        // Get the authorization header (user's session token)
+        const authHeader = request.headers.get('authorization');
+
+        if (!authHeader) {
+            return NextResponse.json({ error: 'Unauthorized - No auth token provided' }, { status: 401 });
         }
+
+        // Create Supabase client with the user's token
+        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            global: {
+                headers: {
+                    Authorization: authHeader
+                }
+            }
+        });
 
         const body = await request.json();
         const {
@@ -67,7 +71,7 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'Content ID is required' }, { status: 400 });
         }
 
-        // Perform the update with service role (bypassing RLS)
+        // Perform the update with user's auth token (RLS will check permissions)
         const { data, error } = await supabase
             .from('homepage_content')
             .update({
@@ -76,7 +80,8 @@ export async function PUT(request: NextRequest) {
                 hero_name,
                 hero_description,
                 hero_typewriter_texts,
-                hero_stats
+                hero_stats,
+                updated_at: new Date().toISOString()
             })
             .eq('id', id)
             .select();
