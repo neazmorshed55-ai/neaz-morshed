@@ -68,6 +68,8 @@ export default function PortfolioManagement() {
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [newGalleryItem, setNewGalleryItem] = useState({ url: '', alt_text: '', type: 'image' as 'image' | 'video' | 'link', skill_tags: [] as string[] });
+  const [showBulkInput, setShowBulkInput] = useState(false);
+  const [bulkUrls, setBulkUrls] = useState('');
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
   const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryItem | null>(null);
   const [showEditGalleryModal, setShowEditGalleryModal] = useState(false);
@@ -443,6 +445,85 @@ export default function PortfolioManagement() {
       console.error('Error adding gallery item:', error);
       const errorMessage = error?.message || error?.error_description || 'Unknown error';
       alert(`Error adding gallery item: ${errorMessage}. Check the console for details.`);
+    }
+    setAddingGalleryItem(false);
+  };
+
+  const handleBulkAddUrls = async () => {
+    if (!supabase || !editingItem || !editingItem.id) {
+      alert('Please save the portfolio item first');
+      return;
+    }
+
+    if (!bulkUrls.trim()) {
+      alert('Please enter at least one URL');
+      return;
+    }
+
+    // Parse URLs - split by newlines and filter empty lines
+    const urls = bulkUrls
+      .split('\n')
+      .map(url => url.trim())
+      .filter(url => url.length > 0);
+
+    if (urls.length === 0) {
+      alert('No valid URLs found');
+      return;
+    }
+
+    setAddingGalleryItem(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    try {
+      // Process each URL
+      for (let i = 0; i < urls.length; i++) {
+        const url = urls[i];
+
+        // Auto-detect type based on URL
+        let type: 'image' | 'video' | 'link' = 'link';
+        if (/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(url)) {
+          type = 'image';
+        } else if (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('tiktok.com') || url.includes('vimeo.com')) {
+          type = 'video';
+        }
+
+        try {
+          const { data, error } = await supabase
+            .from('portfolio_gallery')
+            .insert({
+              portfolio_item_id: editingItem.id,
+              url: url,
+              alt_text: null,
+              type: type,
+              order_index: galleryItems.length + i
+            })
+            .select()
+            .single();
+
+          if (error) throw error;
+
+          if (data) {
+            setGalleryItems(prev => [...prev, { ...data, skill_tags: [] } as GalleryItem]);
+            successCount++;
+          }
+        } catch (itemError) {
+          console.error(`Error adding URL ${url}:`, itemError);
+          errorCount++;
+        }
+      }
+
+      // Show result
+      if (successCount > 0) {
+        alert(`Successfully added ${successCount} URL(s)${errorCount > 0 ? `, ${errorCount} failed` : ''}`);
+        setBulkUrls('');
+        setShowBulkInput(false);
+      } else {
+        alert('Failed to add URLs. Please check the console for details.');
+      }
+    } catch (error) {
+      console.error('Error in bulk add:', error);
+      alert('Error adding URLs');
     }
     setAddingGalleryItem(false);
   };
@@ -944,13 +1025,52 @@ export default function PortfolioManagement() {
                   {/* Gallery Management Section - Only show when editing an existing item */}
                   {editingItem && (
                     <div className="border-t border-white/10 pt-6 mt-6">
-                      <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                        <Image size={18} className="text-[#2ecc71]" />
-                        Gallery Images & Videos
-                      </h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-bold flex items-center gap-2">
+                          <Image size={18} className="text-[#2ecc71]" />
+                          Gallery Images & Videos
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setShowBulkInput(!showBulkInput)}
+                          className="px-4 py-2 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-lg text-[#2ecc71] text-sm font-medium hover:bg-[#2ecc71]/20 transition-all"
+                        >
+                          {showBulkInput ? '← Single Add' : '📋 Bulk Add URLs'}
+                        </button>
+                      </div>
+
+                      {/* Bulk URL Input */}
+                      {showBulkInput && (
+                        <div className="mb-6 p-4 bg-slate-800/30 border border-[#2ecc71]/20 rounded-xl">
+                          <label className="block text-white font-medium mb-2 text-sm">
+                            Paste Multiple URLs (one per line)
+                          </label>
+                          <textarea
+                            value={bulkUrls}
+                            onChange={(e) => setBulkUrls(e.target.value)}
+                            className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 font-mono text-sm"
+                            placeholder="https://example.com/image1.jpg&#10;https://youtube.com/watch?v=xyz&#10;https://docs.google.com/document/d/abc&#10;https://example.com/image2.png"
+                            rows={8}
+                          />
+                          <div className="flex items-center justify-between mt-3">
+                            <p className="text-slate-400 text-xs">
+                              ✨ Auto-detects: Images (.jpg, .png), Videos (YouTube, TikTok), Documents/Links
+                            </p>
+                            <button
+                              type="button"
+                              onClick={handleBulkAddUrls}
+                              disabled={addingGalleryItem || !bulkUrls.trim()}
+                              className="px-6 py-2 bg-[#2ecc71] text-slate-950 font-bold rounded-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            >
+                              {addingGalleryItem ? 'Adding...' : `Add ${bulkUrls.split('\n').filter(u => u.trim()).length} URLs`}
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Add New Gallery Item */}
-                      <div className="flex gap-3 mb-6 items-start">
+                      {!showBulkInput && (
+                        <div className="flex gap-3 mb-6 items-start">
                         <select
                           value={newGalleryItem.type}
                           onChange={(e) => setNewGalleryItem({ ...newGalleryItem, type: e.target.value as 'image' | 'video' | 'link' })}
@@ -1091,7 +1211,7 @@ export default function PortfolioManagement() {
                             </>
                           )}
                         </div>
-                      </div>
+                      )}
 
                       {/* Gallery Grid */}
                       {galleryItems.length > 0 ? (
