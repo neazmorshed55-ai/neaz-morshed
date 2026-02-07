@@ -49,9 +49,12 @@ export default function HomePage() {
 
         if (heroResponse.ok) {
           const heroData = await heroResponse.json();
+          console.log('Fetched hero data from API:', heroData);
           if (heroData && !heroData.error) {
             setHeroContent(heroData);
           }
+        } else {
+          console.error('Failed to fetch hero data:', heroResponse.status, heroResponse.statusText);
         }
 
         // Fetch Skills (Top 6 by order) - using supabase for now

@@ -20,6 +20,8 @@ export async function GET() {
             throw error;
         }
 
+        console.log('[API /api/homepage GET] Fetched data from Supabase:', data);
+
         // Set cache control headers to prevent caching
         return NextResponse.json(data, {
             headers: {
