@@ -78,6 +78,44 @@ const isVerticalContent = (url: string) => {
     url.includes('youtube.com/shorts');
 };
 
+// Get file type label from URL
+const getFileTypeLabel = (url: string): string => {
+  const lowerUrl = url.toLowerCase();
+
+  // PDF files
+  if (lowerUrl.endsWith('.pdf') || (lowerUrl.includes('/export=download') && lowerUrl.includes('drive.google.com'))) {
+    return 'PDF';
+  }
+
+  // Excel files
+  if (lowerUrl.endsWith('.xlsx') || lowerUrl.endsWith('.xls') || lowerUrl.includes('/spreadsheets/')) {
+    return 'Excel Sheet';
+  }
+
+  // Word documents
+  if (lowerUrl.endsWith('.docx') || lowerUrl.endsWith('.doc') || (lowerUrl.includes('/document/') && lowerUrl.includes('docs.google.com'))) {
+    return 'Word Document';
+  }
+
+  // PowerPoint
+  if (lowerUrl.endsWith('.pptx') || lowerUrl.endsWith('.ppt') || lowerUrl.includes('/presentation/')) {
+    return 'PowerPoint';
+  }
+
+  // Google Docs (if not detected above)
+  if (lowerUrl.includes('docs.google.com')) {
+    return 'Google Doc';
+  }
+
+  // Generic Google Drive
+  if (lowerUrl.includes('drive.google.com')) {
+    return 'Google Drive File';
+  }
+
+  // Default for other links
+  return 'Document';
+};
+
 // ============ EMBED URL CONVERTERS ============
 
 const getYouTubeEmbedUrl = (url: string) => {
@@ -477,7 +515,7 @@ export default function PortfolioDetailPage() {
                                   <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                   </svg>
-                                  <span className="font-bold text-xs text-white">Google Drive</span>
+                                  <span className="font-bold text-xs text-white">{getFileTypeLabel(item.url)}</span>
                                 </div>
                               </div>
                             ) : (
@@ -639,12 +677,17 @@ export default function PortfolioDetailPage() {
               );
             })()}
 
-            {/* Caption */}
-            {galleryItems[selectedGalleryIndex].alt_text && (
-              <p className="text-white text-center mt-4 text-lg font-medium">
-                {galleryItems[selectedGalleryIndex].alt_text}
-              </p>
-            )}
+            {/* Caption - Only show if alt_text exists and is not a filename */}
+            {(() => {
+              const altText = galleryItems[selectedGalleryIndex].alt_text;
+              // Check if alt_text is not a filename (doesn't end with common image/file extensions)
+              const isFilename = altText && /\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx)$/i.test(altText);
+              return altText && !isFilename && altText.trim() !== '' && (
+                <p className="text-white text-center mt-4 text-lg font-medium">
+                  {altText}
+                </p>
+              );
+            })()}
 
             {/* Counter */}
             <p className="text-slate-400 text-center mt-2 text-sm">
