@@ -12,6 +12,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
+import SocialEmbed from '../../../components/SocialEmbed';
 
 const isVideoFile = (url: string) => {
   return url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
@@ -1583,27 +1584,14 @@ export default function PortfolioCollectionPage() {
                           </div>
                         </>
                       ) : isTikTokPost ? (
-                        <div className="w-full h-full relative bg-black">
-                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#00f2ea] to-[#ff0050] opacity-20"></div>
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-2">
-                                <Play size={24} className="text-black ml-1" />
-                              </div>
-                              <span className="text-white font-bold text-sm">TikTok Video</span>
-                            </div>
-                          </div>
+                        <div className="w-full h-full relative">
+                          <SocialEmbed url={item.url} className="w-full h-full pointer-events-none" />
+                          <div className="absolute inset-0 z-10 bg-transparent" />
                         </div>
                       ) : isFacebookPost ? (
-                        <div className="w-full h-full relative bg-[#1877f2]">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center text-white">
-                              <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                              </svg>
-                              <span className="font-bold text-xs">Facebook</span>
-                            </div>
-                          </div>
+                        <div className="w-full h-full relative">
+                          <SocialEmbed url={item.url} className="w-full h-full pointer-events-none" />
+                          <div className="absolute inset-0 z-10 bg-transparent" />
                         </div>
                       ) : isInstagramPost ? (
                         <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
