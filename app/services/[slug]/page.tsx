@@ -1506,43 +1506,48 @@ export default function PortfolioCollectionPage() {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {allGalleryItems.map((item, index) => {
-                // Check if it's a video file or actual video platform URL (not Facebook images)
-                const isActualVideo = isVideoFile(item.url) ||
-                  (isEmbeddableVideo(item.url) && !isFacebookImage(item.url));
+                // Check if URL is a direct image (including CDN images from Facebook, etc.)
+                const isImageUrl = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(item.url) ||
+                  item.url.includes('fbcdn.net') ||
+                  item.url.includes('cdninstagram.com');
 
-                // Get thumbnail source
-                const getThumbnailSrc = () => {
-                  // Facebook image posts - extract actual image
-                  if (isFacebookImage(item.url)) {
-                    const fbThumbnail = getFacebookImageThumbnail(item.url);
-                    return fbThumbnail || item.url;
+                // Check URL type
+                const isYouTube = item.url.includes('youtube.com') || item.url.includes('youtu.be');
+                const isTikTokPost = item.url.includes('tiktok.com') && item.url.includes('/video/');
+                const isFacebookPost = item.url.includes('facebook.com') && !item.url.includes('fbcdn.net');
+                const isInstagramPost = item.url.includes('instagram.com') && !item.url.includes('cdninstagram.com');
+                const isGoogleDrive = isGoogleDriveUrl(item.url);
+                const isVimeo = item.url.includes('vimeo.com');
+
+                // Regular image: direct image URL OR image file extension
+                const isRegularImage = isImageUrl && !isTikTokPost && !isFacebookPost && !isInstagramPost;
+
+                const getYouTubeThumbnail = (url: string) => {
+                  const patterns = [
+                    /youtube\.com\/watch\?v=([^&]+)/,
+                    /youtu\.be\/([^?]+)/,
+                    /youtube\.com\/shorts\/([^?]+)/,
+                  ];
+                  for (const pattern of patterns) {
+                    const match = url.match(pattern);
+                    if (match) return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
                   }
-
-                  // Video platforms
-                  if (isActualVideo) {
-                    // YouTube thumbnail
-                    if (item.url.includes('youtube.com') || item.url.includes('youtu.be')) {
-                      const videoId = item.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&?]+)/)?.[1];
-                      return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
-                    }
-
-                    // TikTok thumbnail
-                    if (isTikTokUrl(item.url)) {
-                      return getTikTokThumbnail(item.url);
-                    }
-
-                    // For other platforms (Instagram, Facebook videos), use iframe preview
-                    return null;
-                  }
-
-                  // Default: return URL as-is for regular images
-                  return item.url;
+                  return null;
                 };
 
-                const thumbnailSrc = getThumbnailSrc();
-                const isLink = item.type === 'link';
+                // Get file type label for Google Drive
+                const getFileTypeLabel = (url: string): string => {
+                  const lowerUrl = url.toLowerCase();
+                  if (lowerUrl.endsWith('.pdf') || lowerUrl.includes('/export=download')) return 'PDF';
+                  if (lowerUrl.endsWith('.xlsx') || lowerUrl.endsWith('.xls') || lowerUrl.includes('/spreadsheets/')) return 'Excel Sheet';
+                  if (lowerUrl.endsWith('.docx') || lowerUrl.endsWith('.doc') || lowerUrl.includes('/document/')) return 'Word Document';
+                  if (lowerUrl.endsWith('.pptx') || lowerUrl.endsWith('.ppt') || lowerUrl.includes('/presentation/')) return 'PowerPoint';
+                  if (lowerUrl.includes('docs.google.com')) return 'Google Doc';
+                  if (lowerUrl.includes('drive.google.com')) return 'Google Drive File';
+                  return 'Document';
+                };
 
                 return (
                   <motion.div
@@ -1550,44 +1555,96 @@ export default function PortfolioCollectionPage() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.02 }}
-                    className="rounded-2xl overflow-hidden border border-white/10 bg-black/50 cursor-pointer group hover:border-[#2ecc71]/50 transition-all aspect-square"
                     onClick={() => setSelectedGalleryIndex(index)}
+                    className="cursor-pointer group"
                   >
-                    <div className="relative w-full h-full">
-                      {thumbnailSrc ? (
+                    <div className={`relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all ${isVerticalContent(item.url) ? 'aspect-[9/16]' : 'aspect-video'}`}>
+                      {isRegularImage ? (
                         <Image
-                          src={thumbnailSrc}
-                          alt={item.alt_text || 'Gallery item'}
+                          src={item.url}
+                          alt={item.alt_text || `Gallery image`}
                           fill
-                          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                          sizes="(max-width: 768px) 50vw, 33vw"
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
-                      ) : isActualVideo ? (
-                        <div className="w-full h-full bg-slate-900 flex items-center justify-center">
-                          <div className="w-16 h-16 bg-[#2ecc71]/20 rounded-full flex items-center justify-center">
-                            <Play size={28} className="text-[#2ecc71] ml-1" fill="currentColor" />
+                      ) : isYouTube ? (
+                        <>
+                          <Image
+                            src={getYouTubeThumbnail(item.url) || 'https://via.placeholder.com/640x360?text=YouTube+Video'}
+                            alt={item.alt_text || 'YouTube video'}
+                            fill
+                            sizes="(max-width: 768px) 50vw, 33vw"
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
+                            <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                              <Play size={24} className="text-white ml-1" />
+                            </div>
+                          </div>
+                        </>
+                      ) : isTikTokPost ? (
+                        <div className="w-full h-full relative bg-black">
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#00f2ea] to-[#ff0050] opacity-20"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center">
+                              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-2">
+                                <Play size={24} className="text-black ml-1" />
+                              </div>
+                              <span className="text-white font-bold text-sm">TikTok Video</span>
+                            </div>
                           </div>
                         </div>
-                      ) : isLink ? (
-                        <div className="w-full h-full bg-slate-900 flex items-center justify-center">
-                          {item.url.endsWith('.pdf') || item.url.includes('/documents/') ? (
-                            <FileText size={32} className="text-[#2ecc71]" />
-                          ) : (
-                            <ExternalLink size={32} className="text-[#2ecc71]" />
-                          )}
+                      ) : isFacebookPost ? (
+                        <div className="w-full h-full relative bg-[#1877f2]">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center text-white">
+                              <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                              </svg>
+                              <span className="font-bold text-xs">Facebook</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : isInstagramPost ? (
+                        <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
+                          <div className="text-center text-white">
+                            <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                            <span className="font-bold text-xs">Instagram</span>
+                          </div>
+                        </div>
+                      ) : isGoogleDrive ? (
+                        <div className={`w-full h-full flex items-center justify-center ${
+                          item.url.includes('/document/') ? 'bg-gradient-to-br from-blue-600 to-blue-800' :
+                          item.url.includes('/spreadsheets/') ? 'bg-gradient-to-br from-green-600 to-green-800' :
+                          item.url.includes('/presentation/') ? 'bg-gradient-to-br from-yellow-600 to-yellow-800' :
+                          'bg-gradient-to-br from-slate-700 to-slate-900'
+                        }`}>
+                          <div className="text-center text-white p-4">
+                            {item.url.includes('/document/') ? (
+                              <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H8V18H10V19M14,19H10V17H14V19M14,16H10V15H14V16M10,14H8V12H10V14M14,14H10V12H14V14M10,11H8V10H10V11M14,11H10V10H14V11Z" />
+                              </svg>
+                            ) : item.url.includes('/spreadsheets/') ? (
+                              <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V5H19V19M12,17H17V15H12V17M7,17H10V15H7V17M7,13H10V10H7V13M12,13H17V10H12V13M7,8H17V6H7V8Z" />
+                              </svg>
+                            ) : item.url.includes('/presentation/') ? (
+                              <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V7H19V19M17,12H13V16H11V12H7L12,7L17,12Z" />
+                              </svg>
+                            ) : (
+                              <FileText className="w-12 h-12 mx-auto mb-2" />
+                            )}
+                            <span className="font-bold text-xs block">{getFileTypeLabel(item.url)}</span>
+                          </div>
                         </div>
                       ) : (
-                        <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                          <Eye size={32} className="text-slate-600" />
-                        </div>
-                      )}
-
-                      {/* Play overlay for videos */}
-                      {isActualVideo && thumbnailSrc && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="w-16 h-16 bg-[#2ecc71] rounded-full flex items-center justify-center">
-                            <Play size={28} className="text-slate-900 ml-1" fill="currentColor" />
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center">
+                          <div className="text-center text-[#2ecc71]">
+                            <ExternalLink className="w-12 h-12 mx-auto mb-2" />
+                            <span className="font-bold text-xs text-white">Link</span>
                           </div>
                         </div>
                       )}
