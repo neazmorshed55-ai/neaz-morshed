@@ -9,6 +9,42 @@ const supabase = supabaseUrl && supabaseServiceKey
     ? createClient(supabaseUrl, supabaseServiceKey)
     : null;
 
+// GET method to fetch homepage content
+export async function GET() {
+    try {
+        if (!supabase) {
+            console.error('Supabase not configured');
+            return NextResponse.json({ error: 'Database configuration error' }, { status: 500 });
+        }
+
+        const { data, error } = await supabase
+            .from('homepage_content')
+            .select('*')
+            .single();
+
+        if (error) {
+            console.error('Supabase fetch error:', error);
+            throw error;
+        }
+
+        // Set cache control headers to prevent caching
+        return NextResponse.json(data, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
+
+    } catch (error: any) {
+        console.error('Error fetching homepage content:', error);
+        return NextResponse.json({
+            error: 'Failed to fetch homepage content',
+            details: error.message
+        }, { status: 500 });
+    }
+}
+
 export async function PUT(request: NextRequest) {
     try {
         if (!supabase) {
@@ -54,7 +90,14 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ error: 'No records updated. ID might be incorrect.' }, { status: 404 });
         }
 
-        return NextResponse.json({ success: true, data: data[0] });
+        // Return with no-cache headers to ensure fresh data on next fetch
+        return NextResponse.json({ success: true, data: data[0] }, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
 
     } catch (error: any) {
         console.error('Error updating homepage content:', error);

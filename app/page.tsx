@@ -40,52 +40,50 @@ export default function HomePage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        // Fetch Hero Content with cache busting
-        const { data: heroData } = await supabase
-          .from('homepage_content')
-          .select('*')
-          .single();
+        // Fetch Hero Content from API route (with no-cache)
+        const heroResponse = await fetch('/api/homepage', {
+          cache: 'no-store',
+          headers: { 'Pragma': 'no-cache' }
+        });
 
-        if (heroData) {
-          setHeroContent(heroData);
+        if (heroResponse.ok) {
+          const heroData = await heroResponse.json();
+          if (heroData && !heroData.error) {
+            setHeroContent(heroData);
+          }
         }
 
-        // Fetch Skills (Top 6 by order)
-        const { data: skillsData } = await supabase
-          .from('skills')
-          .select('*')
-          .order('order_index', { ascending: true })
-          .limit(6);
+        // Fetch Skills (Top 6 by order) - using supabase for now
+        if (supabase) {
+          const { data: skillsData } = await supabase
+            .from('skills')
+            .select('*')
+            .order('order_index', { ascending: true })
+            .limit(6);
 
-        if (skillsData) {
-          setSkills(skillsData.map(s => ({
-            name: s.name,
-            level: s.proficiency
-          })));
-        }
+          if (skillsData) {
+            setSkills(skillsData.map(s => ({
+              name: s.name,
+              level: s.proficiency
+            })));
+          }
 
-        // Fetch Services
-        const { data: servicesData } = await supabase
-          .from('services')
-          .select('*')
-          .order('order_index', { ascending: true });
+          // Fetch Services
+          const { data: servicesData } = await supabase
+            .from('services')
+            .select('*')
+            .order('order_index', { ascending: true });
 
-        if (servicesData) {
-          setServices(servicesData.map(s => ({
-            id: s.id,
-            title: s.title,
-            slug: s.slug,
-            // Map icon string to component if needed, or update ServicesSection to handle this
-            // For now passing basic data, ServicesSection might need adjustment if it expects React Nodes
-            icon: getIcon(s.icon),
-            desc: s.description
-          })));
+          if (servicesData) {
+            setServices(servicesData.map(s => ({
+              id: s.id,
+              title: s.title,
+              slug: s.slug,
+              icon: getIcon(s.icon),
+              desc: s.description
+            })));
+          }
         }
 
       } catch (error) {

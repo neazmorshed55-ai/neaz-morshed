@@ -7,7 +7,6 @@ import {
     Save, Loader2, ArrowLeft, LayoutTemplate, Type, Hash, AlignLeft, List
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
-import { supabase } from '../../../lib/supabase';
 
 interface HeroStat {
     label: string;
@@ -69,14 +68,19 @@ export default function HomepageManagement() {
     }
 
     async function handleSave() {
-        if (!supabase || !content?.id) return;
+        if (!content?.id) return;
 
         console.log('Saving homepage content...', formData);
         setSaving(true);
         try {
-            const { error } = await supabase
-                .from('homepage_content')
-                .update({
+            // Use API route to save (with service role key)
+            const response = await fetch('/api/homepage', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: content.id,
                     hero_subtitle: formData.hero_subtitle,
                     hero_title_prefix: formData.hero_title_prefix,
                     hero_name: formData.hero_name,
@@ -84,9 +88,13 @@ export default function HomepageManagement() {
                     hero_typewriter_texts: formData.hero_typewriter_texts,
                     hero_stats: formData.hero_stats
                 })
-                .eq('id', content.id);
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+
+            if (!response.ok || result.error) {
+                throw new Error(result.error || result.details || 'Failed to save');
+            }
 
             console.log('Save successful');
             alert('Homepage updated successfully!');
