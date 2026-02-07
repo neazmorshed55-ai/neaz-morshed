@@ -72,6 +72,7 @@ export default function HomepageManagement() {
     async function handleSave() {
         if (!supabase || !content?.id) return;
 
+        console.log('Saving homepage content...', formData);
         setSaving(true);
         try {
             const { error } = await supabase
@@ -87,10 +88,14 @@ export default function HomepageManagement() {
                 .eq('id', content.id);
 
             if (error) throw error;
+
+            console.log('Save successful');
             alert('Homepage updated successfully!');
-        } catch (error) {
+            await fetchContent(); // Re-fetch to confirm changes
+
+        } catch (error: any) {
             console.error('Error saving homepage content:', error);
-            alert('Failed to save changes.');
+            alert(`Failed to save changes: ${error.message || error}`);
         } finally {
             setSaving(false);
         }
