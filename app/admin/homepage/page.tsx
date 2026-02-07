@@ -101,6 +101,12 @@ export default function HomepageManagement() {
         }
     }
 
+    // Generic Text Change Handler
+    const handleTextChange = (field: keyof HomepageContent, value: string) => {
+        console.log(`Updating ${field} to:`, value);
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
     // Typewriter Text Handlers
     const addTypewriterText = () => {
         if (!newTypewriterText.trim()) return;
@@ -120,9 +126,11 @@ export default function HomepageManagement() {
 
     // Stats Handlers
     const updateStat = (index: number, field: keyof HeroStat, value: string | number) => {
-        const newStats = [...formData.hero_stats];
-        newStats[index] = { ...newStats[index], [field]: value };
-        setFormData(prev => ({ ...prev, hero_stats: newStats }));
+        setFormData(prev => {
+            const newStats = [...prev.hero_stats];
+            newStats[index] = { ...newStats[index], [field]: value };
+            return { ...prev, hero_stats: newStats };
+        });
     };
 
     if (loading) {
@@ -174,7 +182,7 @@ export default function HomepageManagement() {
                                     <input
                                         type="text"
                                         value={formData.hero_subtitle}
-                                        onChange={(e) => setFormData({ ...formData, hero_subtitle: e.target.value })}
+                                        onChange={(e) => handleTextChange('hero_subtitle', e.target.value)}
                                         className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-[#2ecc71]/50 transition-all"
                                     />
                                 </div>
@@ -190,7 +198,7 @@ export default function HomepageManagement() {
                                     <input
                                         type="text"
                                         value={formData.hero_title_prefix}
-                                        onChange={(e) => setFormData({ ...formData, hero_title_prefix: e.target.value })}
+                                        onChange={(e) => handleTextChange('hero_title_prefix', e.target.value)}
                                         className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 transition-all"
                                     />
                                     <p className="text-xs text-slate-500 mt-2">Example: I AM</p>
@@ -202,7 +210,7 @@ export default function HomepageManagement() {
                                     <input
                                         type="text"
                                         value={formData.hero_name}
-                                        onChange={(e) => setFormData({ ...formData, hero_name: e.target.value })}
+                                        onChange={(e) => handleTextChange('hero_name', e.target.value)}
                                         className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#2ecc71]/50 transition-all"
                                     />
                                     <p className="text-xs text-slate-500 mt-2">First 2 words will be used for the big title.</p>
@@ -219,7 +227,7 @@ export default function HomepageManagement() {
                                     <textarea
                                         rows={4}
                                         value={formData.hero_description}
-                                        onChange={(e) => setFormData({ ...formData, hero_description: e.target.value })}
+                                        onChange={(e) => handleTextChange('hero_description', e.target.value)}
                                         className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-[#2ecc71]/50 transition-all resize-none"
                                     />
                                 </div>
