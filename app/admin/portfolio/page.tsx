@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   Plus, Edit2, Trash2, Search, Loader2, X,
   Star, ArrowLeft, Save, Image, ExternalLink, Upload, FileText,
-  ChevronUp, ChevronDown
+  ChevronUp, ChevronDown, Tag
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -73,6 +73,9 @@ export default function PortfolioManagement() {
   const [addingGalleryItem, setAddingGalleryItem] = useState(false);
   const [editingGalleryItem, setEditingGalleryItem] = useState<GalleryItem | null>(null);
   const [showEditGalleryModal, setShowEditGalleryModal] = useState(false);
+  const [selectedGalleryItems, setSelectedGalleryItems] = useState<string[]>([]);
+  const [showBulkTagModal, setShowBulkTagModal] = useState(false);
+  const [bulkTagSelection, setBulkTagSelection] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     service_id: '',
@@ -653,6 +656,89 @@ export default function PortfolioManagement() {
     }
   };
 
+  // Toggle selection for a gallery item
+  const toggleGalleryItemSelection = (itemId: string) => {
+    setSelectedGalleryItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  // Select all gallery items
+  const selectAllGalleryItems = () => {
+    if (selectedGalleryItems.length === galleryItems.length) {
+      setSelectedGalleryItems([]);
+    } else {
+      setSelectedGalleryItems(galleryItems.map(item => item.id));
+    }
+  };
+
+  // Open bulk tag modal
+  const openBulkTagModal = () => {
+    if (selectedGalleryItems.length === 0) {
+      alert('Please select at least one gallery item');
+      return;
+    }
+    setShowBulkTagModal(true);
+    setBulkTagSelection([]);
+  };
+
+  // Handle bulk tag assignment
+  const handleBulkTagAssignment = async () => {
+    if (!supabase || selectedGalleryItems.length === 0) return;
+
+    if (bulkTagSelection.length === 0) {
+      alert('Please select at least one skill tag');
+      return;
+    }
+
+    if (bulkTagSelection.length > 3) {
+      alert('Maximum 3 tags allowed per item');
+      return;
+    }
+
+    try {
+      // For each selected gallery item
+      for (const itemId of selectedGalleryItems) {
+        // First, delete existing tags
+        await supabase
+          .from('portfolio_gallery_skill_tags')
+          .delete()
+          .eq('portfolio_gallery_id', itemId);
+
+        // Then, insert new tags
+        if (bulkTagSelection.length > 0) {
+          const tagInserts = bulkTagSelection.map(skillId => ({
+            portfolio_gallery_id: itemId,
+            sub_skill_id: skillId
+          }));
+
+          await supabase
+            .from('portfolio_gallery_skill_tags')
+            .insert(tagInserts);
+        }
+      }
+
+      // Update local state
+      setGalleryItems(prev =>
+        prev.map(item =>
+          selectedGalleryItems.includes(item.id)
+            ? { ...item, skill_tags: bulkTagSelection }
+            : item
+        )
+      );
+
+      alert(`Successfully updated tags for ${selectedGalleryItems.length} items`);
+      setShowBulkTagModal(false);
+      setSelectedGalleryItems([]);
+      setBulkTagSelection([]);
+    } catch (error) {
+      console.error('Error updating bulk tags:', error);
+      alert('Error updating tags. Please try again.');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
@@ -1216,10 +1302,47 @@ export default function PortfolioManagement() {
 
                       {/* Gallery Grid */}
                       {galleryItems.length > 0 ? (
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <>
+                          {/* Bulk Actions Bar */}
+                          <div className="flex items-center justify-between mb-4 p-3 bg-slate-800/30 border border-white/10 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                checked={selectedGalleryItems.length === galleryItems.length && galleryItems.length > 0}
+                                onChange={selectAllGalleryItems}
+                                className="w-5 h-5 rounded bg-slate-800 border-white/10 text-[#2ecc71] focus:ring-[#2ecc71] focus:ring-offset-0"
+                              />
+                              <span className="text-slate-400 text-sm">
+                                {selectedGalleryItems.length === 0
+                                  ? 'Select items'
+                                  : `${selectedGalleryItems.length} selected`}
+                              </span>
+                            </div>
+                            {selectedGalleryItems.length > 0 && (
+                              <button
+                                onClick={openBulkTagModal}
+                                className="px-4 py-2 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-lg text-[#2ecc71] text-sm font-medium hover:bg-[#2ecc71]/20 transition-all flex items-center gap-2"
+                              >
+                                <Tag size={16} />
+                                Set Tags for Selected
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {galleryItems.map((item, index) => (
                             <div key={item.id} className="relative flex flex-col">
                               <div className="relative group aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/10">
+                                {/* Checkbox for selection */}
+                                <div className="absolute top-2 left-2 z-10">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedGalleryItems.includes(item.id)}
+                                    onChange={() => toggleGalleryItemSelection(item.id)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="w-5 h-5 rounded bg-slate-800 border-white/30 text-[#2ecc71] focus:ring-[#2ecc71] focus:ring-offset-0 shadow-lg"
+                                  />
+                                </div>
                                 {item.type === 'image' ? (
                                   <img src={item.url} alt="Gallery item" className="w-full h-full object-cover" />
                                 ) : item.type === 'video' ? (
@@ -1314,6 +1437,7 @@ export default function PortfolioManagement() {
                             </div>
                           ))}
                         </div>
+                        </>
                       ) : (
                         <p className="text-slate-500 text-sm italic">No gallery items added yet.</p>
                       )}
@@ -1438,6 +1562,94 @@ export default function PortfolioManagement() {
                     className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold hover:bg-[#27ae60]"
                   >
                     Save Tags
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Bulk Tag Assignment Modal */}
+        <AnimatePresence>
+          {showBulkTagModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              onClick={() => setShowBulkTagModal(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg p-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold text-white mb-4">
+                  Set Tags for {selectedGalleryItems.length} Items
+                </h3>
+
+                {/* Selected items preview */}
+                <div className="mb-4 p-3 bg-slate-800/30 border border-white/10 rounded-xl">
+                  <p className="text-slate-400 text-sm">
+                    You are about to set tags for <span className="text-[#2ecc71] font-semibold">{selectedGalleryItems.length}</span> selected gallery items.
+                  </p>
+                </div>
+
+                {/* Tag Selection */}
+                <div className="space-y-2 mb-6">
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                    Select Skills (Max 3)
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {subSkills.map((skill) => {
+                      const isSelected = bulkTagSelection.includes(skill.id);
+                      const canSelect = bulkTagSelection.length < 3;
+
+                      return (
+                        <button
+                          key={skill.id}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setBulkTagSelection(prev => prev.filter(id => id !== skill.id));
+                            } else if (canSelect) {
+                              setBulkTagSelection(prev => [...prev, skill.id]);
+                            }
+                          }}
+                          disabled={!isSelected && !canSelect}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                            isSelected
+                              ? 'bg-[#2ecc71] text-slate-950'
+                              : canSelect
+                              ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white'
+                              : 'bg-slate-900/50 text-slate-600 cursor-not-allowed'
+                          }`}
+                        >
+                          {skill.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-slate-600 text-xs">
+                    Selected: {bulkTagSelection.length}/3 - These tags will be applied to all selected items
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowBulkTagModal(false)}
+                    className="flex-1 py-3 border border-white/10 text-white rounded-xl hover:bg-white/5"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkTagAssignment}
+                    disabled={bulkTagSelection.length === 0}
+                    className="flex-1 py-3 bg-[#2ecc71] text-slate-950 rounded-xl font-bold hover:bg-[#27ae60] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Apply to {selectedGalleryItems.length} Items
                   </button>
                 </div>
               </motion.div>
