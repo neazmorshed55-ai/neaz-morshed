@@ -48,17 +48,16 @@ export default function HomepageManagement() {
     }, []);
 
     async function fetchContent() {
-        if (!supabase) return;
-
         try {
-            const { data, error } = await supabase
-                .from('homepage_content')
-                .select('*')
-                .single();
+            // Fetch from our new API route to ensure fresh data (bypassing client cache)
+            const response = await fetch('/api/homepage', {
+                cache: 'no-store',
+                headers: { 'Pragma': 'no-cache' }
+            });
+            const data = await response.json();
 
-            if (error) throw error;
-
-            if (data) {
+            if (data && !data.error) {
+                console.log('Fetched fresh content:', data);
                 setContent(data);
                 setFormData(data);
             }

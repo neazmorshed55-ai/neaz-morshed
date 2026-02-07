@@ -46,7 +46,7 @@ export default function HomePage() {
       }
 
       try {
-        // Fetch Hero Content
+        // Fetch Hero Content with cache busting
         const { data: heroData } = await supabase
           .from('homepage_content')
           .select('*')
