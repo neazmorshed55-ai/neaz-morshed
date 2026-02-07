@@ -78,6 +78,10 @@ const isVerticalContent = (url: string) => {
     url.includes('youtube.com/shorts');
 };
 
+const isGoogleDriveUrl = (url: string) => {
+  return url.includes('drive.google.com') || url.includes('docs.google.com');
+};
+
 // Get file type label from URL
 const getFileTypeLabel = (url: string): string => {
   const lowerUrl = url.toLowerCase();
@@ -151,11 +155,60 @@ const getFacebookEmbedUrl = (url: string) => {
   return `https://www.facebook.com/plugins/post.php?href=${encodedUrl}&show_text=true&width=500`;
 };
 
+const getGoogleDriveEmbedUrl = (url: string) => {
+  // Extract file ID from various Google Drive URL formats
+  let fileId = '';
+
+  // Format 1: /file/d/FILE_ID/view or /file/d/FILE_ID/
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) fileId = fileMatch[1];
+
+  // Format 2: /document/d/FILE_ID/ (Google Docs)
+  const docMatch = url.match(/\/document\/d\/([a-zA-Z0-9_-]+)/);
+  if (docMatch) fileId = docMatch[1];
+
+  // Format 3: /spreadsheets/d/FILE_ID/ (Google Sheets)
+  const sheetMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (sheetMatch) fileId = sheetMatch[1];
+
+  // Format 4: /presentation/d/FILE_ID/ (Google Slides)
+  const slideMatch = url.match(/\/presentation\/d\/([a-zA-Z0-9_-]+)/);
+  if (slideMatch) fileId = slideMatch[1];
+
+  // Format 5: id= parameter
+  if (!fileId) {
+    const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (idMatch) fileId = idMatch[1];
+  }
+
+  if (fileId) {
+    // For Google Docs, Sheets, Slides - use their specific preview URLs
+    if (url.includes('/document/')) {
+      return `https://docs.google.com/document/d/${fileId}/preview`;
+    } else if (url.includes('/spreadsheets/')) {
+      return `https://docs.google.com/spreadsheets/d/${fileId}/preview`;
+    } else if (url.includes('/presentation/')) {
+      return `https://docs.google.com/presentation/d/${fileId}/preview`;
+    } else {
+      // For generic Drive files (PDFs, etc.) - use file preview
+      return `https://drive.google.com/file/d/${fileId}/preview`;
+    }
+  }
+
+  // If already a preview URL, return as is
+  if (url.includes('/preview')) {
+    return url;
+  }
+
+  return url;
+};
+
 const getEmbedUrl = (url: string) => {
   if (isYouTubeUrl(url)) return getYouTubeEmbedUrl(url);
   if (isTikTokUrl(url)) return getTikTokEmbedUrl(url);
   if (isInstagramUrl(url)) return getInstagramEmbedUrl(url);
   if (isFacebookUrl(url)) return getFacebookEmbedUrl(url);
+  if (isGoogleDriveUrl(url)) return getGoogleDriveEmbedUrl(url);
   return url;
 };
 
@@ -510,12 +563,32 @@ export default function PortfolioDetailPage() {
                                 </div>
                               </div>
                             ) : isGoogleDrive ? (
-                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                                <div className="text-center text-[#2ecc71]">
-                                  <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                  </svg>
-                                  <span className="font-bold text-xs text-white">{getFileTypeLabel(item.url)}</span>
+                              <div className={`w-full h-full flex items-center justify-center ${
+                                item.url.includes('/document/') ? 'bg-gradient-to-br from-blue-600 to-blue-800' :
+                                item.url.includes('/spreadsheets/') ? 'bg-gradient-to-br from-green-600 to-green-800' :
+                                item.url.includes('/presentation/') ? 'bg-gradient-to-br from-yellow-600 to-yellow-800' :
+                                'bg-gradient-to-br from-slate-700 to-slate-900'
+                              }`}>
+                                <div className="text-center text-white p-4">
+                                  {item.url.includes('/document/') ? (
+                                    <svg className="w-14 h-14 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H8V18H10V19M14,19H10V17H14V19M14,16H10V15H14V16M10,14H8V12H10V14M14,14H10V12H14V14M10,11H8V10H10V11M14,11H10V10H14V11Z" />
+                                    </svg>
+                                  ) : item.url.includes('/spreadsheets/') ? (
+                                    <svg className="w-14 h-14 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V5H19V19M12,17H17V15H12V17M7,17H10V15H7V17M7,13H10V10H7V13M12,13H17V10H12V13M7,8H17V6H7V8Z" />
+                                    </svg>
+                                  ) : item.url.includes('/presentation/') ? (
+                                    <svg className="w-14 h-14 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
+                                      <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V7H19V19M17,12H13V16H11V12H7L12,7L17,12Z" />
+                                    </svg>
+                                  ) : (
+                                    <svg className="w-14 h-14 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  )}
+                                  <span className="font-bold text-sm block">{getFileTypeLabel(item.url)}</span>
+                                  <span className="text-xs opacity-75 mt-1 block">Click to view</span>
                                 </div>
                               </div>
                             ) : (
@@ -657,6 +730,8 @@ export default function PortfolioDetailPage() {
                 !item.url.includes('tiktok.com') &&
                 !item.url.includes('vimeo.com');
 
+              const isGoogleDriveDocument = isGoogleDriveUrl(item.url);
+
               if (isRegularImage) {
                 return (
                   <div className="relative w-full h-[80vh] flex items-center justify-center">
@@ -668,6 +743,34 @@ export default function PortfolioDetailPage() {
                       sizes="100vw"
                       priority
                     />
+                  </div>
+                );
+              }
+
+              if (isGoogleDriveDocument) {
+                const embedUrl = getGoogleDriveEmbedUrl(item.url);
+                return (
+                  <div className="w-full">
+                    <div className="relative w-full h-[85vh] bg-white rounded-2xl overflow-hidden shadow-2xl">
+                      <iframe
+                        src={embedUrl}
+                        className="w-full h-full border-0"
+                        allow="autoplay"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-center gap-4">
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#2ecc71] text-slate-900 font-bold rounded-xl hover:scale-105 transition-transform"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink size={18} />
+                        Open in Google Drive
+                      </a>
+                    </div>
                   </div>
                 );
               }
