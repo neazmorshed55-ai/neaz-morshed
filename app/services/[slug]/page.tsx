@@ -15,7 +15,7 @@ import { supabase } from '../../../lib/supabase';
 import SocialEmbed from '../../../components/SocialEmbed';
 
 const isVideoFile = (url: string) => {
-  return url.includes('supabase.co') || url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov');
+  return url.endsWith('.mp4') || url.endsWith('.webm') || url.endsWith('.mov') || url.endsWith('.avi') || url.endsWith('.mkv');
 };
 
 // ============ PLATFORM DETECTION ============
