@@ -634,9 +634,8 @@ export default function PortfolioDetailPage() {
                                 <div className="text-center text-white relative z-10 p-4">
                                   {/* Canva Logo Style Icon */}
                                   <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/20">
-                                    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                                      <path d="M9 9l6 6M15 9l-6 6" />
+                                    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M7.5 7.5c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3zm9 0c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3z"/>
                                     </svg>
                                   </div>
                                   <span className="font-bold text-base block drop-shadow-lg">Canva Design</span>
@@ -843,8 +842,8 @@ export default function PortfolioDetailPage() {
                       {/* Canva Design Preview - Show thumbnail/message */}
                       <div className="text-center p-8">
                         <div className="w-32 h-32 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl">
-                          <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7.5 7.5h9v9h-9v-9zM3 3v18h18V3H3zm16.5 16.5h-15v-15h15v15z"/>
+                          <svg className="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7.5 7.5c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3zm9 0c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3z"/>
                           </svg>
                         </div>
                         <h3 className="text-3xl font-bold text-white mb-4">Canva Design</h3>
