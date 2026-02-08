@@ -2082,7 +2082,7 @@ export default function PortfolioCollectionPage() {
                         />
                       </div>
                     );
-                  } else if (item.type === 'link' || (item.url.startsWith('http') && !isFacebookImage(item.url) && !isGoogleDriveUrl(item.url))) {
+                  } else if (item.type === 'link' || (item.url.startsWith('http') && !isFacebookImage(item.url) && !isGoogleDriveUrl(item.url) && !/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(item.url))) {
                     return (
                       <div className="aspect-video flex items-center justify-center p-12 bg-slate-900">
                         <div className="text-center">
