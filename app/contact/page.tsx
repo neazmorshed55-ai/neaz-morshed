@@ -76,13 +76,13 @@ export default function ContactPage() {
     } catch (err) {
       console.error('Error submitting form:', err);
       setFormStatus('error');
-      alert('There was an error submitting your message. Please email me directly at neazmd.tamim@gmail.com');
+      alert('There was an error submitting your message. Please email me directly at contact@neazmdmorshed.com');
       setTimeout(() => setFormStatus('idle'), 5000);
     }
   };
 
   const contactInfo = [
-    { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'neazmd.tamim@gmail.com', href: 'mailto:neazmd.tamim@gmail.com' },
+    { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'contact@neazmdmorshed.com', href: 'mailto:contact@neazmdmorshed.com' },
     { icon: <Globe className="w-6 h-6" />, label: 'Availability', value: 'Global (Remote)', href: null },
     { icon: <Clock className="w-6 h-6" />, label: 'Response Time', value: 'Within 12 hours', href: null },
     { icon: <MapPin className="w-6 h-6" />, label: 'Location', value: 'Bangladesh', href: null },

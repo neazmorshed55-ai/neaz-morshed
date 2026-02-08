@@ -171,12 +171,12 @@ export default function AIChatbot() {
             throw new Error('Failed to submit');
           }
         } catch (error) {
-          addBotMessage(`Thanks for your interest, ${leadData.name}! There was a small issue saving your details, but you can reach Neaz directly at neazmd.tamim@gmail.com.`);
+          addBotMessage(`Thanks for your interest, ${leadData.name}! There was a small issue saving your details, but you can reach Neaz directly at contact@neazmdmorshed.com.`);
         }
         break;
 
       case 'complete':
-        addBotMessage("Thanks for chatting! If you have more questions, feel free to start a new conversation or reach out directly at neazmd.tamim@gmail.com.");
+        addBotMessage("Thanks for chatting! If you have more questions, feel free to start a new conversation or reach out directly at contact@neazmdmorshed.com.");
         break;
 
       default:

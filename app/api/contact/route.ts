@@ -11,7 +11,7 @@ const supabase = supabaseUrl && supabaseServiceKey
 // Send email notification for contact form submission
 async function sendContactEmail(contact: any) {
   const resendApiKey = process.env.RESEND_API_KEY;
-  const notificationEmail = process.env.NOTIFICATION_EMAIL || 'neazmd.tamim@gmail.com';
+  const notificationEmail = process.env.NOTIFICATION_EMAIL || 'contact@neazmdmorshed.com';
 
   if (!resendApiKey) {
     console.log('Resend API key not configured, skipping email notification');
