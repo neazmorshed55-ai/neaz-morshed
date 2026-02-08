@@ -623,17 +623,30 @@ export default function PortfolioDetailPage() {
                               </div>
                             ) : isCanva ? (
                               <div className="w-full h-full bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center relative overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/50 via-blue-600/50 to-cyan-500/50 backdrop-blur-sm"></div>
-                                <div className="text-center text-white relative z-10">
-                                  <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M7.5 7.5h9v9h-9v-9zM3 3v18h18V3H3zm16.5 16.5h-15v-15h15v15z"/>
-                                  </svg>
-                                  <span className="font-bold text-sm block">Canva Design</span>
-                                  <span className="text-xs opacity-90 mt-1 block">Click to view</span>
+                                {/* Animated background pattern */}
+                                <div className="absolute inset-0 opacity-20">
+                                  <div className="absolute top-0 left-0 w-full h-full">
+                                    <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/30 rounded-full blur-3xl animate-pulse"></div>
+                                    <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-cyan-300/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+                                  </div>
                                 </div>
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                                    <Play size={24} className="text-white ml-1" />
+
+                                <div className="text-center text-white relative z-10 p-4">
+                                  {/* Canva Logo Style Icon */}
+                                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/20">
+                                    <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                                      <path d="M9 9l6 6M15 9l-6 6" />
+                                    </svg>
+                                  </div>
+                                  <span className="font-bold text-base block drop-shadow-lg">Canva Design</span>
+                                  <span className="text-xs opacity-90 mt-1.5 block">Click to open</span>
+                                </div>
+
+                                {/* Hover Overlay */}
+                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                  <div className="w-20 h-20 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-2xl">
+                                    <ExternalLink size={32} className="text-white" />
                                   </div>
                                 </div>
                               </div>
@@ -824,29 +837,31 @@ export default function PortfolioDetailPage() {
               }
 
               if (isCanvaDesign) {
-                const embedUrl = getCanvaEmbedUrl(item.url);
                 return (
                   <div className="w-full">
-                    <div className="relative w-full h-[85vh] bg-white rounded-2xl overflow-hidden shadow-2xl">
-                      <iframe
-                        src={embedUrl}
-                        className="w-full h-full border-0"
-                        allow="autoplay"
-                        loading="lazy"
-                        allowFullScreen
-                      />
-                    </div>
-                    <div className="mt-4 flex justify-center gap-4">
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#2ecc71] text-slate-900 font-bold rounded-xl hover:scale-105 transition-transform"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ExternalLink size={18} />
-                        Open in Canva
-                      </a>
+                    <div className="relative w-full h-[85vh] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
+                      {/* Canva Design Preview - Show thumbnail/message */}
+                      <div className="text-center p-8">
+                        <div className="w-32 h-32 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl">
+                          <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7.5 7.5h9v9h-9v-9zM3 3v18h18V3H3zm16.5 16.5h-15v-15h15v15z"/>
+                          </svg>
+                        </div>
+                        <h3 className="text-3xl font-bold text-white mb-4">Canva Design</h3>
+                        <p className="text-slate-400 mb-8 max-w-md mx-auto">
+                          Click the button below to view this design in Canva
+                        </p>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-500 text-white font-bold rounded-xl hover:scale-105 hover:shadow-2xl transition-all"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <ExternalLink size={20} />
+                          Open in Canva
+                        </a>
+                      </div>
                     </div>
                   </div>
                 );
