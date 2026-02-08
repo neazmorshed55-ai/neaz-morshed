@@ -2001,7 +2001,7 @@ export default function PortfolioCollectionPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-6xl max-h-[90vh] flex items-center justify-center"
+              className="relative w-full h-full flex items-center justify-center px-20"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -2041,7 +2041,7 @@ export default function PortfolioCollectionPage() {
               )}
 
               {/* Content */}
-              <div className="bg-[#0e1526] rounded-3xl overflow-hidden border border-white/10 max-w-full">
+              <div className="bg-[#0e1526] rounded-3xl overflow-hidden border border-white/10 w-full max-w-6xl max-h-[90vh]">
                 {(() => {
                   const item = (selectedItem ? galleryItems : allGalleryItems)[selectedGalleryIndex];
                   const isActualVideo = isVideoFile(item.url) ||
@@ -2049,7 +2049,7 @@ export default function PortfolioCollectionPage() {
 
                   if (isActualVideo) {
                     return (
-                      <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16] max-w-[500px] mx-auto' : 'aspect-video'}`}>
+                      <div className={`relative ${isVerticalContent(item.url) ? 'aspect-[9/16] w-full max-h-[85vh]' : 'aspect-video w-full'}`}>
                         {isVideoFile(item.url) ? (
                           <video
                             src={item.url}
