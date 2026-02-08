@@ -55,25 +55,20 @@ export default function ContactPage() {
         throw new Error('All fields are required.');
       }
 
-      if (!supabase) {
-        console.error('Supabase client is null. Check environment variables.');
-        setFormStatus('error');
-        alert('Form submission is currently unavailable. Please contact hello@neaz.pro directly.');
-        return;
+      // Submit via API endpoint which will save to database AND send email
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
       }
-
-      const { error } = await supabase
-        .from('contacts')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            message: formData.message,
-            status: 'new'
-          }
-        ]);
-
-      if (error) throw error;
 
       setFormStatus('success');
       setFormData({ name: '', email: '', message: '' });
@@ -81,12 +76,13 @@ export default function ContactPage() {
     } catch (err) {
       console.error('Error submitting form:', err);
       setFormStatus('error');
+      alert('There was an error submitting your message. Please email me directly at neazmd.tamim@gmail.com');
       setTimeout(() => setFormStatus('idle'), 5000);
     }
   };
 
   const contactInfo = [
-    { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'hello@neaz.pro', href: 'mailto:hello@neaz.pro' },
+    { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'neazmd.tamim@gmail.com', href: 'mailto:neazmd.tamim@gmail.com' },
     { icon: <Globe className="w-6 h-6" />, label: 'Availability', value: 'Global (Remote)', href: null },
     { icon: <Clock className="w-6 h-6" />, label: 'Response Time', value: 'Within 12 hours', href: null },
     { icon: <MapPin className="w-6 h-6" />, label: 'Location', value: 'Bangladesh', href: null },

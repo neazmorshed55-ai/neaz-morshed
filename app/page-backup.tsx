@@ -607,7 +607,7 @@ export default function PortfolioPage() {
               <div className="flex flex-wrap justify-center gap-6 mb-12">
                 <div className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/5">
                   <Mail className="text-[#2ecc71]" />
-                  <span className="font-bold">hello@neaz.pro</span>
+                  <span className="font-bold">neazmd.tamim@gmail.com</span>
                 </div>
                 <div className="flex items-center gap-4 px-8 py-4 rounded-2xl bg-white/5 border border-white/5">
                   <Globe className="text-[#2ecc71]" />
