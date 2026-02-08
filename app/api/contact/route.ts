@@ -103,19 +103,27 @@ async function sendContactEmail(contact: any) {
 // POST - Submit contact form
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== Contact Form Submission Started ===');
+
+    // Check Supabase connection
     if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+      console.error('Supabase client is null');
+      return NextResponse.json({
+        error: 'Database not configured. Please check Supabase environment variables.'
+      }, { status: 500 });
     }
 
     const body = await request.json();
     const { name, email, message } = body;
+    console.log('Received data:', { name, email, messageLength: message?.length });
 
     // Validate required fields
     if (!name || !email || !message) {
+      console.error('Validation failed: Missing required fields');
       return NextResponse.json({ error: 'Name, email, and message are required' }, { status: 400 });
     }
 
-    // Get IP and location
+    // Get IP and location (optional, won't block submission)
     const forwarded = request.headers.get('x-forwarded-for');
     const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown';
     const userAgent = request.headers.get('user-agent') || '';
@@ -130,9 +138,11 @@ export async function POST(request: NextRequest) {
           geoData = { country: geoJson.country, city: geoJson.city };
         }
       } catch (error) {
-        console.error('Geolocation fetch error:', error);
+        console.error('Geolocation fetch error (non-critical):', error);
       }
     }
+
+    console.log('Attempting database insert...');
 
     // Insert contact into database
     const { data, error } = await supabase
@@ -146,14 +156,31 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase insert error:', error);
+      throw new Error(`Database error: ${error.message}`);
+    }
 
-    // Send email notification asynchronously
-    sendContactEmail({ ...data, ...geoData });
+    console.log('Database insert successful:', data?.id);
 
+    // Send email notification asynchronously (don't block response)
+    try {
+      sendContactEmail({ ...data, ...geoData });
+      console.log('Email notification triggered');
+    } catch (emailError) {
+      console.error('Email notification error (non-critical):', emailError);
+      // Don't fail the request if email fails
+    }
+
+    console.log('=== Contact Form Submission Completed ===');
     return NextResponse.json({ success: true, contact: data });
-  } catch (error) {
-    console.error('Error submitting contact form:', error);
-    return NextResponse.json({ error: 'Failed to submit contact form' }, { status: 500 });
+
+  } catch (error: any) {
+    console.error('=== Contact Form Submission Failed ===');
+    console.error('Error details:', error);
+    return NextResponse.json({
+      error: error.message || 'Failed to submit contact form',
+      details: process.env.NODE_ENV === 'development' ? error.toString() : undefined
+    }, { status: 500 });
   }
 }
