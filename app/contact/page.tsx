@@ -67,7 +67,9 @@ export default function ContactPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit form');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || 'Failed to submit form');
       }
 
       setFormStatus('success');
