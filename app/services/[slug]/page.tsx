@@ -2104,13 +2104,13 @@ export default function PortfolioCollectionPage() {
                     );
                   } else {
                     return (
-                      <div className="relative max-w-full">
+                      <div className="relative w-full h-[80vh] flex items-center justify-center">
                         <Image
                           src={item.url}
                           alt={item.alt_text || 'Gallery image'}
-                          width={1200}
-                          height={675}
-                          className="object-contain max-h-[80vh] w-auto mx-auto"
+                          fill
+                          className="object-contain"
+                          sizes="100vw"
                           priority
                         />
                       </div>
