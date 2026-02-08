@@ -141,11 +141,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         message,
-        status: 'new',
-        ip_address: ip,
-        country: geoData.country,
-        city: geoData.city,
-        user_agent: userAgent,
+        status: 'new'
       })
       .select()
       .single();
