@@ -21,7 +21,7 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefin
 const ADMIN_CREDENTIALS = {
   username: 'Admin',
   password: 'txNMT59@60',
-  emails: ['neazmd.tamim@gmail.com', 'neazmorshed55@gmail.com']
+  emails: ['contact@neazmdmorshed.com', 'neazmorshed55@gmail.com']
 };
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {

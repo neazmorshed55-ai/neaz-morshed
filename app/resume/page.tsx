@@ -560,7 +560,7 @@ export default function ResumePage() {
   const personalInfo = {
     name: "NEAZ MD. MORSHED",
     title: "Digital Asset Builder | AI Implementation Engineer",
-    email: "neazmd.tamim@gmail.com",
+    email: "contact@neazmdmorshed.com",
     phone: "+8801775939996",
     location: "Bashundhara R/A, Dhaka, Bangladesh",
     linkedin: "linkedin.com/in/neazmorshed222",

@@ -93,7 +93,7 @@ async function analyzeVisitorInterests(sessionId: string) {
 // Send visitor notification email
 async function sendVisitorNotification(visitor: any, geoData: any, interestAnalysis: any) {
   const resendApiKey = process.env.RESEND_API_KEY;
-  const notificationEmail = process.env.NOTIFICATION_EMAIL || 'neazmd.tamim@gmail.com';
+  const notificationEmail = process.env.NOTIFICATION_EMAIL || 'contact@neazmdmorshed.com';
 
   if (!resendApiKey) {
     console.log('Resend API key not configured, skipping email notification');

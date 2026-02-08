@@ -1,7 +1,7 @@
 # Email Setup Documentation
 
 ## Overview
-Your contact form is now configured to send emails directly to **neazmd.tamim@gmail.com** when someone submits a message through the contact page at https://neaz-morshed.vercel.app/contact
+Your contact form is now configured to send emails directly to **contact@neazmdmorshed.com** when someone submits a message through the contact page at https://neaz-morshed.vercel.app/contact
 
 ## How It Works
 
@@ -15,7 +15,7 @@ Your contact form is now configured to send emails directly to **neazmd.tamim@gm
 
 Your site uses [Resend](https://resend.com) to send emails. The configuration is:
 - **From Address**: `notifications@neaz.pro`
-- **To Address**: `neazmd.tamim@gmail.com` (configured via `NOTIFICATION_EMAIL` environment variable)
+- **To Address**: `contact@neazmdmorshed.com` (configured via `NOTIFICATION_EMAIL` environment variable)
 
 ## Environment Variables
 
@@ -25,7 +25,7 @@ The following environment variables are configured in `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=https://oemxzmnvvjiukejxktby.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=[your-supabase-key]
 RESEND_API_KEY=[your-resend-api-key]
-NOTIFICATION_EMAIL=neazmd.tamim@gmail.com
+NOTIFICATION_EMAIL=contact@neazmdmorshed.com
 ```
 
 ## Vercel Deployment Setup
@@ -36,7 +36,7 @@ To ensure emails work on your production site (neaz-morshed.vercel.app), you nee
 2. Select your `neaz-morshed` project
 3. Go to **Settings** → **Environment Variables**
 4. Add/Update the following:
-   - `NOTIFICATION_EMAIL` = `neazmd.tamim@gmail.com`
+   - `NOTIFICATION_EMAIL` = `contact@neazmdmorshed.com`
    - `RESEND_API_KEY` = `re_9ewAQB2G_PGaBM6mLcwUrPZs4sgUQY7pX`
    - `NEXT_PUBLIC_SUPABASE_URL` = `https://oemxzmnvvjiukejxktby.supabase.co`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = [your-supabase-key]
@@ -57,7 +57,7 @@ To test the email functionality:
 1. Visit https://neaz-morshed.vercel.app/contact
 2. Fill out the form with test data
 3. Click "Send Message"
-4. Check your inbox at **neazmd.tamim@gmail.com**
+4. Check your inbox at **contact@neazmdmorshed.com**
 5. You should receive an email within a few seconds
 
 ## Troubleshooting
