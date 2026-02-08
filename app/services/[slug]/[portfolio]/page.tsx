@@ -631,7 +631,7 @@ export default function PortfolioDetailPage() {
                                   </div>
                                 </div>
 
-                                <div className="text-center text-white relative z-10 p-4">
+                                <div className="text-center text-white relative z-10 p-4 group-hover:blur-[2px] transition-all duration-300">
                                   {/* Canva Logo Style Icon */}
                                   <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/20">
                                     <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
@@ -643,7 +643,7 @@ export default function PortfolioDetailPage() {
                                 </div>
 
                                 {/* Hover Overlay */}
-                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
                                   <div className="w-20 h-20 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-2xl">
                                     <ExternalLink size={32} className="text-white" />
                                   </div>
