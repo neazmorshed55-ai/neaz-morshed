@@ -223,7 +223,7 @@ export default function AIChatbot() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${
+        className={`fixed bottom-6 right-6 z-40 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${
           isOpen ? 'bg-slate-800' : 'bg-gradient-to-br from-[#2ecc71] to-[#27ae60]'
         }`}
         style={{ boxShadow: isOpen ? 'none' : '0 0 30px rgba(46, 204, 113, 0.4)' }}
