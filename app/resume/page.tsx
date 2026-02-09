@@ -684,8 +684,13 @@ export default function ResumePage() {
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                   <a href="https://www.fiverr.com/neaz222" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M23 13.5V12h-2.297l-.022-.107-1.064-4.988-.047-.212H14v1.625h4.53l.838 3.682H14V13.5h5.592l.063.295.338 1.574H14v1.631h6.318l.018.079.657 2.921H1.028l.657-2.921.018-.079h2.824v-1.631H2.004l.338-1.574.062-.295h2.824V12H.623l.838-3.682H6v-1.625H.533l-.047.212L.423 11.893.401 12H0v1.5h.401l-.338 1.574-.063.295H0v1.631h.024l-.75 3.336-.02.089H0V24h24v-3.575h-.044l-.02-.089-.75-3.336H24v-1.631h-.038l-.063-.295-.338-1.574H24zm-13 0v-1.625h4v1.625h-4zm0 1.631h4v1.574h-4v-1.574z"/>
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                      <circle cx="2.5" cy="2.5" r="1.2"/>
+                      <path d="M0 5h3.5v0.8H0.8v1.5h2.5v0.8H0.8v2.5H0V5z"/>
+                      <path d="M4 5h3v0.8H4.8v1.5h2.2v0.8H4.8v2.5H4V5z"/>
+                      <path d="M7.5 5h3v0.8h-2.2v1.5h2v0.8h-2v2.5h-0.8V5z"/>
+                      <path d="M11 5h3.5v0.8h-2.7v1.5h2.5v0.8h-2.5v1.7h2.7v0.8H11V5z"/>
+                      <path d="M14.8 5h0.8v5.5h-0.8V5z"/>
                     </svg>
                     <span>Fiverr</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

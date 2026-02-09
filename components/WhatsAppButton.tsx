@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 // Replace with your actual WhatsApp number (including country code, without + or -)
 // Example: "8801712345678"
-const WHATSAPP_NUMBER = "8801725225027"; // Using a placeholder, user can update this.
+const WHATSAPP_NUMBER = "8801775939996"; // Updated to user's number
 const PREFILLED_MESSAGE = "Hi Neaz, I would like to discuss a project.";
 
 export default function WhatsAppButton() {
