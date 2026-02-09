@@ -387,12 +387,14 @@ export default function SkillDetailPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
-              <Link
-                href="/#contact"
+              <a
+                href="https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
               >
                 Hire Me <ArrowRight size={18} />
-              </Link>
+              </a>
               <a
                 href="https://www.fiverr.com/neaz222"
                 target="_blank"
