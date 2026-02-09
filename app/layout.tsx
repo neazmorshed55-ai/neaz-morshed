@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import VisitorTracker from '../components/VisitorTracker';
+import WhatsAppButton from '../components/WhatsAppButton';
 import AIChatbot from '../components/AIChatbot';
 
 // Optimized font loading - preloads and serves locally
@@ -81,6 +82,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden`}>
         <VisitorTracker />
         {children}
+        <WhatsAppButton />
         <AIChatbot />
 
         {/* Social Media Embed Scripts */}
