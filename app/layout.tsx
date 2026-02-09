@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   keywords: ['Virtual Assistant', 'Web Design', 'Video Editing', 'Social Media Marketing', 'Outsourcing', 'Neaz Morshed', 'Virtual Assistant BD'],
   authors: [{ name: 'Neaz Md. Morshed' }],
   creator: 'Neaz Md. Morshed',
+  icons: {
+    icon: '/icon',
+    apple: '/apple-icon',
+  },
   // Canonical URL - prevents duplicate content issues
   alternates: {
     canonical: '/',
