@@ -300,7 +300,7 @@ export default function AdminResumePage() {
         </div>
 
         {/* Additional Management Links */}
-        <div className="mt-8 grid md:grid-cols-3 gap-4">
+        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-5 gap-4">
           <a
             href="/admin/resume/experiences"
             className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
@@ -329,6 +329,26 @@ export default function AdminResumePage() {
               Certifications
             </div>
             <p className="text-sm text-slate-400">Manage certifications</p>
+          </a>
+
+          <a
+            href="/admin/resume/stats"
+            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+          >
+            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+              Stats
+            </div>
+            <p className="text-sm text-slate-400">Achievement statistics</p>
+          </a>
+
+          <a
+            href="/admin/resume/skills"
+            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+          >
+            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+              Skills
+            </div>
+            <p className="text-sm text-slate-400">Skills & expertise</p>
           </a>
         </div>
       </div>
