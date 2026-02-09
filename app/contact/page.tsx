@@ -78,7 +78,7 @@ export default function ContactPage() {
     } catch (err) {
       console.error('Error submitting form:', err);
       setFormStatus('error');
-      alert('There was an error submitting your message. Please email me directly at contact@neazmdmorshed.com');
+      alert('There was an error submitting your message. Please email me directly at neazmd.tamim@gmail.com');
       setTimeout(() => setFormStatus('idle'), 5000);
     }
   };
