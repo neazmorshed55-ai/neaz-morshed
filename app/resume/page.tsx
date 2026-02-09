@@ -677,12 +677,16 @@ export default function ResumePage() {
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                   <a href="https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
-                    <Globe size={14} />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.561 13.158c-1.102 0-2.135-.467-3.074-1.227l.228-1.076.008-.042c.207-1.143.849-3.06 2.839-3.06 1.492 0 2.703 1.212 2.703 2.703-.001 1.489-1.212 2.702-2.704 2.702zm0-8.14c-2.539 0-4.51 1.649-5.31 4.366-1.22-1.834-2.148-4.036-2.687-5.892H7.828v7.112c-.002 1.406-1.141 2.546-2.547 2.548-1.405-.002-2.543-1.143-2.545-2.548V3.492H0v7.112c0 2.914 2.37 5.303 5.281 5.303 2.913 0 5.283-2.389 5.283-5.303v-1.19c.529 1.107 1.182 2.229 1.974 3.221l-1.673 7.873h2.797l1.213-5.71c1.063.679 2.285 1.109 3.686 1.109 3 0 5.439-2.452 5.439-5.45 0-3-2.439-5.439-5.439-5.439z"/>
+                    </svg>
                     <span>Upwork</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                   <a href="https://www.fiverr.com/neaz222" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
-                    <Globe size={14} />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M23 13.5V12h-2.297l-.022-.107-1.064-4.988-.047-.212H14v1.625h4.53l.838 3.682H14V13.5h5.592l.063.295.338 1.574H14v1.631h6.318l.018.079.657 2.921H1.028l.657-2.921.018-.079h2.824v-1.631H2.004l.338-1.574.062-.295h2.824V12H.623l.838-3.682H6v-1.625H.533l-.047.212L.423 11.893.401 12H0v1.5h.401l-.338 1.574-.063.295H0v1.631h.024l-.75 3.336-.02.089H0V24h24v-3.575h-.044l-.02-.089-.75-3.336H24v-1.631h-.038l-.063-.295-.338-1.574H24zm-13 0v-1.625h4v1.625h-4zm0 1.631h4v1.574h-4v-1.574z"/>
+                    </svg>
                     <span>Fiverr</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
