@@ -614,8 +614,8 @@ export default function ResumePage() {
       <Navbar />
 
       {/* Main Content */}
-      <main className="pt-32 pb-20">
-        <div className="container mx-auto px-6 max-w-6xl">
+      <main className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           {/* Back Link */}
           <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all mb-8 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -627,7 +627,7 @@ export default function ResumePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative bg-gradient-to-r from-[#2ecc71]/20 via-[#2ecc71]/10 to-transparent p-8 lg:p-12 rounded-[3rem] border border-white/10 mb-12 overflow-hidden"
+            className="relative bg-gradient-to-r from-[#2ecc71]/20 via-[#2ecc71]/10 to-transparent p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl md:rounded-[3rem] border border-white/10 mb-8 sm:mb-10 md:mb-12 overflow-hidden"
           >
             {/* Animated Background */}
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2ecc71]/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
@@ -638,7 +638,7 @@ export default function ResumePage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-2"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-2"
                 >
                   {personalInfo.name}
                 </motion.h1>
@@ -646,7 +646,7 @@ export default function ResumePage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-[#2ecc71] text-lg font-bold mb-4"
+                  className="text-[#2ecc71] text-sm sm:text-base md:text-lg font-bold mb-3 sm:mb-4"
                 >
                   {personalInfo.title}
                 </motion.p>
@@ -655,7 +655,7 @@ export default function ResumePage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="flex flex-wrap gap-4 text-sm"
+                  className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm"
                 >
                   <div className="flex items-center gap-2 text-slate-300 hover:text-[#2ecc71] transition-colors cursor-pointer">
                     <Mail size={14} className="text-[#2ecc71]" />
@@ -691,7 +691,7 @@ export default function ResumePage() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-950 font-black rounded-2xl shadow-lg shadow-[#2ecc71]/20 uppercase tracking-wider text-sm"
+                className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-[#2ecc71] text-slate-950 font-black rounded-xl sm:rounded-2xl shadow-lg shadow-[#2ecc71]/20 uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap"
               >
                 <Download size={18} />
                 Download PDF
@@ -700,7 +700,7 @@ export default function ResumePage() {
           </motion.div>
 
           {/* Stats with Icons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-10 md:mb-12">
             {achievements.map((stat, i) => (
               <motion.div
                 key={i}
@@ -708,24 +708,24 @@ export default function ResumePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="p-5 bg-slate-900/60 rounded-2xl text-center border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
+                className="p-3 sm:p-4 md:p-5 bg-slate-900/60 rounded-xl sm:rounded-2xl text-center border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
               >
                 <div className="flex justify-center mb-2 text-[#2ecc71] group-hover:scale-110 transition-transform">
                   {stat.icon}
                 </div>
-                <div className="text-2xl font-black text-[#2ecc71]">{stat.value}</div>
-                <div className="text-xs text-slate-400 uppercase tracking-wider mt-1">{stat.label}</div>
+                <div className="text-xl sm:text-2xl font-black text-[#2ecc71]">{stat.value}</div>
+                <div className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider mt-1">{stat.label}</div>
               </motion.div>
             ))}
           </div>
 
           {/* ========== SECTION 1: WORK EXPERIENCE ========== */}
-          <section className="mb-16">
+          <section className="mb-10 sm:mb-12 md:mb-16">
             <motion.h2
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+              className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
               <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
                 <Briefcase className="text-[#2ecc71]" size={28} />
@@ -735,7 +735,7 @@ export default function ResumePage() {
             </motion.h2>
 
             {/* Experience Tabs */}
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
               {[
                 { key: 'full-time', label: 'Full-Time', color: 'bg-[#2ecc71]' },
                 { key: 'part-time', label: 'Part-Time', color: 'bg-blue-500' },
@@ -746,7 +746,7 @@ export default function ResumePage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                  className={`px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 ${
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 ${
                     activeTab === tab.key
                       ? `${tab.color} text-slate-900 shadow-lg`
                       : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/10 hover:border-white/20'
@@ -844,7 +844,7 @@ export default function ResumePage() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+              className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
               <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
                 <GraduationCap className="text-[#2ecc71]" size={28} />
@@ -913,7 +913,7 @@ export default function ResumePage() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+              className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
               <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
                 <Cpu className="text-[#2ecc71]" size={28} />
@@ -967,7 +967,7 @@ export default function ResumePage() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+              className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
               <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
                 <Award className="text-[#2ecc71]" size={28} />
@@ -1013,7 +1013,7 @@ export default function ResumePage() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 text-2xl font-black uppercase tracking-tight mb-8"
+              className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
               <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
                 <Code className="text-[#2ecc71]" size={28} />

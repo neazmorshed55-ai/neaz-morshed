@@ -142,12 +142,14 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="py-6 sm:py-8 border-t border-white/5">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
           <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
             {[
               { label: 'Blog', href: '/blog' },
               { label: 'Linktree', href: 'https://linktr.ee/neazmorshed' },
               { label: 'LinkedIn', href: 'https://www.linkedin.com/in/neazmorshed222/' },
+              { label: 'Upwork', href: 'https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3' },
               { label: 'Fiverr', href: 'https://www.fiverr.com/neaz222' },
               { label: 'Facebook', href: 'https://www.facebook.com/neazmorshed001/' },
             ].map((link) => (
@@ -167,6 +169,7 @@ export default function HomePage() {
             <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
             <span className="text-slate-500">Copyright © 2026</span>
           </p>
+          </div>
         </div>
       </footer>
     </div>

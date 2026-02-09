@@ -110,29 +110,29 @@ export default function Navbar() {
           : 'bg-transparent py-8'
           }`}
       >
-        <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 flex justify-between items-center max-w-7xl">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-4 group cursor-pointer">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 md:gap-4 group cursor-pointer">
             {branding.logo_image_url ? (
               <img
                 src={branding.logo_image_url}
                 alt={branding.site_name}
-                className="w-12 h-12 rounded-2xl object-cover group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl object-cover group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]"
               />
             ) : (
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-slate-950 group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center font-black text-sm sm:text-base text-slate-950 group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]"
                 style={{ backgroundColor: branding.primary_color }}
               >
                 {branding.logo_text}
               </div>
             )}
             <div className="flex flex-col">
-              <span className="text-xl font-extrabold tracking-tighter leading-none text-white">
+              <span className="text-base sm:text-lg md:text-xl font-extrabold tracking-tighter leading-none text-white">
                 {branding.site_name}
               </span>
               <span
-                className="text-[10px] font-bold tracking-[0.2em] mt-1 uppercase"
+                className="text-[9px] sm:text-[10px] font-bold tracking-[0.15em] sm:tracking-[0.2em] mt-0.5 sm:mt-1 uppercase"
                 style={{ color: branding.primary_color }}
               >
                 {branding.tagline}
