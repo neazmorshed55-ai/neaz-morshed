@@ -223,9 +223,8 @@ export default function AIChatbot() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-40 w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${
-          isOpen ? 'bg-slate-800' : 'bg-gradient-to-br from-[#2ecc71] to-[#27ae60]'
-        }`}
+        className={`fixed bottom-6 right-6 z-[9999] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-slate-800' : 'bg-gradient-to-br from-[#2ecc71] to-[#27ae60]'
+          }`}
         style={{ boxShadow: isOpen ? 'none' : '0 0 30px rgba(46, 204, 113, 0.4)' }}
       >
         <AnimatePresence mode="wait">
@@ -261,7 +260,7 @@ export default function AIChatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-48px)] bg-[#0b0f1a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+            className="fixed bottom-24 right-6 z-[9999] w-[380px] max-w-[calc(100vw-48px)] max-h-[calc(100vh-120px)] bg-[#0b0f1a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-[#2ecc71] to-[#27ae60] p-5">
@@ -277,7 +276,7 @@ export default function AIChatbot() {
             </div>
 
             {/* Messages */}
-            <div className="h-[350px] overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-700">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 min-h-0">
               {messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -285,20 +284,18 @@ export default function AIChatbot() {
                   animate={{ opacity: 1, y: 0 }}
                   className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${
-                    message.role === 'bot' ? 'bg-[#2ecc71]/20' : 'bg-slate-700'
-                  }`}>
+                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${message.role === 'bot' ? 'bg-[#2ecc71]/20' : 'bg-slate-700'
+                    }`}>
                     {message.role === 'bot' ? (
                       <Bot className="w-4 h-4 text-[#2ecc71]" />
                     ) : (
                       <User className="w-4 h-4 text-slate-300" />
                     )}
                   </div>
-                  <div className={`max-w-[75%] p-3 rounded-2xl ${
-                    message.role === 'bot'
-                      ? 'bg-slate-800/80 text-slate-200 rounded-tl-sm'
-                      : 'bg-[#2ecc71] text-slate-900 rounded-tr-sm'
-                  }`}>
+                  <div className={`max-w-[75%] p-3 rounded-2xl ${message.role === 'bot'
+                    ? 'bg-slate-800/80 text-slate-200 rounded-tl-sm'
+                    : 'bg-[#2ecc71] text-slate-900 rounded-tr-sm'
+                    }`}>
                     <p className="text-sm leading-relaxed">{message.content}</p>
                   </div>
                 </motion.div>
