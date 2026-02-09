@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { Plus, Edit, Trash2, Save, X, RefreshCw, Briefcase } from 'lucide-react';
+import ProtectedRoute from '../../../../components/admin/ProtectedRoute';
 
 interface Experience {
   id: string;
@@ -16,7 +17,7 @@ interface Experience {
   order_index: number;
 }
 
-export default function AdminExperiencesPage() {
+function AdminExperiencesPage() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -419,5 +420,13 @@ function ExperienceForm({
         </button>
       </div>
     </div>
+  );
+}
+
+export default function AdminExperiencesPageWrapped() {
+  return (
+    <ProtectedRoute>
+      <AdminExperiencesPage />
+    </ProtectedRoute>
   );
 }

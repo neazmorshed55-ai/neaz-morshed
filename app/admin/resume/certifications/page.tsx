@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { Plus, Edit, Trash2, Save, X, RefreshCw, Award } from 'lucide-react';
+import ProtectedRoute from '../../../../components/admin/ProtectedRoute';
 
 interface Certification {
   id: string;
@@ -14,7 +15,7 @@ interface Certification {
   order_index: number;
 }
 
-export default function AdminCertificationsPage() {
+function AdminCertificationsPage() {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -343,5 +344,13 @@ function CertificationForm({
         </button>
       </div>
     </div>
+  );
+}
+
+export default function AdminCertificationsPageWrapped() {
+  return (
+    <ProtectedRoute>
+      <AdminCertificationsPage />
+    </ProtectedRoute>
   );
 }

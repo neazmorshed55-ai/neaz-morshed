@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { Save, RefreshCw, TrendingUp } from 'lucide-react';
+import ProtectedRoute from '../../../../components/admin/ProtectedRoute';
 
 interface Stat {
   id: string;
@@ -12,7 +13,7 @@ interface Stat {
   order_index: number;
 }
 
-export default function AdminStatsPage() {
+function AdminStatsPage() {
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -203,5 +204,13 @@ export default function AdminStatsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminStatsPageWrapped() {
+  return (
+    <ProtectedRoute>
+      <AdminStatsPage />
+    </ProtectedRoute>
   );
 }

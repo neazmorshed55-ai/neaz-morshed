@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { Plus, Edit, Trash2, Save, X, RefreshCw, Code } from 'lucide-react';
+import ProtectedRoute from '../../../../components/admin/ProtectedRoute';
 
 interface SkillCategory {
   id: string;
@@ -11,7 +12,7 @@ interface SkillCategory {
   order_index: number;
 }
 
-export default function AdminSkillsPage() {
+function AdminSkillsPage() {
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -325,5 +326,13 @@ function SkillForm({
         </button>
       </div>
     </div>
+  );
+}
+
+export default function AdminSkillsPageWrapped() {
+  return (
+    <ProtectedRoute>
+      <AdminSkillsPage />
+    </ProtectedRoute>
   );
 }
