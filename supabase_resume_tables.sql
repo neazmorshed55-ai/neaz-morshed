@@ -40,7 +40,52 @@ CREATE TABLE IF NOT EXISTS resume_skills (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
--- 4. Resume Capstone Project Table
+-- 4. Resume Experiences Table
+CREATE TABLE IF NOT EXISTS resume_experiences (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company TEXT NOT NULL,
+  position TEXT NOT NULL,
+  location TEXT NOT NULL,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  description TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  type TEXT NOT NULL DEFAULT 'full-time' CHECK (type IN ('full-time', 'part-time', 'project')),
+  order_index INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 5. Resume Education Table
+CREATE TABLE IF NOT EXISTS resume_education (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  institution TEXT NOT NULL,
+  degree TEXT NOT NULL,
+  field TEXT NOT NULL,
+  location TEXT NOT NULL,
+  start_date TEXT NOT NULL,
+  end_date TEXT NOT NULL,
+  gpa TEXT,
+  description TEXT[] DEFAULT ARRAY[]::TEXT[],
+  order_index INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 6. Resume Certifications Table
+CREATE TABLE IF NOT EXISTS resume_certifications (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  issuer TEXT NOT NULL,
+  issue_date TEXT NOT NULL,
+  credential_id TEXT,
+  credential_url TEXT,
+  description TEXT[] DEFAULT ARRAY[]::TEXT[],
+  order_index INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 7. Resume Capstone Project Table
 CREATE TABLE IF NOT EXISTS resume_capstone (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL DEFAULT 'Microcontroller Based Home Automation System Using Bluetooth, GSM, Wi-Fi and DTMF',
@@ -95,6 +140,29 @@ SELECT * FROM (VALUES
 ) AS v(category, skills, order_index)
 WHERE NOT EXISTS (SELECT 1 FROM resume_skills);
 
+-- Insert default experiences
+INSERT INTO resume_experiences (company, position, location, start_date, end_date, description, type, order_index)
+SELECT * FROM (VALUES
+  ('Upwork', 'Top Rated Plus Freelancer', 'Remote', 'Sep 2021', 'Present', ARRAY['Maintained 100% Job Success Score across 180+ client projects', 'Delivered web design, video editing, and virtual assistance services', 'Built long-term client relationships with exceptional service quality'], 'full-time', 1),
+  ('Fiverr', 'Level 2 Seller', 'Remote', 'Jan 2020', 'Present', ARRAY['Provided administrative support and content creation services', 'Specialized in video production and social media management', 'Achieved Level 2 status through consistent quality delivery'], 'part-time', 2)
+) AS v(company, position, location, start_date, end_date, description, type, order_index)
+WHERE NOT EXISTS (SELECT 1 FROM resume_experiences);
+
+-- Insert default education
+INSERT INTO resume_education (institution, degree, field, location, start_date, end_date, gpa, description, order_index)
+SELECT * FROM (VALUES
+  ('Ahsanullah University of Science and Technology', 'Bachelor of Science', 'Electrical and Electronic Engineering', 'Dhaka, Bangladesh', '2011', '2015', '3.42/4.00', ARRAY['Published IEEE research paper on home automation systems', 'Focus on embedded systems and IoT technologies'], 1)
+) AS v(institution, degree, field, location, start_date, end_date, gpa, description, order_index)
+WHERE NOT EXISTS (SELECT 1 FROM resume_education);
+
+-- Insert default certifications
+INSERT INTO resume_certifications (title, issuer, issue_date, credential_id, credential_url, description, order_index)
+SELECT * FROM (VALUES
+  ('Top Rated Plus', 'Upwork', '2023', NULL, 'https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3', ARRAY['Elite freelancer status on Upwork platform', 'Requires 100% Job Success Score and exceptional client feedback'], 1),
+  ('Level 2 Seller', 'Fiverr', '2022', NULL, 'https://www.fiverr.com/neaz222', ARRAY['Advanced seller tier on Fiverr platform', 'Achieved through consistent quality and positive reviews'], 2)
+) AS v(title, issuer, issue_date, credential_id, credential_url, description, order_index)
+WHERE NOT EXISTS (SELECT 1 FROM resume_certifications);
+
 -- Insert default capstone project
 INSERT INTO resume_capstone (title, description, year, doi, publication_url, badges)
 SELECT
@@ -113,12 +181,18 @@ WHERE NOT EXISTS (SELECT 1 FROM resume_capstone);
 ALTER TABLE resume_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE resume_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE resume_skills ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resume_experiences ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resume_education ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resume_certifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE resume_capstone ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for public read access
 CREATE POLICY "Allow public read access" ON resume_settings FOR SELECT USING (true);
 CREATE POLICY "Allow public read access" ON resume_stats FOR SELECT USING (true);
 CREATE POLICY "Allow public read access" ON resume_skills FOR SELECT USING (true);
+CREATE POLICY "Allow public read access" ON resume_experiences FOR SELECT USING (true);
+CREATE POLICY "Allow public read access" ON resume_education FOR SELECT USING (true);
+CREATE POLICY "Allow public read access" ON resume_certifications FOR SELECT USING (true);
 CREATE POLICY "Allow public read access" ON resume_capstone FOR SELECT USING (true);
 
 -- Create policies for authenticated users (admin) to modify
@@ -133,6 +207,18 @@ CREATE POLICY "Allow authenticated users to delete" ON resume_stats FOR DELETE U
 CREATE POLICY "Allow authenticated users to insert" ON resume_skills FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow authenticated users to update" ON resume_skills FOR UPDATE USING (true);
 CREATE POLICY "Allow authenticated users to delete" ON resume_skills FOR DELETE USING (true);
+
+CREATE POLICY "Allow authenticated users to insert" ON resume_experiences FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated users to update" ON resume_experiences FOR UPDATE USING (true);
+CREATE POLICY "Allow authenticated users to delete" ON resume_experiences FOR DELETE USING (true);
+
+CREATE POLICY "Allow authenticated users to insert" ON resume_education FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated users to update" ON resume_education FOR UPDATE USING (true);
+CREATE POLICY "Allow authenticated users to delete" ON resume_education FOR DELETE USING (true);
+
+CREATE POLICY "Allow authenticated users to insert" ON resume_certifications FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow authenticated users to update" ON resume_certifications FOR UPDATE USING (true);
+CREATE POLICY "Allow authenticated users to delete" ON resume_certifications FOR DELETE USING (true);
 
 CREATE POLICY "Allow authenticated users to insert" ON resume_capstone FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow authenticated users to update" ON resume_capstone FOR UPDATE USING (true);
@@ -154,4 +240,7 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_resume_settings_updated_at BEFORE UPDATE ON resume_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_resume_stats_updated_at BEFORE UPDATE ON resume_stats FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_resume_skills_updated_at BEFORE UPDATE ON resume_skills FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_resume_experiences_updated_at BEFORE UPDATE ON resume_experiences FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_resume_education_updated_at BEFORE UPDATE ON resume_education FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_resume_certifications_updated_at BEFORE UPDATE ON resume_certifications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_resume_capstone_updated_at BEFORE UPDATE ON resume_capstone FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
