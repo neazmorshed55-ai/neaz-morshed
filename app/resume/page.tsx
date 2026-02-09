@@ -676,9 +676,14 @@ export default function ResumePage() {
                     <span>LinkedIn</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
-                  <a href={`https://${personalInfo.portfolio}`} target="_blank" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
+                  <a href="https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
                     <Globe size={14} />
-                    <span>Portfolio</span>
+                    <span>Upwork</span>
+                    <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </a>
+                  <a href="https://www.fiverr.com/neaz222" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
+                    <Globe size={14} />
+                    <span>Fiverr</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
                 </div>
