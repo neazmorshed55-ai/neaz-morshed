@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { User, Mail, Phone, MapPin, Globe, FileDown, Save, RefreshCw } from 'lucide-react';
+import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 
 interface ResumeSettings {
   id: string;
@@ -18,7 +19,7 @@ interface ResumeSettings {
   pdf_download_url: string;
 }
 
-export default function AdminResumePage() {
+function AdminResumePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<ResumeSettings | null>(null);
@@ -353,5 +354,13 @@ export default function AdminResumePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminResumePageWrapped() {
+  return (
+    <ProtectedRoute>
+      <AdminResumePage />
+    </ProtectedRoute>
   );
 }
