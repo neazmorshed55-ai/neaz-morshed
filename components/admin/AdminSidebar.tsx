@@ -15,7 +15,9 @@ import {
   MessageSquare,
   ChevronLeft,
   Menu,
-  Image
+  Image,
+  Mail,
+  Users
 } from 'lucide-react';
 import { useAdminAuth } from '../../lib/admin-auth';
 
@@ -27,6 +29,8 @@ interface AdminSidebarProps {
 const menuItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Media Library', href: '/admin/media', icon: Image },
+  { name: 'Contacts', href: '/admin/contacts', icon: Mail },
+  { name: 'Leads', href: '/admin/leads', icon: Users },
   { name: 'Services', href: '/admin/services', icon: Briefcase },
   { name: 'Experience', href: '/admin/experience', icon: Award },
   { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
