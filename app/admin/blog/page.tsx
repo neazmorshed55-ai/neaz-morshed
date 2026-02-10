@@ -119,17 +119,27 @@ export default function BlogAdminPage() {
         try {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `blog-covers/${fileName}`;
+            const filePath = `media/${fileName}`;
 
             const { error: uploadError } = await supabase.storage
-                .from('portfolio-assets') // Reusing existing bucket
-                .upload(filePath, file);
+                .from('images') // Using same bucket as Media Library
+                .upload(filePath, file, { upsert: true });
 
             if (uploadError) throw uploadError;
 
             const { data: { publicUrl } } = supabase.storage
-                .from('portfolio-assets')
+                .from('images')
                 .getPublicUrl(filePath);
+
+            // Also save to media_assets table for consistency
+            await supabase.from('media_assets').insert({
+                file_name: fileName,
+                file_path: filePath,
+                file_url: publicUrl,
+                file_type: 'image',
+                file_size: file.size,
+                uploaded_by: 'blog_admin'
+            });
 
             setCurrentBlog({ ...currentBlog, cover_image: publicUrl });
             showNotification('success', 'Image uploaded successfully');
