@@ -65,7 +65,9 @@ export default function Navbar() {
           .order('order_index', { ascending: true });
 
         if (!navError && navData && navData.length > 0) {
-          setNavItems(navData);
+          // Filter out contact page link
+          const filteredNavData = navData.filter(item => item.href !== '/contact');
+          setNavItems(filteredNavData);
         }
 
         // Fetch site branding
