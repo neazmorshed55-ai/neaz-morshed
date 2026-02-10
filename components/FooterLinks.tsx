@@ -13,11 +13,6 @@ interface FooterLink {
 
 const defaultLinks = [
   { name: 'Blog', url: '/blog' },
-  { name: 'Linktree', url: 'https://linktr.ee/neazmorshed' },
-  { name: 'LinkedIn', url: 'https://www.linkedin.com/in/neazmorshed222/' },
-  { name: 'Upwork', url: 'https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3' },
-  { name: 'Fiverr', url: 'https://www.fiverr.com/neaz222' },
-  { name: 'Facebook', url: 'https://www.facebook.com/neazmorshed001/' },
 ];
 
 export default function FooterLinks() {

@@ -97,10 +97,6 @@ export default function HomePage() {
           <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
             {[
               { label: 'Blog', href: '/blog' },
-              { label: 'Linktree', href: 'https://linktr.ee/neazmorshed' },
-              { label: 'LinkedIn', href: 'https://www.linkedin.com/in/neazmorshed222/' },
-              { label: 'Fiverr', href: 'https://www.fiverr.com/neaz222' },
-              { label: 'Facebook', href: 'https://www.facebook.com/neazmorshed001/' },
             ].map((link) => (
               <a
                 key={link.label}
