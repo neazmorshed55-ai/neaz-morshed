@@ -812,7 +812,7 @@ export default function PortfolioDetailPage() {
                 const embedUrl = getGoogleDriveEmbedUrl(item.url);
                 return (
                   <div className="w-full">
-                    <div className="relative w-full h-[85vh] bg-white rounded-2xl overflow-hidden shadow-2xl">
+                    <div className="relative w-full h-[55vh] bg-white rounded-2xl overflow-hidden shadow-2xl">
                       <iframe
                         src={embedUrl}
                         className="w-full h-full border-0"
@@ -839,7 +839,7 @@ export default function PortfolioDetailPage() {
               if (isCanvaDesign) {
                 return (
                   <div className="w-full">
-                    <div className="relative w-full h-[85vh] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
+                    <div className="relative w-full h-[55vh] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
                       {/* Canva Design Preview - Show thumbnail/message */}
                       <div className="text-center p-8">
                         <div className="w-32 h-32 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl">

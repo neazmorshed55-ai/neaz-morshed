@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Database, Target, Layout } from 'lucide-react';
+import { Briefcase, Database, Target, Layout, ArrowRight, Calendar, MapPin } from 'lucide-react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
 import {
   HeroSection,
   SkillsSection,
-  ServicesSection,
   // ContactSection removed
 } from '@/components/sections';
+import { Card, Container, SectionHeader } from '@/components/ui';
 import { supabase } from '@/lib/supabase';
 
 // Setup fallback data just in case DB is empty or fails
@@ -37,12 +39,13 @@ export default function HomePage() {
   const [heroContent, setHeroContent] = useState(defaultHero);
   const [skills, setSkills] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
+  const [experiences, setExperiences] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         // Fetch all data in parallel for faster loading
-        const [heroResponse, skillsResult, servicesResult] = await Promise.all([
+        const [heroResponse, skillsResult, servicesResult, experiencesResult] = await Promise.all([
           fetch('/api/homepage', {
             next: { revalidate: 300 } // Cache for 5 minutes
           }),
@@ -58,6 +61,14 @@ export default function HomePage() {
               .from('services')
               .select('*')
               .order('order_index', { ascending: true })
+              .limit(4)
+            : Promise.resolve({ data: null }),
+          supabase
+            ? supabase
+              .from('experiences')
+              .select('*')
+              .order('start_date', { ascending: false })
+              .limit(5)
             : Promise.resolve({ data: null })
         ]);
 
@@ -86,6 +97,11 @@ export default function HomePage() {
             icon: getIcon(s.icon),
             desc: s.description
           })));
+        }
+
+        // Process experiences data
+        if (experiencesResult.data) {
+          setExperiences(experiencesResult.data);
         }
 
       } catch (error) {
@@ -123,8 +139,131 @@ export default function HomePage() {
         />
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
+        {/* Services Section - Inline */}
+        {services.length > 0 && (
+          <section className="py-16 sm:py-24 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a]">
+            <Container>
+              <SectionHeader
+                title="Services"
+                subtitle="What I Offer"
+              />
 
-        {services.length > 0 && <ServicesSection services={services} />}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 sm:gap-8 mt-12">
+                {services.map((service, index) => (
+                  <motion.div
+                    key={service.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Link href={`/services/${service.slug}`}>
+                      <Card className="h-full group hover:border-[#2ecc71]/50 transition-all duration-300 cursor-pointer">
+                        <div className="flex flex-col h-full">
+                          <div className="text-[#2ecc71] mb-4 group-hover:scale-110 transition-transform duration-300">
+                            {service.icon}
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold mb-3 group-hover:text-[#2ecc71] transition-colors duration-300">
+                            {service.title}
+                          </h3>
+                          <p className="text-slate-400 text-sm sm:text-base leading-relaxed flex-grow">
+                            {service.desc}
+                          </p>
+                        </div>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex justify-center mt-12"
+              >
+                <Link href="/services">
+                  <button className="group px-8 py-4 bg-[#2ecc71] text-slate-900 font-semibold rounded-lg hover:bg-[#27ae60] transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-[#2ecc71]/20">
+                    See More Services
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </button>
+                </Link>
+              </motion.div>
+            </Container>
+          </section>
+        )}
+
+        {/* Experiences Section - Inline */}
+        {experiences.length > 0 && (
+          <section className="py-16 sm:py-24 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a]">
+            <Container>
+              <SectionHeader
+                title="Experience"
+                subtitle="Professional Journey"
+              />
+
+              <div className="grid grid-cols-1 gap-6 mt-12">
+                {experiences.map((exp, index) => (
+                  <motion.div
+                    key={exp.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Card className="group hover:border-[#2ecc71]/50 transition-all duration-300">
+                      <div className="flex flex-col sm:flex-row gap-6">
+                        <div className="flex-1">
+                          <h3 className="text-xl sm:text-2xl font-bold mb-2 group-hover:text-[#2ecc71] transition-colors duration-300">
+                            {exp.title}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-4 text-slate-400 text-sm sm:text-base mb-3">
+                            <span className="font-semibold text-[#2ecc71]">{exp.company}</span>
+                            {exp.location && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-4 h-4" />
+                                {exp.location}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-slate-500 text-sm mb-4">
+                            <Calendar className="w-4 h-4" />
+                            <span>
+                              {new Date(exp.start_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                              {' - '}
+                              {exp.end_date ? new Date(exp.end_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Present'}
+                            </span>
+                          </div>
+                          {exp.description && (
+                            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
+                              {exp.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                className="flex justify-center mt-12"
+              >
+                <Link href="/experience">
+                  <button className="group px-8 py-4 bg-[#2ecc71] text-slate-900 font-semibold rounded-lg hover:bg-[#27ae60] transition-all duration-300 flex items-center gap-2 shadow-lg hover:shadow-[#2ecc71]/20">
+                    Know More
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  </button>
+                </Link>
+              </motion.div>
+            </Container>
+          </section>
+        )}
 
         {/* ContactSection removed */}
       </main>
