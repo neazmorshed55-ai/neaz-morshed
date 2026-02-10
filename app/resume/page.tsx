@@ -585,12 +585,8 @@ export default function ResumePage() {
 
   const personalInfo = {
     name: "NEAZ MD. MORSHED",
-    title: "Digital Asset Builder | AI Implementation Engineer",
-    email: "contact@neazmdmorshed.com",
-    phone: "+8801775939996",
-    location: "Bashundhara R/A, Dhaka, Bangladesh",
-    linkedin: "linkedin.com/in/neazmorshed222",
-    portfolio: "neaz.pro"
+    title: "VIRTUAL ASSISTANT",
+    // Contact info hidden as per request
   };
 
   useEffect(() => {
@@ -636,7 +632,7 @@ export default function ResumePage() {
         const { data: statsData } = await supabase
           .from('resume_stats')
           .select('*')
-          .order('order_index', { ascending: true});
+          .order('order_index', { ascending: true });
         if (statsData && statsData.length > 0) {
           const statsArray = statsData.map((stat: Stat) => ({
             label: stat.label,
@@ -716,40 +712,8 @@ export default function ResumePage() {
                 >
                   {personalInfo.title}
                 </motion.p>
-                {/* Contact Info */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm"
-                >
-                  <div className="flex items-center gap-2 text-slate-300 hover:text-[#2ecc71] transition-colors cursor-pointer">
-                    <Mail size={14} className="text-[#2ecc71]" />
-                    <span>{personalInfo.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-300 hover:text-[#2ecc71] transition-colors cursor-pointer">
-                    <Phone size={14} className="text-[#2ecc71]" />
-                    <span>{personalInfo.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <MapPin size={14} className="text-[#2ecc71]" />
-                    <span>{personalInfo.location}</span>
-                  </div>
-                </motion.div>
-                <div className="flex flex-wrap gap-4 mt-3">
-                  <a href={`https://www.${personalInfo.linkedin}`} target="_blank" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
-                    <span>LinkedIn</span>
-                    <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  </a>
-                  <a href="https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
-                    <span>Upwork</span>
-                    <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  </a>
-                  <a href="https://www.fiverr.com/neaz222" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
-                    <span>Fiverr</span>
-                    <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  </a>
-                </div>
+                {/* Contact Info & Social Links hidden as per request */}
+
               </div>
               <motion.a
                 href={resumePdfLink}
@@ -812,16 +776,14 @@ export default function ResumePage() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 ${
-                    activeTab === tab.key
+                  className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 ${activeTab === tab.key
                       ? `${tab.color} text-slate-900 shadow-lg`
                       : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/10 hover:border-white/20'
-                  }`}
+                    }`}
                 >
                   {tab.label}
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${
-                    activeTab === tab.key ? 'bg-slate-900/20' : 'bg-white/10'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === tab.key ? 'bg-slate-900/20' : 'bg-white/10'
+                    }`}>
                     {experiences.filter(e => e.type === tab.key).length}
                   </span>
                 </motion.button>
@@ -837,11 +799,10 @@ export default function ResumePage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ delay: i * 0.05 }}
-                    className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
-                      expandedExp === exp.id
+                    className={`rounded-2xl border transition-all duration-300 overflow-hidden ${expandedExp === exp.id
                         ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/5'
                         : 'bg-slate-900/60 border-white/5 hover:border-white/10'
-                    }`}
+                      }`}
                   >
                     <div
                       onClick={() => setExpandedExp(expandedExp === exp.id ? null : exp.id)}
@@ -849,9 +810,8 @@ export default function ResumePage() {
                     >
                       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-2 mb-2">
                         <div className="flex-1">
-                          <h3 className={`text-lg font-bold transition-colors ${
-                            expandedExp === exp.id ? 'text-[#2ecc71]' : 'text-white'
-                          }`}>{exp.position}</h3>
+                          <h3 className={`text-lg font-bold transition-colors ${expandedExp === exp.id ? 'text-[#2ecc71]' : 'text-white'
+                            }`}>{exp.position}</h3>
                           <p className="text-[#2ecc71] font-semibold text-sm">{exp.company}</p>
                           <p className="text-slate-500 text-xs mt-1">{exp.location}</p>
                         </div>
@@ -862,9 +822,8 @@ export default function ResumePage() {
                           </div>
                           <ChevronDown
                             size={18}
-                            className={`text-slate-400 transition-transform duration-300 ${
-                              expandedExp === exp.id ? 'rotate-180 text-[#2ecc71]' : ''
-                            }`}
+                            className={`text-slate-400 transition-transform duration-300 ${expandedExp === exp.id ? 'rotate-180 text-[#2ecc71]' : ''
+                              }`}
                           />
                         </div>
                       </div>
@@ -927,16 +886,14 @@ export default function ResumePage() {
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ scale: 1.02, y: -3 }}
                   onClick={() => setExpandedEdu(expandedEdu === edu.id ? null : edu.id)}
-                  className={`p-6 rounded-2xl border transition-all cursor-pointer ${
-                    expandedEdu === edu.id
+                  className={`p-6 rounded-2xl border transition-all cursor-pointer ${expandedEdu === edu.id
                       ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg'
                       : 'bg-slate-900/60 border-white/5 hover:border-[#2ecc71]/20'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className={`p-2 rounded-lg transition-colors ${
-                      expandedEdu === edu.id ? 'bg-[#2ecc71] text-slate-900' : 'bg-[#2ecc71]/10 text-[#2ecc71]'
-                    }`}>
+                    <div className={`p-2 rounded-lg transition-colors ${expandedEdu === edu.id ? 'bg-[#2ecc71] text-slate-900' : 'bg-[#2ecc71]/10 text-[#2ecc71]'
+                      }`}>
                       <GraduationCap size={20} />
                     </div>
                     <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -1096,15 +1053,13 @@ export default function ResumePage() {
                   transition={{ delay: i * 0.05 }}
                   onMouseEnter={() => setHoveredSkill(category)}
                   onMouseLeave={() => setHoveredSkill(null)}
-                  className={`p-5 rounded-2xl border transition-all duration-300 ${
-                    hoveredSkill === category
+                  className={`p-5 rounded-2xl border transition-all duration-300 ${hoveredSkill === category
                       ? 'bg-[#1a1f2e] border-[#2ecc71]/40 shadow-lg shadow-[#2ecc71]/10 scale-[1.02]'
                       : 'bg-slate-900/60 border-white/5'
-                  }`}
+                    }`}
                 >
-                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 transition-colors ${
-                    hoveredSkill === category ? 'text-[#2ecc71]' : 'text-slate-400'
-                  }`}>{category}</h3>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 transition-colors ${hoveredSkill === category ? 'text-[#2ecc71]' : 'text-slate-400'
+                    }`}>{category}</h3>
                   <div className="flex flex-wrap gap-2">
                     {skillList.map((skill, j) => (
                       <motion.span
@@ -1113,11 +1068,10 @@ export default function ResumePage() {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: j * 0.03 }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          hoveredSkill === category
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${hoveredSkill === category
                             ? 'bg-[#2ecc71]/20 text-[#2ecc71] border border-[#2ecc71]/30'
                             : 'bg-slate-800 text-slate-300'
-                        }`}
+                          }`}
                       >
                         {skill}
                       </motion.span>
