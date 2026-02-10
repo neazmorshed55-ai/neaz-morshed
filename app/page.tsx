@@ -8,7 +8,7 @@ import {
   HeroSection,
   SkillsSection,
   ServicesSection,
-  ContactSection,
+  // ContactSection removed
 } from '@/components/sections';
 import { supabase } from '@/lib/supabase';
 
@@ -48,16 +48,16 @@ export default function HomePage() {
           }),
           supabase
             ? supabase
-                .from('skills')
-                .select('*')
-                .order('order_index', { ascending: true })
-                .limit(6)
+              .from('skills')
+              .select('*')
+              .order('order_index', { ascending: true })
+              .limit(6)
             : Promise.resolve({ data: null }),
           supabase
             ? supabase
-                .from('services')
-                .select('*')
-                .order('order_index', { ascending: true })
+              .from('services')
+              .select('*')
+              .order('order_index', { ascending: true })
             : Promise.resolve({ data: null })
         ]);
 
@@ -126,7 +126,7 @@ export default function HomePage() {
 
         {services.length > 0 && <ServicesSection services={services} />}
 
-        <ContactSection />
+        {/* ContactSection removed */}
       </main>
 
       {/* Footer */}

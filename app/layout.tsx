@@ -7,12 +7,7 @@ import dynamic from 'next/dynamic';
 import VisitorTracker from '../components/VisitorTracker';
 
 // Lazy load heavy components to improve initial page load
-const WhatsAppButton = dynamic(() => import('../components/WhatsAppButton'), {
-  ssr: false,
-});
-const AIChatbot = dynamic(() => import('../components/AIChatbot'), {
-  ssr: false,
-});
+// WhatsAppButton & AIChatbot imports removed
 
 // Optimized font loading - preloads and serves locally
 const inter = Inter({
@@ -89,8 +84,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden`}>
         <VisitorTracker />
         {children}
-        <WhatsAppButton />
-        <AIChatbot />
+        {/* WhatsAppButton and AIChatbot removed */}
 
         {/* Social Media Embed Scripts */}
         <Script

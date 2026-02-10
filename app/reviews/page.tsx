@@ -253,23 +253,7 @@ export default function ReviewsPage() {
           </div>
         </section>
 
-        {/* Filter Tabs */}
-        <section className="container mx-auto px-6 max-w-7xl mb-12">
-          <div className="flex flex-wrap justify-center gap-4">
-            {['all', 'fiverr', 'upwork', 'linkedin', 'direct'].map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setActiveFilter(filter as typeof activeFilter)}
-                className={`px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all ${activeFilter === filter
-                  ? 'bg-[#2ecc71] text-slate-900'
-                  : 'bg-slate-900/60 border border-white/10 text-slate-400 hover:border-[#2ecc71]/30 hover:text-white'
-                  }`}
-              >
-                {filter === 'all' ? 'All Reviews' : filter}
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* Filter Tabs removed */}
 
         {/* Reviews Grid */}
         <section className="container mx-auto px-6 max-w-7xl">
@@ -359,86 +343,13 @@ export default function ReviewsPage() {
           </div>
         </section>
 
-        {/* Social Links Section */}
-        <section className="container mx-auto px-6 max-w-7xl mt-20">
-          <div className="bg-gradient-to-br from-[#2ecc71]/10 to-transparent border border-[#2ecc71]/20 rounded-[4rem] p-12 lg:p-16 text-center">
-            <h2 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter mb-6">
-              See More Reviews
-            </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto mb-10">
-              Check out my profiles on these platforms to see more reviews and recommendations from satisfied clients.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              <a
-                href="https://www.linkedin.com/in/neazmorshed222/details/recommendations/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-8 py-4 bg-sky-500/20 border border-sky-500/30 rounded-2xl text-sky-400 hover:bg-sky-500/30 transition-all font-bold"
-              >
-                <Linkedin className="w-5 h-5" />
-                LinkedIn Recommendations
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.facebook.com/neazmorshed001/reviews"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-8 py-4 bg-blue-500/20 border border-blue-500/30 rounded-2xl text-blue-400 hover:bg-blue-500/30 transition-all font-bold"
-              >
-                <Facebook className="w-5 h-5" />
-                Facebook Reviews
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.fiverr.com/neaz222"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-8 py-4 bg-[#2ecc71]/20 border border-[#2ecc71]/30 rounded-2xl text-[#2ecc71] hover:bg-[#2ecc71]/30 transition-all font-bold"
-              >
-                <Star className="w-5 h-5" />
-                Fiverr Reviews
-                <ExternalLink className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.freelancer.com/u/tamim70"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-8 py-4 bg-cyan-500/20 border border-cyan-500/30 rounded-2xl text-cyan-400 hover:bg-cyan-500/30 transition-all font-bold"
-              >
-                <Star className="w-5 h-5" />
-                Freelancer Reviews
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-        </section>
+        {/* Social Links Section removed */}
 
         {/* World Map Section */}
         <WorldMap />
 
         {/* CTA Section */}
-        <section className="container mx-auto px-6 max-w-7xl mt-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center"
-          >
-            <h2 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter mb-6">
-              Ready to Experience the <span className="text-gradient">Difference</span>?
-            </h2>
-            <p className="text-slate-300 max-w-2xl mx-auto mb-10">
-              Join hundreds of satisfied clients who have transformed their business operations with my help.
-            </p>
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-3 px-12 py-6 bg-[#2ecc71] text-slate-900 rounded-2xl font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#2ecc71]/20"
-            >
-              Start Your Project
-              <ExternalLink className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </section>
+        {/* CTA Section removed */}
       </main>
 
       {/* Footer */}

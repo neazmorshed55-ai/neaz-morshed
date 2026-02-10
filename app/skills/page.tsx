@@ -86,7 +86,7 @@ export default function SkillsPage() {
             {/* Decorative Arc */}
             <div className="flex justify-center mb-8">
               <svg width="200" height="60" viewBox="0 0 200 60" fill="none" className="text-[#2ecc71]">
-                <path d="M10 50 Q100 0 190 50" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                <path d="M10 50 Q100 0 190 50" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
               </svg>
             </div>
 
@@ -242,42 +242,7 @@ export default function SkillsPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center p-16 bg-slate-900/60 border border-white/10 rounded-[4rem] relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#2ecc71]/10 rounded-full blur-[100px] -z-10"></div>
-
-            <h3 className="text-4xl font-black uppercase tracking-tight mb-6">
-              Ready to Work Together?
-            </h3>
-            <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
-              Let's discuss how my skills can help your business grow and succeed.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/#contact"
-                className="px-10 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm flex items-center gap-3"
-              >
-                Contact Me <ArrowRight size={18} />
-              </Link>
-              <a
-                href={pdfUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-10 py-5 border-2 border-white/20 text-white font-black rounded-2xl hover:border-[#2ecc71] transition-all uppercase tracking-widest text-sm flex items-center gap-3"
-              >
-                Download PDF <Download size={18} />
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* CTA Section removed */}
 
       {/* Footer */}
       <footer className="py-6 sm:py-8 border-t border-white/5">
