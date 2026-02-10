@@ -228,30 +228,30 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="prose prose-invert prose-lg max-w-none
-                            prose-headings:font-black prose-headings:tracking-tight prose-headings:scroll-mt-24
-                            prose-h1:text-4xl prose-h1:text-white prose-h1:mb-6 prose-h1:mt-12 prose-h1:uppercase
-                            prose-h2:text-3xl prose-h2:text-white prose-h2:mb-5 prose-h2:mt-10 prose-h2:border-l-4 prose-h2:border-[#2ecc71] prose-h2:pl-4 prose-h2:uppercase prose-h2:bg-gradient-to-r prose-h2:from-[#2ecc71]/5 prose-h2:to-transparent prose-h2:py-3 prose-h2:rounded-r-xl
-                            prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8 prose-h3:font-bold
-                            prose-h4:text-xl prose-h4:text-slate-300 prose-h4:mb-3 prose-h4:mt-6 prose-h4:font-bold
-                            prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg prose-p:font-normal
-                            prose-strong:text-[#2ecc71] prose-strong:font-bold
+                        className="prose prose-invert max-w-none
+                            prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-headings:text-white
+                            prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12 prose-h1:leading-tight
+                            prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-10 prose-h2:border-l-4 prose-h2:border-[#2ecc71] prose-h2:pl-5 prose-h2:bg-gradient-to-r prose-h2:from-[#2ecc71]/5 prose-h2:to-transparent prose-h2:py-3 prose-h2:rounded-r-xl prose-h2:leading-tight
+                            prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-snug
+                            prose-h4:text-lg md:prose-h4:text-xl prose-h4:text-slate-300 prose-h4:mb-3 prose-h4:mt-6
+                            prose-p:text-slate-300 prose-p:leading-[1.8] prose-p:mb-5 prose-p:text-[17px] md:prose-p:text-[18px] prose-p:font-normal
+                            prose-strong:text-[#2ecc71] prose-strong:font-semibold
                             prose-em:text-slate-400 prose-em:italic
-                            prose-a:text-[#2ecc71] prose-a:no-underline prose-a:font-semibold hover:prose-a:underline prose-a:transition-all
-                            prose-ul:my-6 prose-ul:space-y-3 prose-ul:list-none
-                            prose-ol:my-6 prose-ol:space-y-3 prose-ol:list-decimal prose-ol:pl-6
-                            prose-li:text-slate-300 prose-li:pl-2 prose-li:relative
-                            prose-li:before:absolute prose-li:before:left-[-1.5rem] prose-li:before:content-['▹'] prose-li:before:text-[#2ecc71] prose-li:before:font-bold
+                            prose-a:text-[#2ecc71] prose-a:no-underline prose-a:font-medium hover:prose-a:underline prose-a:transition-all
+                            prose-ul:my-6 prose-ul:space-y-2.5 prose-ul:list-none prose-ul:text-[17px] md:prose-ul:text-[18px]
+                            prose-ol:my-6 prose-ol:space-y-2.5 prose-ol:list-decimal prose-ol:pl-6 prose-ol:text-[17px] md:prose-ol:text-[18px]
+                            prose-li:text-slate-300 prose-li:pl-2 prose-li:relative prose-li:leading-[1.7]
+                            prose-li:before:absolute prose-li:before:left-[-1.5rem] prose-li:before:content-['▹'] prose-li:before:text-[#2ecc71] prose-li:before:font-bold prose-li:before:text-lg
                             prose-ol>li:before:content-none
-                            prose-li:marker:text-[#2ecc71] prose-li:marker:font-bold
-                            prose-blockquote:border-l-4 prose-blockquote:border-[#2ecc71] prose-blockquote:bg-gradient-to-r prose-blockquote:from-slate-900/80 prose-blockquote:to-slate-900/20 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-slate-400 prose-blockquote:my-8
-                            prose-code:bg-slate-800/50 prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-code:text-[#2ecc71] prose-code:text-sm prose-code:font-mono prose-code:border prose-code:border-[#2ecc71]/20
-                            prose-pre:bg-slate-900 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl prose-pre:p-6 prose-pre:my-8
+                            prose-li:marker:text-[#2ecc71] prose-li:marker:font-semibold
+                            prose-blockquote:border-l-4 prose-blockquote:border-[#2ecc71] prose-blockquote:bg-gradient-to-r prose-blockquote:from-slate-900/80 prose-blockquote:to-slate-900/20 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-slate-400 prose-blockquote:my-8 prose-blockquote:text-[17px]
+                            prose-code:bg-slate-800/50 prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-code:text-[#2ecc71] prose-code:text-[15px] prose-code:font-mono prose-code:border prose-code:border-[#2ecc71]/20
+                            prose-pre:bg-slate-900 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl prose-pre:p-6 prose-pre:my-8 prose-pre:text-[15px]
                             prose-img:rounded-2xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl prose-img:my-8
                             prose-hr:border-white/10 prose-hr:my-12
-                            prose-table:border-collapse prose-table:w-full prose-table:my-8
+                            prose-table:border-collapse prose-table:w-full prose-table:my-8 prose-table:text-[16px]
                             prose-thead:border-b-2 prose-thead:border-[#2ecc71]
-                            prose-th:text-left prose-th:p-4 prose-th:font-bold prose-th:text-white prose-th:uppercase prose-th:text-sm prose-th:tracking-wider
+                            prose-th:text-left prose-th:p-4 prose-th:font-semibold prose-th:text-white prose-th:uppercase prose-th:text-sm prose-th:tracking-wider
                             prose-td:p-4 prose-td:border-b prose-td:border-white/10 prose-td:text-slate-300
                             prose-tr:transition-colors hover:prose-tr:bg-white/5"
                     >
