@@ -32,7 +32,7 @@ const defaultNavItems: NavItem[] = [
   { id: '3', label: 'Services', href: '/services', order_index: 3, is_visible: true, is_button: false, open_in_new_tab: false },
   { id: '4', label: 'Experience', href: '/experience', order_index: 4, is_visible: true, is_button: false, open_in_new_tab: false },
   { id: '5', label: 'Reviews', href: '/reviews', order_index: 5, is_visible: true, is_button: false, open_in_new_tab: false },
-  { id: '6', label: 'Contact', href: '/contact', order_index: 6, is_visible: true, is_button: false, open_in_new_tab: false },
+  // Contact link removed as per request
   { id: '8', label: 'Resume', href: '/resume', order_index: 8, is_visible: true, is_button: true, open_in_new_tab: false },
 ];
 

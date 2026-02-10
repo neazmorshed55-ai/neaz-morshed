@@ -73,9 +73,7 @@ export default function HeroSection({
 
             {/* CTA & Stats */}
             <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 items-start sm:items-center">
-              <Button href="#contact" icon={ArrowRight} size="lg">
-                Let's Collaborate
-              </Button>
+              {/* Contact button removed */}
 
               <div className="flex gap-4 sm:gap-6 pl-0 sm:pl-4 sm:border-l border-white/10">
                 {stats.map((stat, i) => (

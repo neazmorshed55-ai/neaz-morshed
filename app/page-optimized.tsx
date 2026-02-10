@@ -7,7 +7,7 @@ import {
   HeroSection,
   SkillsSection,
   ServicesSection,
-  ContactSection,
+  // ContactSection removed
 } from '@/components/sections';
 
 export default function HomePage() {
@@ -88,7 +88,7 @@ export default function HomePage() {
 
         <ServicesSection services={config.services} />
 
-        <ContactSection />
+        {/* ContactSection removed */}
       </main>
 
       {/* Footer */}
