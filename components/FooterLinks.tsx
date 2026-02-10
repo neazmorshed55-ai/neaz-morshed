@@ -83,19 +83,6 @@ export default function FooterLinks() {
     );
   }
 
-  return (
-    <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-      {links.map((link) => (
-        <a
-          key={link.id}
-          href={link.url}
-          target={link.url.startsWith('http') ? '_blank' : undefined}
-          rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-          className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest"
-        >
-          {link.name}
-        </a>
-      ))}
-    </div>
-  );
+  return null;
+
 }

@@ -95,19 +95,7 @@ export default function HomePage() {
       <footer className="py-6 sm:py-8 border-t border-white/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
           <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-            {[
-              { label: 'Blog', href: '/blog' },
-            ].map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith('http') ? '_blank' : undefined}
-                rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest"
-              >
-                {link.label}
-              </a>
-            ))}
+            {/* Links hidden as per request */}
           </div>
           <p className="text-slate-400 text-xs sm:text-sm font-medium">
             Designed and Developed by{' '}
