@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-    ArrowLeft, Calendar, User, Tag, Share2, Facebook, Linkedin, Twitter
+    ArrowLeft, Calendar, User, Tag, Share2, Facebook, Linkedin, Twitter,
+    Clock, Eye, ArrowUp, Copy, Check
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import Navbar from '../../../components/Navbar';
@@ -29,6 +30,17 @@ interface BlogPost {
 export default function BlogDetailPage({ params }: { params: { slug: string } }) {
     const [blog, setBlog] = useState<BlogPost | null>(null);
     const [loading, setLoading] = useState(true);
+    const [copied, setCopied] = useState(false);
+    const [showScrollTop, setShowScrollTop] = useState(false);
+    const [readingTime, setReadingTime] = useState(0);
+
+    // Reading progress bar
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
 
     useEffect(() => {
         async function fetchBlog() {
@@ -46,12 +58,53 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
 
             if (!error && data) {
                 setBlog(data);
+                // Calculate reading time (average 200 words per minute)
+                const wordCount = data.content.split(/\s+/).length;
+                const minutes = Math.ceil(wordCount / 200);
+                setReadingTime(minutes);
             }
             setLoading(false);
         }
 
         fetchBlog();
     }, [params.slug]);
+
+    // Scroll to top button visibility
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollTop(window.scrollY > 400);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Copy link function
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    // Social share functions
+    const shareToTwitter = () => {
+        const url = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(blog?.title || '');
+        window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+    };
+
+    const shareToLinkedIn = () => {
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+    };
+
+    const shareToFacebook = () => {
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    };
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     if (loading) {
         return (
@@ -83,6 +136,12 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
 
     return (
         <div className="bg-[#0b0f1a] text-white min-h-screen selection:bg-[#2ecc71] selection:text-slate-900">
+            {/* Reading Progress Bar */}
+            <motion.div
+                className="fixed top-0 left-0 right-0 h-1 bg-[#2ecc71] origin-left z-50"
+                style={{ scaleX }}
+            />
+
             <Navbar />
 
             <main className="pb-24">
@@ -106,18 +165,33 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                             {blog.title}
                         </h1>
 
-                        <div className="flex items-center gap-6 text-sm text-slate-400 border-b border-white/10 pb-12 mb-12">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-slate-400 border-b border-white/10 pb-8 mb-12"
+                        >
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center overflow-hidden">
-                                    <User size={16} />
+                                <div className="w-10 h-10 bg-gradient-to-br from-[#2ecc71] to-[#27ae60] rounded-full flex items-center justify-center">
+                                    <User size={18} className="text-slate-900" />
                                 </div>
-                                <span className="font-bold">{blog.author || 'Neaz Morshed'}</span>
+                                <span className="font-bold text-white">{blog.author || 'Neaz Morshed'}</span>
                             </div>
+                            <span className="text-slate-700">•</span>
                             <div className="flex items-center gap-2">
                                 <Calendar size={16} className="text-[#2ecc71]" />
-                                <span className="font-medium">{new Date(blog.published_at).toLocaleDateString()}</span>
+                                <span className="font-medium">{new Date(blog.published_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}</span>
                             </div>
-                        </div>
+                            <span className="text-slate-700">•</span>
+                            <div className="flex items-center gap-2">
+                                <Clock size={16} className="text-[#2ecc71]" />
+                                <span className="font-medium">{readingTime} min read</span>
+                            </div>
+                        </motion.div>
                     </div>
                 </section>
 
@@ -150,47 +224,107 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                     )}
 
                     {/* Article Body */}
-                    <article
+                    <motion.article
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
                         className="prose prose-invert prose-lg max-w-none
-                            prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight
-                            prose-h1:text-4xl prose-h1:text-white prose-h1:mb-6 prose-h1:mt-12
-                            prose-h2:text-3xl prose-h2:text-white prose-h2:mb-5 prose-h2:mt-10 prose-h2:border-l-4 prose-h2:border-[#2ecc71] prose-h2:pl-4
-                            prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8
-                            prose-h4:text-xl prose-h4:text-slate-300 prose-h4:mb-3 prose-h4:mt-6
-                            prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg
+                            prose-headings:font-black prose-headings:tracking-tight prose-headings:scroll-mt-24
+                            prose-h1:text-4xl prose-h1:text-white prose-h1:mb-6 prose-h1:mt-12 prose-h1:uppercase
+                            prose-h2:text-3xl prose-h2:text-white prose-h2:mb-5 prose-h2:mt-10 prose-h2:border-l-4 prose-h2:border-[#2ecc71] prose-h2:pl-4 prose-h2:uppercase prose-h2:bg-gradient-to-r prose-h2:from-[#2ecc71]/5 prose-h2:to-transparent prose-h2:py-3 prose-h2:rounded-r-xl
+                            prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8 prose-h3:font-bold
+                            prose-h4:text-xl prose-h4:text-slate-300 prose-h4:mb-3 prose-h4:mt-6 prose-h4:font-bold
+                            prose-p:text-slate-300 prose-p:leading-relaxed prose-p:mb-6 prose-p:text-lg prose-p:font-normal
                             prose-strong:text-[#2ecc71] prose-strong:font-bold
-                            prose-a:text-[#2ecc71] prose-a:no-underline hover:prose-a:underline
-                            prose-ul:my-6 prose-ul:space-y-3
+                            prose-em:text-slate-400 prose-em:italic
+                            prose-a:text-[#2ecc71] prose-a:no-underline prose-a:font-semibold hover:prose-a:underline prose-a:transition-all
+                            prose-ul:my-6 prose-ul:space-y-3 prose-ul:list-none
                             prose-ol:my-6 prose-ol:space-y-3 prose-ol:list-decimal prose-ol:pl-6
-                            prose-li:text-slate-300 prose-li:pl-2
+                            prose-li:text-slate-300 prose-li:pl-2 prose-li:relative
+                            prose-li:before:absolute prose-li:before:left-[-1.5rem] prose-li:before:content-['▹'] prose-li:before:text-[#2ecc71] prose-li:before:font-bold
+                            prose-ol>li:before:content-none
                             prose-li:marker:text-[#2ecc71] prose-li:marker:font-bold
-                            prose-blockquote:border-l-4 prose-blockquote:border-[#2ecc71] prose-blockquote:bg-slate-900/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-slate-400
-                            prose-code:bg-slate-800 prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-code:text-[#2ecc71] prose-code:text-sm
-                            prose-pre:bg-slate-900 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl
-                            prose-img:rounded-2xl prose-img:border prose-img:border-white/10
-                            prose-hr:border-white/10 prose-hr:my-12"
+                            prose-blockquote:border-l-4 prose-blockquote:border-[#2ecc71] prose-blockquote:bg-gradient-to-r prose-blockquote:from-slate-900/80 prose-blockquote:to-slate-900/20 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-slate-400 prose-blockquote:my-8
+                            prose-code:bg-slate-800/50 prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-code:text-[#2ecc71] prose-code:text-sm prose-code:font-mono prose-code:border prose-code:border-[#2ecc71]/20
+                            prose-pre:bg-slate-900 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl prose-pre:p-6 prose-pre:my-8
+                            prose-img:rounded-2xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl prose-img:my-8
+                            prose-hr:border-white/10 prose-hr:my-12
+                            prose-table:border-collapse prose-table:w-full prose-table:my-8
+                            prose-thead:border-b-2 prose-thead:border-[#2ecc71]
+                            prose-th:text-left prose-th:p-4 prose-th:font-bold prose-th:text-white prose-th:uppercase prose-th:text-sm prose-th:tracking-wider
+                            prose-td:p-4 prose-td:border-b prose-td:border-white/10 prose-td:text-slate-300
+                            prose-tr:transition-colors hover:prose-tr:bg-white/5"
                     >
-                        {/* If content is HTML (from rich text editor later), verify safety. For now, assuming raw text or basic HTML provided by Admin */}
-                        <div dangerouslySetInnerHTML={{ __html: blog.content ? blog.content.replace(/\n/g, '<br/>') : '' }} />
-                    </article>
+                        <div dangerouslySetInnerHTML={{ __html: blog.content || '' }} />
+                    </motion.article>
 
                     {/* Share */}
-                    <div className="mt-16 pt-8 border-t border-white/10">
-                        <h4 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-4">Share this article</h4>
-                        <div className="flex gap-4">
-                            <button className="p-3 bg-slate-900 rounded-xl hover:bg-[#1da1f2] hover:text-white transition-colors text-slate-400">
-                                <Twitter size={20} />
-                            </button>
-                            <button className="p-3 bg-slate-900 rounded-xl hover:bg-[#0077b5] hover:text-white transition-colors text-slate-400">
-                                <Linkedin size={20} />
-                            </button>
-                            <button className="p-3 bg-slate-900 rounded-xl hover:bg-[#1877f2] hover:text-white transition-colors text-slate-400">
-                                <Facebook size={20} />
-                            </button>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mt-16 pt-8 border-t border-white/10"
+                    >
+                        <h4 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
+                            <Share2 size={16} className="text-[#2ecc71]" />
+                            Share this article
+                        </h4>
+                        <div className="flex flex-wrap gap-3">
+                            <motion.button
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={shareToTwitter}
+                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#1da1f2] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#1da1f2]"
+                            >
+                                <Twitter size={18} />
+                                <span>Twitter</span>
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={shareToLinkedIn}
+                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#0077b5] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#0077b5]"
+                            >
+                                <Linkedin size={18} />
+                                <span>LinkedIn</span>
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={shareToFacebook}
+                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#1877f2] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#1877f2]"
+                            >
+                                <Facebook size={18} />
+                                <span>Facebook</span>
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={copyLink}
+                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#2ecc71] hover:text-slate-900 transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#2ecc71]"
+                            >
+                                {copied ? <Check size={18} /> : <Copy size={18} />}
+                                <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+                            </motion.button>
                         </div>
-                    </div>
+                    </motion.div>
                 </section>
             </main>
+
+            {/* Scroll to Top Button */}
+            {showScrollTop && (
+                <motion.button
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    onClick={scrollToTop}
+                    className="fixed bottom-8 right-8 p-4 bg-[#2ecc71] text-slate-900 rounded-full shadow-2xl hover:bg-[#27ae60] transition-colors z-40 group"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <ArrowUp size={24} className="group-hover:-translate-y-1 transition-transform" />
+                </motion.button>
+            )}
 
             {/* Footer */}
             <footer className="py-6 sm:py-8 border-t border-white/5">
