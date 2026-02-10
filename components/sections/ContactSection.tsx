@@ -30,8 +30,8 @@ export default function ContactSection() {
             </div>
           </div>
 
-          <Button href="/contact" icon={ArrowRight} size="lg">
-            Contact Me
+          <Button href="mailto:neazmd.tamim@gmail.com" icon={ArrowRight} size="lg">
+            Email Me
           </Button>
         </div>
       </Container>

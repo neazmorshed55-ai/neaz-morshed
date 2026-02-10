@@ -722,7 +722,7 @@ export default function PortfolioDetailPage() {
                   I can create custom solutions tailored to your specific needs. Let&apos;s discuss your project!
                 </p>
                 <Link
-                  href="/contact"
+                  href="mailto:neazmd.tamim@gmail.com"
                   className="block w-full text-center px-6 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
                 >
                   Get in Touch

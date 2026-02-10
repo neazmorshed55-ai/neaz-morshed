@@ -803,7 +803,7 @@ export default function ExperiencePage() {
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link
-                  href="/contact"
+                  href="mailto:neazmd.tamim@gmail.com"
                   className="px-10 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm flex items-center gap-3"
                 >
                   Contact Me <ArrowRight size={18} />
