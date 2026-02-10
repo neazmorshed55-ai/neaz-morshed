@@ -85,22 +85,6 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
         setTimeout(() => setCopied(false), 2000);
     };
 
-    // Social share functions
-    const shareToTwitter = () => {
-        const url = encodeURIComponent(window.location.href);
-        const text = encodeURIComponent(blog?.title || '');
-        window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-    };
-
-    const shareToLinkedIn = () => {
-        const url = encodeURIComponent(window.location.href);
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
-    };
-
-    const shareToFacebook = () => {
-        const url = encodeURIComponent(window.location.href);
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
-    };
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -270,33 +254,6 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                             Share this article
                         </h4>
                         <div className="flex flex-wrap gap-3">
-                            <motion.button
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={shareToTwitter}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#1da1f2] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#1da1f2]"
-                            >
-                                <Twitter size={18} />
-                                <span>Twitter</span>
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={shareToLinkedIn}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#0077b5] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#0077b5]"
-                            >
-                                <Linkedin size={18} />
-                                <span>LinkedIn</span>
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={shareToFacebook}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#1877f2] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#1877f2]"
-                            >
-                                <Facebook size={18} />
-                                <span>Facebook</span>
-                            </motion.button>
                             <motion.button
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}

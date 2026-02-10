@@ -25,7 +25,7 @@ export default function HeroSection({
   stats,
 }: HeroSectionProps) {
   const [profileImage, setProfileImage] = useState(
-    'https://images.unsplash.com/photo-1519085195758-2a89f9c3f732?auto=format&fit=crop&q=80&w=800'
+    '/placeholder-profile.jpg' // Local placeholder image
   );
 
   useEffect(() => {

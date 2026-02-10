@@ -715,17 +715,7 @@ export default function ResumePage() {
                 {/* Contact Info & Social Links hidden as per request */}
 
               </div>
-              <motion.a
-                href={resumePdfLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-[#2ecc71] text-slate-950 font-black rounded-xl sm:rounded-2xl shadow-lg shadow-[#2ecc71]/20 uppercase tracking-wider text-xs sm:text-sm whitespace-nowrap"
-              >
-                <Download size={18} />
-                Download PDF
-              </motion.a>
+              {/* Download button removed for Upwork portfolio */}
             </div>
           </motion.div>
 
@@ -972,13 +962,7 @@ export default function ResumePage() {
 
                 <div className="flex items-center gap-4 pt-4 border-t border-white/10">
                   <span className="text-slate-500 text-xs font-mono">DOI: 10.1109/ICAEE.2015.7506806</span>
-                  <a
-                    href="https://doi.org/10.1109/ICAEE.2015.7506806"
-                    target="_blank"
-                    className="flex items-center gap-1 text-[#2ecc71] text-xs font-bold hover:underline"
-                  >
-                    View Publication <ExternalLink size={12} />
-                  </a>
+                  {/* External link removed for Upwork portfolio */}
                 </div>
               </div>
             </motion.div>
@@ -1082,26 +1066,7 @@ export default function ResumePage() {
             </div>
           </section>
 
-          {/* Download CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center pt-12 border-t border-white/10"
-          >
-            <p className="text-slate-400 mb-6 text-lg">Get a copy of my complete resume</p>
-            <motion.a
-              href={resumePdfLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 px-12 py-5 bg-[#2ecc71] text-slate-950 font-black rounded-2xl shadow-xl shadow-[#2ecc71]/30 uppercase tracking-wider group"
-            >
-              <Download size={20} className="group-hover:animate-bounce" />
-              Download PDF Resume
-            </motion.a>
-          </motion.div>
+          {/* Download CTA removed for Upwork portfolio */}
         </div>
       </main>
 

@@ -8,14 +8,14 @@ interface VideoBackgroundProps {
   opacity?: number;
 }
 
-// Professional video URLs for different page types
-const videoSources: Record<string, string> = {
-  skills: 'https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_30fps.mp4', // Abstract tech particles
-  services: 'https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_30fps.mp4', // Digital network
-  experience: 'https://videos.pexels.com/video-files/856428/856428-hd_1920_1080_25fps.mp4', // Time-lapse city/progress
-  reviews: 'https://videos.pexels.com/video-files/3255275/3255275-uhd_2560_1440_25fps.mp4', // Soft abstract light
-  contact: 'https://videos.pexels.com/video-files/852388/852388-hd_1920_1080_30fps.mp4', // Globe/connection theme
-  calendar: 'https://videos.pexels.com/video-files/6774133/6774133-uhd_2732_1440_25fps.mp4', // Calendar/Schedule theme
+// Animated gradient backgrounds for different page types (replacing external videos)
+const gradientBackgrounds: Record<string, string> = {
+  skills: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple tech gradient
+  services: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Pink to red
+  experience: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Blue gradient
+  reviews: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Green to cyan
+  contact: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // Pink to yellow
+  calendar: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', // Cyan to purple
 };
 
 export default function VideoBackground({ type, opacity = 0.3 }: VideoBackgroundProps) {
@@ -30,22 +30,16 @@ export default function VideoBackground({ type, opacity = 0.3 }: VideoBackground
 
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden z-0">
-      {/* Video element with Parallax */}
+      {/* Animated Gradient Background (replacing video) */}
       <motion.div
-        style={{ y, scale }}
+        style={{
+          y,
+          scale,
+          background: gradientBackgrounds[type],
+          opacity
+        }}
         className="absolute inset-0 w-full h-full"
-      >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-          style={{ opacity }}
-        >
-          <source src={videoSources[type]} type="video/mp4" />
-        </video>
-      </motion.div>
+      />
 
       {/* Dark Overlay for "Dark Overlay Effect" */}
       <div className="absolute inset-0 bg-[#0b0f1a]/80" />

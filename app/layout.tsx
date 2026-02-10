@@ -84,24 +84,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden`}>
         <VisitorTracker />
         {children}
-        {/* WhatsAppButton and AIChatbot removed */}
-
-        {/* Social Media Embed Scripts */}
-        <Script
-          src="https://www.instagram.com/embed.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          src="https://www.tiktok.com/embed.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          async
-          defer
-          crossOrigin="anonymous"
-          src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0"
-          strategy="lazyOnload"
-        />
+        {/* All external scripts removed for Upwork portfolio */}
       </body>
     </html>
   );

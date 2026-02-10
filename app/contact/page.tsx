@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   Mail, Globe, CheckCircle2, Send, Loader2,
-  MapPin, Clock, MessageSquare, Linkedin, Facebook
+  MapPin, Clock, MessageSquare, 
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import Navbar from '../../components/Navbar';
@@ -61,10 +61,6 @@ export default function ContactPage() {
     { icon: <MapPin className="w-6 h-6" />, label: 'Location', value: 'Bangladesh', href: null },
   ];
 
-  const socialLinks = [
-    { icon: <Linkedin className="w-5 h-5" />, label: 'LinkedIn', href: 'https://www.linkedin.com/in/neazmorshed222/' },
-    { icon: <Facebook className="w-5 h-5" />, label: 'Facebook', href: 'https://www.facebook.com/neazmorshed001' },
-  ];
 
   return (
     <div className="bg-[#0b0f1a] text-white min-h-screen selection:bg-[#2ecc71] selection:text-slate-900">

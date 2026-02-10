@@ -1,4 +1,5 @@
 "use client";
+import { getFlagEmoji } from '@/lib/flag-emoji';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
@@ -35,7 +36,7 @@ interface Review {
 // Get flag image URL from CDN
 const getFlagUrl = (countryCode: string) => {
   if (!countryCode) return '';
-  return `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
+  return getFlagEmoji(countryCode);
 };
 
 // Count-up animation component

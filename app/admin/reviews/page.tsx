@@ -1,4 +1,5 @@
 "use client";
+import { getFlagEmoji } from '@/lib/flag-emoji';
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -87,18 +88,10 @@ const countries = [
 // Get flag image URL from CDN
 const getFlagUrl = (countryCode: string) => {
   if (!countryCode) return '';
-  return `https://flagcdn.com/24x18/${countryCode.toLowerCase()}.png`;
+  return getFlagEmoji(countryCode);
 };
 
-// Convert country code to flag emoji (for select dropdown)
-const getFlagEmoji = (countryCode: string) => {
-  if (!countryCode) return '';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-};
+// getFlagEmoji is imported from @/lib/flag-emoji (removed duplicate)
 
 export default function ReviewsManagement() {
   const [reviews, setReviews] = useState<Review[]>([]);

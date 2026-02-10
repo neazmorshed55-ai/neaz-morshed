@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { getFlagEmoji } from '../lib/flag-emoji';
 
 // Custom hook for count-up animation
 function useCountUp(end: number, duration: number = 2000, startOnView: boolean = true) {
@@ -43,7 +44,7 @@ import {
 import { supabase } from '../lib/supabase';
 
 // GeoJSON URL for world map (TopoJSON format)
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const geoUrl = "/assets/data/countries-110m.json";
 
 // My location (Bangladesh)
 const MY_LOCATION = {
@@ -265,11 +266,7 @@ export default function WorldMap() {
           <div className="space-y-1.5">
             {top3Countries.map((country, index) => (
               <div key={country.country_code} className="flex items-center gap-2">
-                <img
-                  src={`https://flagcdn.com/w20/${country.country_code.toLowerCase()}.png`}
-                  alt={country.country_name}
-                  className="w-5 h-3.5 object-cover rounded-sm shadow-sm"
-                />
+                <span className="text-2xl">{getFlagEmoji(country.country_code)}</span>
                 <span className="text-white text-xs lg:text-sm font-medium">
                   {country.country_name}
                 </span>
