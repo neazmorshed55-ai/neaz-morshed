@@ -581,7 +581,7 @@ export default function ResumePage() {
   const [expandedExp, setExpandedExp] = useState<string | null>(null);
   const [expandedEdu, setExpandedEdu] = useState<string | null>(null);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
-  const [resumePdfLink, setResumePdfLink] = useState<string>('#');
+  const [resumePdfLink, setResumePdfLink] = useState<string>('https://drive.usercontent.google.com/u/0/uc?id=1D5RuRCHvdkI-u-sWTo8BOCiXh_PwDWe9&export=download');
 
   const personalInfo = {
     name: "NEAZ MD. MORSHED",
@@ -648,7 +648,7 @@ export default function ResumePage() {
 
         // Fetch resume PDF link from settings
         const { data: settingsData } = await supabase
-          .from('settings')
+          .from('site_settings')
           .select('resume_pdf_link')
           .single();
         if (settingsData?.resume_pdf_link) {
