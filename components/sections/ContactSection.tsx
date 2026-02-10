@@ -1,8 +1,8 @@
 "use client";
 
 import React from 'react';
-import { Mail, Globe, ArrowRight } from 'lucide-react';
-import { Button, SectionHeader, Container } from '@/components/ui';
+import { Mail, Globe } from 'lucide-react';
+import { SectionHeader, Container } from '@/components/ui';
 
 export default function ContactSection() {
   return (
@@ -19,7 +19,7 @@ export default function ContactSection() {
             align="center"
           />
 
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6 ">
             <div className="flex items-center gap-3 sm:gap-4 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-white/5 border border-white/5">
               <Mail className="text-[#2ecc71] w-5 h-5" />
               <span className="font-bold text-sm sm:text-base">contact@neazmdmorshed.com</span>
@@ -30,9 +30,6 @@ export default function ContactSection() {
             </div>
           </div>
 
-          <Button href="mailto:neazmd.tamim@gmail.com" icon={ArrowRight} size="lg">
-            Email Me
-          </Button>
         </div>
       </Container>
     </section>

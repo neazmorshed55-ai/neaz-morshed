@@ -91,3 +91,28 @@ body {
     min-width: 44px;
   }
 }
+/* Responsive image utilities */
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Prevent layout shift on image load */
+img[width][height] {
+  height: auto;
+}
+
+/* Ensure containers don't overflow on mobile */
+.container-safe {
+  max-width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-safe {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

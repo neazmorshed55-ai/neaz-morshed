@@ -21,6 +21,14 @@ const inter = Inter({
  * This file serves as the main entry point for the App Router shell.
  */
 
+// Viewport configuration for responsive design
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#2ecc71',
+};
 export const metadata: Metadata = {
   metadataBase: new URL('https://neazmorshed.com'),
   title: {
