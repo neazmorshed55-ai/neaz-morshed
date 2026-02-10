@@ -18,7 +18,8 @@ import {
   Image,
   Mail,
   Users,
-  FileText
+  FileText,
+  Link as LinkIcon
 } from 'lucide-react';
 import { useAdminAuth } from '../../lib/admin-auth';
 
@@ -38,6 +39,7 @@ const menuItems = [
   { name: 'Reviews', href: '/admin/reviews', icon: MessageSquare },
   { name: 'Skills', href: '/admin/skills', icon: Wrench },
   { name: 'Portfolio Items', href: '/admin/portfolio', icon: Star },
+  { name: 'Footer Links', href: '/admin/footer', icon: LinkIcon },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 

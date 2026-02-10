@@ -41,6 +41,8 @@ export default function BlogAdminPage() {
     const [saving, setSaving] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+    const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+    const [mediaFiles, setMediaFiles] = useState<any[]>([]);
 
     // Quill modules configuration
     const modules = {
@@ -91,6 +93,22 @@ export default function BlogAdminPage() {
         setTimeout(() => setNotification(null), 3000);
     };
 
+    // Fetch Media Library
+    const fetchMediaLibrary = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('media_library')
+                .select('*')
+                .eq('file_type', 'image')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setMediaFiles(data || []);
+        } catch (error) {
+            console.error('Error fetching media:', error);
+        }
+    };
+
     // Handle File Upload
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
@@ -121,6 +139,13 @@ export default function BlogAdminPage() {
         } finally {
             setUploadingImage(false);
         }
+    };
+
+    // Handle Media Selection
+    const handleMediaSelect = (mediaUrl: string) => {
+        setCurrentBlog({ ...currentBlog, cover_image: mediaUrl });
+        setShowMediaLibrary(false);
+        showNotification('success', 'Image selected from media library');
     };
 
     // Handle Edit/Create
@@ -350,6 +375,17 @@ export default function BlogAdminPage() {
                                         className="flex-1 bg-slate-950 border border-white/10 rounded-xl p-4 text-white focus:border-[#2ecc71] outline-none transition-colors"
                                         placeholder="https://..."
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowMediaLibrary(true);
+                                            fetchMediaLibrary();
+                                        }}
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#2ecc71]/10 hover:bg-[#2ecc71]/20 border border-[#2ecc71]/30 rounded-xl text-[#2ecc71] font-bold text-sm transition-colors whitespace-nowrap"
+                                    >
+                                        <ImageIcon size={16} />
+                                        Browse
+                                    </button>
                                     <label className="flex items-center justify-center p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl cursor-pointer transition-colors">
                                         <input
                                             type="file"
@@ -519,6 +555,61 @@ export default function BlogAdminPage() {
                     )}
                 </>
             )}
+
+            {/* Media Library Modal */}
+            <AnimatePresence>
+                {showMediaLibrary && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                        onClick={() => setShowMediaLibrary(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-slate-900 rounded-2xl p-6 max-w-5xl w-full max-h-[80vh] overflow-auto border border-white/10"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-black text-white uppercase tracking-tight">Select Image</h2>
+                                <button
+                                    onClick={() => setShowMediaLibrary(false)}
+                                    className="p-2 hover:bg-white/5 rounded-xl transition-colors"
+                                >
+                                    <X size={20} className="text-slate-400" />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {mediaFiles.map((media) => (
+                                    <button
+                                        key={media.id}
+                                        onClick={() => handleMediaSelect(media.file_url)}
+                                        className="aspect-video rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#2ecc71] transition-all group"
+                                    >
+                                        <img
+                                            src={media.file_url}
+                                            alt={media.file_name}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+
+                            {mediaFiles.length === 0 && (
+                                <div className="text-center py-12 text-slate-500">
+                                    <ImageIcon size={48} className="mx-auto mb-4 opacity-50" />
+                                    <p>No images in media library</p>
+                                    <p className="text-sm mt-2">Upload images from <NextLink href="/admin/media" className="text-[#2ecc71] hover:underline">Media Library</NextLink></p>
+                                </div>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

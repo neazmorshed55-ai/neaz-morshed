@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Briefcase, Database, Target, Layout, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import FooterLinks from '@/components/FooterLinks';
 import {
   HeroSection,
   SkillsSection,
@@ -144,31 +145,12 @@ export default function HomePage() {
       <footer className="py-6 sm:py-8 border-t border-white/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-            {[
-              { label: 'Blog', href: '/blog' },
-              { label: 'Linktree', href: 'https://linktr.ee/neazmorshed' },
-              { label: 'LinkedIn', href: 'https://www.linkedin.com/in/neazmorshed222/' },
-              { label: 'Upwork', href: 'https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3' },
-              { label: 'Fiverr', href: 'https://www.fiverr.com/neaz222' },
-              { label: 'Facebook', href: 'https://www.facebook.com/neazmorshed001/' },
-            ].map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target={link.href.startsWith('http') ? '_blank' : undefined}
-                rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-          <p className="text-slate-400 text-xs sm:text-sm font-medium">
-            Designed and Developed by{' '}
-            <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-            <span className="text-slate-500">Copyright © 2026</span>
-          </p>
+            <FooterLinks />
+            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+              Designed and Developed by{' '}
+              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-slate-500">Copyright © 2026</span>
+            </p>
           </div>
         </div>
       </footer>

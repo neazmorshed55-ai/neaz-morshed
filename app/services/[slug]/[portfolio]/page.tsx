@@ -13,6 +13,7 @@ import {
 import { supabase } from '../../../../lib/supabase';
 import Navbar from '../../../../components/Navbar';
 import SocialEmbed from '../../../../components/SocialEmbed';
+import FooterLinks from '../../../../components/FooterLinks';
 
 // ============ PLATFORM DETECTION ============
 
@@ -892,16 +893,16 @@ export default function PortfolioDetailPage() {
       )}
 
       {/* Footer */}
-      <footer className="py-8 border-t border-white/5">
-        <div className="container mx-auto px-6 max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-          <div className="flex gap-8">
-            <a href="/blog" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Blog</a>
-            <a href="https://www.linkedin.com/in/neazmorshed222/" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">LinkedIn</a>
-            <a href="https://www.fiverr.com/neaz222" target="_blank" className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest">Fiverr</a>
+      <footer className="py-6 sm:py-8 border-t border-white/5">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
+            <FooterLinks />
+            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+              Designed and Developed by{' '}
+              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-slate-500">Copyright © 2026</span>
+            </p>
           </div>
-          <p className="text-slate-400 text-sm font-medium">
-            Designed and Developed by <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> • <span className="text-slate-500">Copyright © 2026</span>
-          </p>
         </div>
       </footer>
     </div>
