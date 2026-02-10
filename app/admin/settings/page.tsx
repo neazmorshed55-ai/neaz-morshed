@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
   ArrowLeft, Save, Loader2, Palette, Type, RefreshCw,
-  Check, Eye
+  Check, Eye, FileText, Download
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
@@ -19,6 +19,7 @@ interface SiteSettings {
   font_family: string;
   heading_font: string;
   border_radius: string;
+  resume_pdf_link?: string;
   updated_at?: string;
 }
 
@@ -126,6 +127,7 @@ export default function SettingsPage() {
             font_family: settings.font_family,
             heading_font: settings.heading_font,
             border_radius: settings.border_radius,
+            resume_pdf_link: settings.resume_pdf_link || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', settings.id);
@@ -141,7 +143,8 @@ export default function SettingsPage() {
             text_color: settings.text_color,
             font_family: settings.font_family,
             heading_font: settings.heading_font,
-            border_radius: settings.border_radius
+            border_radius: settings.border_radius,
+            resume_pdf_link: settings.resume_pdf_link || null
           });
 
         if (error) throw error;
@@ -421,6 +424,49 @@ export default function SettingsPage() {
                     {option.label}
                   </button>
                 ))}
+              </div>
+            </motion.div>
+
+            {/* Resume PDF Link */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-slate-900/60 border border-white/5 rounded-2xl p-6"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <FileText className="text-[#2ecc71]" size={24} />
+                <h2 className="text-xl font-bold text-white">Resume PDF Link</h2>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    PDF Download Link
+                  </label>
+                  <div className="flex gap-3">
+                    <input
+                      type="url"
+                      value={settings.resume_pdf_link || ''}
+                      onChange={(e) => setSettings({ ...settings, resume_pdf_link: e.target.value })}
+                      placeholder="https://drive.google.com/file/d/your-file-id/view"
+                      className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#2ecc71]/50"
+                    />
+                    {settings.resume_pdf_link && (
+                      <a
+                        href={settings.resume_pdf_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-3 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-xl text-[#2ecc71] font-bold hover:bg-[#2ecc71]/20 transition-all"
+                      >
+                        <Eye size={18} />
+                        Preview
+                      </a>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    💡 Tip: Upload your PDF to Google Drive, get shareable link, or use any direct PDF URL
+                  </p>
+                </div>
               </div>
             </motion.div>
           </div>

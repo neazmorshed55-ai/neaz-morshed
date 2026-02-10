@@ -581,6 +581,7 @@ export default function ResumePage() {
   const [expandedExp, setExpandedExp] = useState<string | null>(null);
   const [expandedEdu, setExpandedEdu] = useState<string | null>(null);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+  const [resumePdfLink, setResumePdfLink] = useState<string>('#');
 
   const personalInfo = {
     name: "NEAZ MD. MORSHED",
@@ -591,8 +592,6 @@ export default function ResumePage() {
     linkedin: "linkedin.com/in/neazmorshed222",
     portfolio: "neaz.pro"
   };
-
-  const pdfUrl = "https://drive.google.com/uc?export=download&id=1rouYADSZdqaNf74U341XElF_0H57tqtu";
 
   useEffect(() => {
     async function fetchData() {
@@ -637,7 +636,7 @@ export default function ResumePage() {
         const { data: statsData } = await supabase
           .from('resume_stats')
           .select('*')
-          .order('order_index', { ascending: true });
+          .order('order_index', { ascending: true});
         if (statsData && statsData.length > 0) {
           const statsArray = statsData.map((stat: Stat) => ({
             label: stat.label,
@@ -645,6 +644,15 @@ export default function ResumePage() {
             icon: stat.icon
           }));
           setAchievements(statsArray);
+        }
+
+        // Fetch resume PDF link from settings
+        const { data: settingsData } = await supabase
+          .from('settings')
+          .select('resume_pdf_link')
+          .single();
+        if (settingsData?.resume_pdf_link) {
+          setResumePdfLink(settingsData.resume_pdf_link);
         }
       } catch (error) {
         console.error('Error fetching resume data:', error);
@@ -744,7 +752,7 @@ export default function ResumePage() {
                 </div>
               </div>
               <motion.a
-                href={pdfUrl}
+                href={resumePdfLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
@@ -1129,7 +1137,7 @@ export default function ResumePage() {
           >
             <p className="text-slate-400 mb-6 text-lg">Get a copy of my complete resume</p>
             <motion.a
-              href={pdfUrl}
+              href={resumePdfLink}
               target="_blank"
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}

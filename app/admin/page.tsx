@@ -93,10 +93,10 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
-    { name: 'Add Service', href: '/admin/services/new', icon: Briefcase },
-    { name: 'Add Experience', href: '/admin/experience/new', icon: Award },
-    { name: 'Add Review', href: '/admin/reviews/new', icon: MessageSquare },
-    { name: 'Add Skill', href: '/admin/skills/new', icon: Wrench },
+    { name: 'Add Service', href: '/admin/services', icon: Briefcase },
+    { name: 'Add Experience', href: '/admin/experience', icon: Award },
+    { name: 'Add Review', href: '/admin/reviews', icon: MessageSquare },
+    { name: 'Add Skill', href: '/admin/skills', icon: Wrench },
     { name: 'Add Blog Post', href: '/admin/blog', icon: BookOpen },
   ];
 
