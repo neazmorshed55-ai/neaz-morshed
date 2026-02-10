@@ -301,56 +301,62 @@ function AdminResumePage() {
         </div>
 
         {/* Additional Management Links */}
-        <div className="mt-8 grid md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <a
-            href="/admin/resume/experiences"
-            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
-          >
-            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
-              Experiences
-            </div>
-            <p className="text-sm text-slate-400">Manage work history</p>
-          </a>
+        <div className="mt-8 space-y-4">
+          {/* First Row - 3 Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a
+              href="/admin/resume/experiences"
+              className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+            >
+              <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+                Experiences
+              </div>
+              <p className="text-sm text-slate-400">Manage work history</p>
+            </a>
 
-          <a
-            href="/admin/resume/education"
-            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
-          >
-            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
-              Education
-            </div>
-            <p className="text-sm text-slate-400">Manage education history</p>
-          </a>
+            <a
+              href="/admin/resume/education"
+              className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+            >
+              <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+                Education
+              </div>
+              <p className="text-sm text-slate-400">Manage education history</p>
+            </a>
 
-          <a
-            href="/admin/resume/certifications"
-            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
-          >
-            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
-              Certifications
-            </div>
-            <p className="text-sm text-slate-400">Manage certifications</p>
-          </a>
+            <a
+              href="/admin/resume/certifications"
+              className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+            >
+              <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+                Certifications
+              </div>
+              <p className="text-sm text-slate-400">Manage certifications</p>
+            </a>
+          </div>
 
-          <a
-            href="/admin/resume/skills"
-            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
-          >
-            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
-              Skills
-            </div>
-            <p className="text-sm text-slate-400">Skills & expertise</p>
-          </a>
+          {/* Second Row - 2 Cards (Centered) */}
+          <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+            <a
+              href="/admin/resume/skills"
+              className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+            >
+              <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+                Skills
+              </div>
+              <p className="text-sm text-slate-400">Skills & expertise</p>
+            </a>
 
-          <a
-            href="/admin/resume/stats"
-            className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
-          >
-            <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
-              Stats
-            </div>
-            <p className="text-sm text-slate-400">Achievement statistics</p>
-          </a>
+            <a
+              href="/admin/resume/stats"
+              className="p-6 bg-slate-900/60 border border-white/10 rounded-xl hover:border-[#2ecc71]/30 transition-all text-center group"
+            >
+              <div className="text-2xl font-black text-white mb-2 group-hover:text-[#2ecc71] transition-colors">
+                Stats
+              </div>
+              <p className="text-sm text-slate-400">Achievement statistics</p>
+            </a>
+          </div>
         </div>
       </div>
     </div>
