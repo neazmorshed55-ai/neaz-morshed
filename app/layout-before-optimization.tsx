@@ -3,16 +3,9 @@ import React from 'react';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
-import dynamic from 'next/dynamic';
 import VisitorTracker from '../components/VisitorTracker';
-
-// Lazy load heavy components to improve initial page load
-const WhatsAppButton = dynamic(() => import('../components/WhatsAppButton'), {
-  ssr: false,
-});
-const AIChatbot = dynamic(() => import('../components/AIChatbot'), {
-  ssr: false,
-});
+import WhatsAppButton from '../components/WhatsAppButton';
+import AIChatbot from '../components/AIChatbot';
 
 // Optimized font loading - preloads and serves locally
 const inter = Inter({

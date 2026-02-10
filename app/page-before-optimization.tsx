@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Database, Target, Layout } from 'lucide-react';
+import { Briefcase, Database, Target, Layout, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
 import {
@@ -34,6 +34,7 @@ const defaultHero = {
 };
 
 export default function HomePage() {
+  const [loading, setLoading] = useState(true);
   const [heroContent, setHeroContent] = useState(defaultHero);
   const [skills, setSkills] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
@@ -41,55 +42,58 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch all data in parallel for faster loading
-        const [heroResponse, skillsResult, servicesResult] = await Promise.all([
-          fetch('/api/homepage', {
-            next: { revalidate: 300 } // Cache for 5 minutes
-          }),
-          supabase
-            ? supabase
-                .from('skills')
-                .select('*')
-                .order('order_index', { ascending: true })
-                .limit(6)
-            : Promise.resolve({ data: null }),
-          supabase
-            ? supabase
-                .from('services')
-                .select('*')
-                .order('order_index', { ascending: true })
-            : Promise.resolve({ data: null })
-        ]);
+        // Fetch Hero Content from API route (with no-cache)
+        const heroResponse = await fetch('/api/homepage', {
+          cache: 'no-store',
+          headers: { 'Pragma': 'no-cache' }
+        });
 
-        // Process hero data
         if (heroResponse.ok) {
           const heroData = await heroResponse.json();
+          console.log('Fetched hero data from API:', heroData);
           if (heroData && !heroData.error) {
             setHeroContent(heroData);
           }
+        } else {
+          console.error('Failed to fetch hero data:', heroResponse.status, heroResponse.statusText);
         }
 
-        // Process skills data
-        if (skillsResult.data) {
-          setSkills(skillsResult.data.map(s => ({
-            name: s.name,
-            level: s.proficiency
-          })));
-        }
+        // Fetch Skills (Top 6 by order) - using supabase for now
+        if (supabase) {
+          const { data: skillsData } = await supabase
+            .from('skills')
+            .select('*')
+            .order('order_index', { ascending: true })
+            .limit(6);
 
-        // Process services data
-        if (servicesResult.data) {
-          setServices(servicesResult.data.map(s => ({
-            id: s.id,
-            title: s.title,
-            slug: s.slug,
-            icon: getIcon(s.icon),
-            desc: s.description
-          })));
+          if (skillsData) {
+            setSkills(skillsData.map(s => ({
+              name: s.name,
+              level: s.proficiency
+            })));
+          }
+
+          // Fetch Services
+          const { data: servicesData } = await supabase
+            .from('services')
+            .select('*')
+            .order('order_index', { ascending: true });
+
+          if (servicesData) {
+            setServices(servicesData.map(s => ({
+              id: s.id,
+              title: s.title,
+              slug: s.slug,
+              icon: getIcon(s.icon),
+              desc: s.description
+            })));
+          }
         }
 
       } catch (error) {
         console.error('Error fetching homepage data:', error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -107,6 +111,14 @@ export default function HomePage() {
       default: return <Briefcase {...props} />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="bg-[#0b0f1a] min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-[#2ecc71] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#0b0f1a] text-white selection:bg-[#2ecc71] selection:text-slate-900 min-h-screen">
