@@ -538,7 +538,7 @@ const defaultCertifications: Certification[] = [
   }
 ];
 
-const skills = {
+const defaultSkills = {
   'Modern Web Stack': ['Next.js', 'Node.js', 'Supabase (Database & Auth)', 'Vercel (Deployment)', 'React'],
   'Full-Stack Workflow': ['Building scalable web applications', 'API integration', 'Cloud databases'],
   'Administrative & VA': ['Administrative Support', 'Task Management', 'Email & Calendar Management', 'Database Management'],
@@ -548,10 +548,34 @@ const skills = {
   'AI & Automation': ['GenSpark AI', 'ChatGPT', 'DALL-E', 'Eleven Labs', 'Midjourney', 'RunwayML', 'Pictory AI', 'Vizard.ai']
 };
 
+interface Stat {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+  order_index: number;
+}
+
+interface SkillCategory {
+  id: string;
+  category: string;
+  skills: string[];
+  order_index: number;
+}
+
+const defaultAchievements = [
+  { label: 'Job Success', value: '100%', icon: 'Zap' },
+  { label: 'Hours Completed', value: '5,000+', icon: 'Sparkles' },
+  { label: 'Global Clients', value: '180+', icon: 'Globe' },
+  { label: 'Years Experience', value: '12+', icon: 'Briefcase' }
+];
+
 export default function ResumePage() {
   const [experiences, setExperiences] = useState<Experience[]>(defaultExperiences);
   const [education, setEducation] = useState<Education[]>(defaultEducation);
   const [certifications, setCertifications] = useState<Certification[]>(defaultCertifications);
+  const [skills, setSkills] = useState<Record<string, string[]>>(defaultSkills);
+  const [achievements, setAchievements] = useState(defaultAchievements);
   const [activeTab, setActiveTab] = useState<'full-time' | 'part-time' | 'project'>('full-time');
   const [expandedExp, setExpandedExp] = useState<string | null>(null);
   const [expandedEdu, setExpandedEdu] = useState<string | null>(null);
@@ -574,23 +598,53 @@ export default function ResumePage() {
       if (!supabase) return;
 
       try {
+        // Fetch experiences
         const { data: expData } = await supabase
           .from('resume_experiences')
           .select('*')
           .order('order_index', { ascending: true });
         if (expData && expData.length > 0) setExperiences(expData);
 
+        // Fetch education
         const { data: eduData } = await supabase
           .from('resume_education')
           .select('*')
           .order('order_index', { ascending: true });
         if (eduData && eduData.length > 0) setEducation(eduData);
 
+        // Fetch certifications
         const { data: certData } = await supabase
           .from('resume_certifications')
           .select('*')
           .order('order_index', { ascending: true });
         if (certData && certData.length > 0) setCertifications(certData);
+
+        // Fetch skills
+        const { data: skillsData } = await supabase
+          .from('resume_skills')
+          .select('*')
+          .order('order_index', { ascending: true });
+        if (skillsData && skillsData.length > 0) {
+          const skillsObj: Record<string, string[]> = {};
+          skillsData.forEach((item: SkillCategory) => {
+            skillsObj[item.category] = item.skills;
+          });
+          setSkills(skillsObj);
+        }
+
+        // Fetch stats
+        const { data: statsData } = await supabase
+          .from('resume_stats')
+          .select('*')
+          .order('order_index', { ascending: true });
+        if (statsData && statsData.length > 0) {
+          const statsArray = statsData.map((stat: Stat) => ({
+            label: stat.label,
+            value: stat.value,
+            icon: stat.icon
+          }));
+          setAchievements(statsArray);
+        }
       } catch (error) {
         console.error('Error fetching resume data:', error);
       }
@@ -601,12 +655,15 @@ export default function ResumePage() {
 
   const filteredExperiences = experiences.filter(exp => exp.type === activeTab);
 
-  const achievements = [
-    { label: 'Job Success', value: '100%', icon: <Zap size={20} /> },
-    { label: 'Hours Completed', value: '5,000+', icon: <Sparkles size={20} /> },
-    { label: 'Global Clients', value: '180+', icon: <Globe size={20} /> },
-    { label: 'Years Experience', value: '12+', icon: <Briefcase size={20} /> }
-  ];
+  const getIcon = (iconName: string) => {
+    const iconMap: Record<string, any> = {
+      'Zap': <Zap size={20} />,
+      'Sparkles': <Sparkles size={20} />,
+      'Globe': <Globe size={20} />,
+      'Briefcase': <Briefcase size={20} />
+    };
+    return iconMap[iconName] || <Sparkles size={20} />;
+  };
 
   return (
     <div className="bg-[#0b0f1a] text-white min-h-screen">
@@ -711,7 +768,7 @@ export default function ResumePage() {
                 className="p-3 sm:p-4 md:p-5 bg-slate-900/60 rounded-xl sm:rounded-2xl text-center border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
               >
                 <div className="flex justify-center mb-2 text-[#2ecc71] group-hover:scale-110 transition-transform">
-                  {stat.icon}
+                  {getIcon(stat.icon)}
                 </div>
                 <div className="text-xl sm:text-2xl font-black text-[#2ecc71]">{stat.value}</div>
                 <div className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider mt-1">{stat.label}</div>
