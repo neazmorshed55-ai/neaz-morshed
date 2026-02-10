@@ -230,9 +230,9 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                         transition={{ delay: 0.3 }}
                         className="prose prose-invert max-w-none
                             prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-headings:text-white
-                            prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12 prose-h1:leading-tight
-                            prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:mb-5 prose-h2:mt-10 prose-h2:border-l-4 prose-h2:border-[#2ecc71] prose-h2:pl-5 prose-h2:bg-gradient-to-r prose-h2:from-[#2ecc71]/5 prose-h2:to-transparent prose-h2:py-3 prose-h2:rounded-r-xl prose-h2:leading-tight
-                            prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-snug
+                            prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12 prose-h1:leading-tight prose-h1:font-black
+                            prose-h2:text-[28px] md:prose-h2:text-[36px] prose-h2:mb-6 prose-h2:mt-12 prose-h2:border-l-[6px] prose-h2:border-[#2ecc71] prose-h2:pl-6 prose-h2:bg-gradient-to-r prose-h2:from-[#2ecc71]/10 prose-h2:to-transparent prose-h2:py-4 prose-h2:rounded-r-xl prose-h2:leading-tight prose-h2:font-black
+                            prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-snug prose-h3:font-bold
                             prose-h4:text-lg md:prose-h4:text-xl prose-h4:text-slate-300 prose-h4:mb-3 prose-h4:mt-6
                             prose-p:text-slate-300 prose-p:leading-[1.8] prose-p:mb-5 prose-p:text-[17px] md:prose-p:text-[18px] prose-p:font-normal
                             prose-strong:text-[#2ecc71] prose-strong:font-semibold
