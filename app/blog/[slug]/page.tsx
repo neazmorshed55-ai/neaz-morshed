@@ -229,12 +229,12 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                         className="prose prose-invert max-w-none
-                            prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-headings:text-white
-                            prose-h1:text-3xl md:prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12 prose-h1:leading-tight prose-h1:font-black
-                            prose-h2:text-[28px] md:prose-h2:text-[36px] prose-h2:mb-6 prose-h2:mt-12 prose-h2:border-l-[6px] prose-h2:border-[#2ecc71] prose-h2:pl-6 prose-h2:bg-gradient-to-r prose-h2:from-[#2ecc71]/10 prose-h2:to-transparent prose-h2:py-4 prose-h2:rounded-r-xl prose-h2:leading-tight prose-h2:font-black
-                            prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-slate-200 prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-snug prose-h3:font-bold
-                            prose-h4:text-lg md:prose-h4:text-xl prose-h4:text-slate-300 prose-h4:mb-3 prose-h4:mt-6
-                            prose-p:text-slate-300 prose-p:leading-[1.8] prose-p:mb-5 prose-p:text-[17px] md:prose-p:text-[18px] prose-p:font-normal
+                            prose-headings:tracking-normal prose-headings:scroll-mt-24 prose-headings:text-white
+                            prose-h1:text-[32px] md:prose-h1:text-[40px] prose-h1:mb-6 prose-h1:mt-10 prose-h1:leading-[1.3] prose-h1:font-black
+                            prose-h2:text-[26px] md:prose-h2:text-[32px] prose-h2:mb-5 prose-h2:mt-10 prose-h2:leading-[1.4] prose-h2:font-bold prose-h2:border-none prose-h2:pl-0 prose-h2:bg-transparent prose-h2:py-0
+                            prose-h3:text-[22px] md:prose-h3:text-[26px] prose-h3:text-white prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-[1.4] prose-h3:font-semibold
+                            prose-h4:text-[19px] md:prose-h4:text-[22px] prose-h4:text-white prose-h4:mb-3 prose-h4:mt-6 prose-h4:font-semibold
+                            prose-p:text-slate-300 prose-p:leading-[1.75] prose-p:mb-5 prose-p:text-[17px] md:prose-p:text-[18px] prose-p:font-normal
                             prose-strong:text-[#2ecc71] prose-strong:font-semibold
                             prose-em:text-slate-400 prose-em:italic
                             prose-a:text-[#2ecc71] prose-a:no-underline prose-a:font-medium hover:prose-a:underline prose-a:transition-all
