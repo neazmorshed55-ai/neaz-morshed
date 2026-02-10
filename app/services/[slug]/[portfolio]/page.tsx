@@ -795,13 +795,13 @@ export default function PortfolioDetailPage() {
 
               if (isRegularImage) {
                 return (
-                  <div className="relative w-full h-[80vh] flex items-center justify-center">
+                  <div className="relative w-full max-w-6xl mx-auto" style={{ height: 'calc(100vh - 140px)' }}>
                     <Image
                       src={item.url}
                       alt={item.alt_text || 'Gallery image'}
                       fill
                       className="object-contain"
-                      sizes="100vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 80vw"
                       priority
                     />
                   </div>
