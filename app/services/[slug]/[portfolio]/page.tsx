@@ -798,8 +798,8 @@ export default function PortfolioDetailPage() {
 
               if (isRegularImage) {
                 return (
-                  <div className="flex items-center justify-center">
-                    <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-white/10">
+                  <div className="flex items-center justify-center w-full h-[85vh]">
+                    <div className="relative aspect-video h-[80vh] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
                       <Image
                         src={item.url}
                         alt={item.alt_text || 'Gallery image'}
@@ -889,8 +889,14 @@ export default function PortfolioDetailPage() {
             {/* Caption - Only show if alt_text exists and is not a filename */}
             {(() => {
               const altText = galleryItems[selectedGalleryIndex].alt_text;
-              // Check if alt_text is not a filename (doesn't end with common image/file extensions)
-              const isFilename = altText && /\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx)$/i.test(altText);
+              // Check if alt_text is not a filename
+              // Patterns: ends with extension, contains file path separators, or looks like a URL path
+              const isFilename = altText && (
+                /\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|xls|xlsx|ppt|pptx|mp4|mov|avi|webm)$/i.test(altText) ||
+                /[\/\\]/.test(altText) || // Contains path separators
+                /^(image|img|photo|picture|file|document)[-_\s]*\d+/i.test(altText) || // Generic names like "image_1", "photo-001"
+                /^\d+\.(jpg|jpeg|png)/i.test(altText) // Starts with numbers like "123.jpg"
+              );
               return altText && !isFilename && altText.trim() !== '' && (
                 <p className="text-white text-center mt-4 text-lg font-medium">
                   {altText}
