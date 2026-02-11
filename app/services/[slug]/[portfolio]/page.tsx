@@ -874,11 +874,11 @@ export default function PortfolioDetailPage() {
 
               // For videos and reels - use bounded container with appropriate aspect ratio
               return (
-                <div className="flex items-center justify-center">
-                  <div className={`relative bg-black rounded-2xl overflow-hidden border border-white/10 ${
+                <div className="flex items-center justify-center w-full h-[85vh]">
+                  <div className={`relative bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl ${
                     isVerticalVideo
-                      ? 'aspect-[9/16] max-w-[450px] w-full'
-                      : 'aspect-video w-full max-w-5xl'
+                      ? 'aspect-[9/16] h-[80vh]'
+                      : 'aspect-video w-[85vw] max-w-5xl'
                   }`}>
                     <SocialEmbed url={item.url} className="w-full h-full" />
                   </div>
