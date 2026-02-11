@@ -582,18 +582,49 @@ export default function ResumePage() {
   const [expandedEdu, setExpandedEdu] = useState<string | null>(null);
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const [resumePdfLink, setResumePdfLink] = useState<string>('https://drive.usercontent.google.com/u/0/uc?id=1D5RuRCHvdkI-u-sWTo8BOCiXh_PwDWe9&export=download');
-
-  const personalInfo = {
+  const [personalInfo, setPersonalInfo] = useState({
     name: "NEAZ MD. MORSHED",
     title: "VIRTUAL ASSISTANT",
-    // Contact info hidden as per request
-  };
+    email: "",
+    phone: "",
+    location: "",
+    linkedin_url: "",
+    upwork_url: "",
+    fiverr_url: "",
+    portfolio_url: "",
+    pdf_download_url: ""
+  });
 
   useEffect(() => {
     async function fetchData() {
       if (!supabase) return;
 
       try {
+        // Fetch personal info from resume_settings
+        const { data: resumeSettingsData } = await supabase
+          .from('resume_settings')
+          .select('*')
+          .limit(1)
+          .single();
+        if (resumeSettingsData) {
+          setPersonalInfo({
+            name: resumeSettingsData.name || "NEAZ MD. MORSHED",
+            title: resumeSettingsData.title || "VIRTUAL ASSISTANT",
+            email: resumeSettingsData.email || "",
+            phone: resumeSettingsData.phone || "",
+            location: resumeSettingsData.location || "",
+            linkedin_url: resumeSettingsData.linkedin_url || "",
+            upwork_url: resumeSettingsData.upwork_url || "",
+            fiverr_url: resumeSettingsData.fiverr_url || "",
+            portfolio_url: resumeSettingsData.portfolio_url || "",
+            pdf_download_url: resumeSettingsData.pdf_download_url || ""
+          });
+          // Also update resume PDF link if available
+          if (resumeSettingsData.pdf_download_url) {
+            setResumePdfLink(resumeSettingsData.pdf_download_url);
+          }
+        }
+
         // Fetch experiences
         const { data: expData } = await supabase
           .from('resume_experiences')
