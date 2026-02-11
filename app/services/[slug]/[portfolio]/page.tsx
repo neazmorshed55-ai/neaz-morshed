@@ -793,17 +793,22 @@ export default function PortfolioDetailPage() {
               const isGoogleDriveDocument = isGoogleDriveUrl(item.url);
               const isCanvaDesign = isCanvaUrl(item.url);
 
+              // Check if content is vertical (reels/shorts/TikTok)
+              const isVerticalVideo = isVerticalContent(item.url);
+
               if (isRegularImage) {
                 return (
-                  <div className="relative w-full h-[80vh] flex items-center justify-center">
-                    <Image
-                      src={item.url}
-                      alt={item.alt_text || 'Gallery image'}
-                      fill
-                      className="object-contain"
-                      sizes="100vw"
-                      priority
-                    />
+                  <div className="flex items-center justify-center">
+                    <div className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden border border-white/10">
+                      <Image
+                        src={item.url}
+                        alt={item.alt_text || 'Gallery image'}
+                        fill
+                        className="object-contain"
+                        sizes="100vw"
+                        priority
+                      />
+                    </div>
                   </div>
                 );
               }
@@ -867,8 +872,17 @@ export default function PortfolioDetailPage() {
                 );
               }
 
+              // For videos and reels - use bounded container with appropriate aspect ratio
               return (
-                <SocialEmbed url={item.url} className="rounded-2xl shadow-2xl w-full mx-auto" />
+                <div className="flex items-center justify-center">
+                  <div className={`relative bg-black rounded-2xl overflow-hidden border border-white/10 ${
+                    isVerticalVideo
+                      ? 'aspect-[9/16] max-w-[450px] w-full'
+                      : 'aspect-video w-full max-w-5xl'
+                  }`}>
+                    <SocialEmbed url={item.url} className="w-full h-full" />
+                  </div>
+                </div>
               );
             })()}
 
