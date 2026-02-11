@@ -583,15 +583,9 @@ export default function SkillDetailPage() {
                   <p className="text-slate-400 mb-4 text-sm">
                     Let&apos;s discuss your project and bring your vision to life.
                   </p>
-                  <p className="text-slate-500 mb-6 text-xs leading-relaxed italic border-l-2 border-[#2ecc71]/30 pl-4">
-                    I am sharing these links strictly as samples of my previous work. To ensure we follow Upwork&apos;s safety policies, please keep all of our communication and hiring here on the platform.
+                  <p className="text-slate-500 text-xs leading-relaxed italic border-l-2 border-[#2ecc71]/30 pl-4">
+                    I am sharing these links strictly as samples of my previous work. To ensure we follow Upwork&apos;s safety policies, please keep all of our communication and hiring on the upwork platform.
                   </p>
-                  <Link
-                    href="/#contact"
-                    className="block w-full text-center px-6 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
-                  >
-                    Get in Touch
-                  </Link>
                 </div>
               </div>
             </div>
