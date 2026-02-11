@@ -580,8 +580,11 @@ export default function SkillDetailPage() {
                 {/* Quick Contact */}
                 <div className="p-8 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-3xl">
                   <h3 className="text-xl font-black uppercase tracking-tight mb-4">Ready to Start?</h3>
-                  <p className="text-slate-400 mb-6 text-sm">
+                  <p className="text-slate-400 mb-4 text-sm">
                     Let&apos;s discuss your project and bring your vision to life.
+                  </p>
+                  <p className="text-slate-500 mb-6 text-xs leading-relaxed italic border-l-2 border-[#2ecc71]/30 pl-4">
+                    I am sharing these links strictly as samples of my previous work. To ensure we follow Upwork&apos;s safety policies, please keep all of our communication and hiring here on the platform.
                   </p>
                   <Link
                     href="/#contact"
