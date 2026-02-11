@@ -703,30 +703,15 @@ export default function PortfolioDetailPage() {
                 </div>
               )}
 
-              {/* Project Link */}
-              {portfolio.project_url && (
-                <a
-                  href={portfolio.project_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full px-8 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
-                >
-                  View Live Project <ExternalLink size={18} />
-                </a>
-              )}
-
               {/* CTA */}
               <div className="p-8 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-3xl">
-                <h3 className="text-xl font-black uppercase tracking-tight mb-4">Want Similar Work?</h3>
-                <p className="text-slate-400 mb-6 text-sm">
-                  I can create custom solutions tailored to your specific needs. Let&apos;s discuss your project!
+                <h3 className="text-xl font-black uppercase tracking-tight mb-4">Ready to Start?</h3>
+                <p className="text-slate-400 mb-4 text-sm">
+                  Let&apos;s discuss your project and bring your vision to life.
                 </p>
-                <Link
-                  href="mailto:neazmd.tamim@gmail.com"
-                  className="block w-full text-center px-6 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
-                >
-                  Get in Touch
-                </Link>
+                <p className="text-slate-500 text-xs leading-relaxed italic border-l-2 border-[#2ecc71]/30 pl-4">
+                  I am sharing these links strictly as samples of my previous work. To ensure we follow Upwork&apos;s safety policies, please keep all of our communication and hiring on the upwork platform.
+                </p>
               </div>
             </div>
           </div>
@@ -878,7 +863,7 @@ export default function PortfolioDetailPage() {
             {(() => {
               const altText = galleryItems[selectedGalleryIndex].alt_text;
               // Check if alt_text is not a filename (doesn't end with common image/file extensions)
-              const isFilename = altText && /\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx)$/i.test(altText);
+              const isFilename = altText && /\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx|mp4|mov|avi|mkv)$/i.test(altText);
               return altText && !isFilename && altText.trim() !== '' && (
                 <p className="text-white text-center mt-4 text-lg font-medium">
                   {altText}

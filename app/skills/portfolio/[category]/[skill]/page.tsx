@@ -686,12 +686,17 @@ export default function SkillDetailPage() {
                 );
               })()}
 
-              {/* Caption */}
-              {galleryItems[selectedGalleryIndex].alt_text && (
-                <p className="text-white text-center mt-4 text-lg font-medium">
-                  {galleryItems[selectedGalleryIndex].alt_text}
-                </p>
-              )}
+              {/* Caption - Only show if alt_text exists and is not a filename */}
+              {(() => {
+                const altText = galleryItems[selectedGalleryIndex].alt_text;
+                // Check if alt_text is not a filename (doesn't end with common image/file extensions)
+                const isFilename = altText && /\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx|mp4|mov|avi|mkv)$/i.test(altText);
+                return altText && !isFilename && altText.trim() !== '' && (
+                  <p className="text-white text-center mt-4 text-lg font-medium">
+                    {altText}
+                  </p>
+                );
+              })()}
 
               {/* Counter */}
               <p className="text-slate-400 text-center mt-2 text-sm">
