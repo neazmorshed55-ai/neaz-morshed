@@ -583,15 +583,17 @@ export default function ResumePage() {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
   const [resumePdfLink, setResumePdfLink] = useState<string>('https://drive.usercontent.google.com/u/0/uc?id=1D5RuRCHvdkI-u-sWTo8BOCiXh_PwDWe9&export=download');
 
-  const personalInfo = {
+  const [personalInfo, setPersonalInfo] = useState({
     name: "NEAZ MD. MORSHED",
     title: "Digital Asset Builder | AI Implementation Engineer",
     email: "contact@neazmdmorshed.com",
     phone: "+8801775939996",
     location: "Bashundhara R/A, Dhaka, Bangladesh",
     linkedin: "linkedin.com/in/neazmorshed222",
-    portfolio: "neaz.pro"
-  };
+    portfolio: "neaz.pro",
+    upwork: "https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3",
+    fiverr: "https://www.fiverr.com/neaz222"
+  });
 
   useEffect(() => {
     async function fetchData() {
@@ -653,6 +655,29 @@ export default function ResumePage() {
           .single();
         if (settingsData?.resume_pdf_link) {
           setResumePdfLink(settingsData.resume_pdf_link);
+        }
+
+        // Fetch personal information from resume_settings
+        const { data: resumeSettingsData } = await supabase
+          .from('resume_settings')
+          .select('*')
+          .limit(1)
+          .single();
+        if (resumeSettingsData) {
+          setPersonalInfo({
+            name: resumeSettingsData.name || "NEAZ MD. MORSHED",
+            title: resumeSettingsData.title || "Digital Asset Builder | AI Implementation Engineer",
+            email: resumeSettingsData.email || "contact@neazmdmorshed.com",
+            phone: resumeSettingsData.phone || "+8801775939996",
+            location: resumeSettingsData.location || "Bashundhara R/A, Dhaka, Bangladesh",
+            linkedin: resumeSettingsData.linkedin_url || "linkedin.com/in/neazmorshed222",
+            portfolio: resumeSettingsData.portfolio_url || "neaz.pro",
+            upwork: resumeSettingsData.upwork_url || "https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3",
+            fiverr: resumeSettingsData.fiverr_url || "https://www.fiverr.com/neaz222"
+          });
+          if (resumeSettingsData.pdf_download_url) {
+            setResumePdfLink(resumeSettingsData.pdf_download_url);
+          }
         }
       } catch (error) {
         console.error('Error fetching resume data:', error);
@@ -741,11 +766,11 @@ export default function ResumePage() {
                     <span>LinkedIn</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
-                  <a href="https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
+                  <a href={personalInfo.upwork} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
                     <span>Upwork</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
-                  <a href="https://www.fiverr.com/neaz222" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
+                  <a href={personalInfo.fiverr} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-colors text-sm group">
                     <span>Fiverr</span>
                     <ExternalLink size={10} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </a>
