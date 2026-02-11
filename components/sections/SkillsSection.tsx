@@ -15,7 +15,7 @@ interface SkillsSectionProps {
 
 export default function SkillsSection({ skills }: SkillsSectionProps) {
   return (
-    <section id="skills" className="py-16 sm:py-24 lg:py-32 bg-slate-900/10">
+    <section id="skills" className="py-8 sm:py-12 lg:py-16 bg-slate-900/10">
       <Container>
         <SectionHeader
           subtitle="Expertise"

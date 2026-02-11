@@ -20,7 +20,7 @@ interface ServicesSectionProps {
 
 export default function ServicesSection({ services }: ServicesSectionProps) {
   return (
-    <section id="services" className="py-12 sm:py-16 lg:py-20 relative">
+    <section id="services" className="py-6 sm:py-8 lg:py-10 relative">
       <Container>
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 sm:mb-24 gap-8 lg:gap-12">
           <div className="max-w-3xl">

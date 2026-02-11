@@ -23,7 +23,7 @@ interface ExperienceSectionProps {
 
 export default function ExperienceSection({ experiences }: ExperienceSectionProps) {
   return (
-    <section id="experience" className="py-12 sm:py-16 lg:py-20 relative">
+    <section id="experience" className="py-6 sm:py-8 lg:py-10 relative">
       <Container>
         <div className="mb-16 sm:mb-24">
           <SectionHeader
