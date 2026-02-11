@@ -96,7 +96,7 @@ export default function SocialEmbed({ url, className = '' }: SocialEmbedProps) {
     return () => clearTimeout(timer);
   }, [url]);
 
-  const aspectClass = isVerticalContent(url) ? 'aspect-[9/16] max-w-[400px] mx-auto' : 'aspect-video';
+  const aspectClass = isVerticalContent(url) ? 'aspect-[9/16] max-w-[400px] max-h-[80vh] mx-auto' : 'aspect-video';
 
   // YouTube Embed
   if (isYouTubeUrl(url)) {
