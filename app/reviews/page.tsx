@@ -312,15 +312,11 @@ export default function ReviewsPage() {
                       <h4 className="font-black text-white">{review.client_name}</h4>
                       {review.country_code && (
                         <div className="flex items-center gap-1.5 mt-1 mb-2">
-                          <Image
-                            src={getFlagUrl(review.country_code)}
-                            alt={review.country_name || ''}
-                            width={20}
-                            height={15}
-                            className="rounded-sm"
-                          />
+                          <span className="text-lg leading-none" title={review.country_name || ""}>
+                            {getFlagUrl(review.country_code)}
+                          </span>
                           <span className="text-[11px] text-slate-400">
-                            {review.city ? `${review.city}, ` : ''}{review.country_name}
+                            {review.city ? `${review.city}, ` : ""}{review.country_name}
                           </span>
                         </div>
                       )}
