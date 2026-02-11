@@ -878,7 +878,7 @@ export default function PortfolioDetailPage() {
                   <div className={`relative bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl ${
                     isVerticalVideo
                       ? 'aspect-[9/16] h-[80vh]'
-                      : 'aspect-video w-[85vw] max-w-5xl'
+                      : 'aspect-video h-[80vh]'
                   }`}>
                     <SocialEmbed url={item.url} className="w-full h-full" />
                   </div>
