@@ -868,7 +868,9 @@ export default function PortfolioDetailPage() {
               }
 
               return (
-                <SocialEmbed url={item.url} className="rounded-2xl shadow-2xl w-full mx-auto" />
+                <div className="w-full max-h-[60vh] flex items-center justify-center">
+                  <SocialEmbed url={item.url} className="rounded-2xl shadow-2xl max-w-4xl w-full" />
+                </div>
               );
             })()}
 
