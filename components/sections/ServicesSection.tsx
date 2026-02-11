@@ -25,8 +25,8 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-16 sm:mb-24 gap-8 lg:gap-12">
           <div className="max-w-3xl">
             <SectionHeader
-              subtitle="Our Solutions"
-              title="High-Impact Business Services"
+              subtitle="What I Offer"
+              title="Services"
               align="left"
             />
           </div>
@@ -80,6 +80,26 @@ export default function ServicesSection({ services }: ServicesSectionProps) {
             </Link>
           ))}
         </div>
+
+        {/* See More Services Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex justify-center mt-12 sm:mt-16"
+        >
+          <Link href="/services">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-3 px-8 sm:px-12 py-4 sm:py-5 bg-[#2ecc71] text-slate-950 font-black rounded-2xl shadow-xl shadow-[#2ecc71]/30 uppercase tracking-wider text-sm sm:text-base hover:shadow-[#2ecc71]/50 transition-all"
+            >
+              See More Services
+              <ArrowRight size={20} />
+            </motion.button>
+          </Link>
+        </motion.div>
       </Container>
     </section>
   );

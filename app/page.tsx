@@ -8,6 +8,7 @@ import {
   HeroSection,
   SkillsSection,
   ServicesSection,
+  ExperienceSection,
   ContactSection,
 } from '@/components/sections';
 import { supabase } from '@/lib/supabase';
@@ -38,6 +39,7 @@ export default function HomePage() {
   const [heroContent, setHeroContent] = useState(defaultHero);
   const [skills, setSkills] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
+  const [experiences, setExperiences] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -73,11 +75,12 @@ export default function HomePage() {
             })));
           }
 
-          // Fetch Services
+          // Fetch Services (Top 4)
           const { data: servicesData } = await supabase
             .from('services')
             .select('*')
-            .order('order_index', { ascending: true });
+            .order('order_index', { ascending: true })
+            .limit(4);
 
           if (servicesData) {
             setServices(servicesData.map(s => ({
@@ -87,6 +90,17 @@ export default function HomePage() {
               icon: getIcon(s.icon),
               desc: s.description
             })));
+          }
+
+          // Fetch Experiences (Top 4)
+          const { data: experiencesData } = await supabase
+            .from('experiences')
+            .select('*')
+            .order('order_index', { ascending: true })
+            .limit(4);
+
+          if (experiencesData) {
+            setExperiences(experiencesData);
           }
         }
 
@@ -137,6 +151,8 @@ export default function HomePage() {
         {skills.length > 0 && <SkillsSection skills={skills} />}
 
         {services.length > 0 && <ServicesSection services={services} />}
+
+        {experiences.length > 0 && <ExperienceSection experiences={experiences} />}
 
         <ContactSection />
       </main>
