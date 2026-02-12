@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
+import IPadShowcase from '@/components/IPadShowcase';
 import {
   HeroSection,
   SkillsSection,
@@ -139,6 +140,10 @@ export default function HomePage() {
         />
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
+
+        {/* iPad Portfolio Showcase */}
+        <IPadShowcase />
+
         {/* Services Section - Inline */}
         {services.length > 0 && (
           <section className="py-16 sm:py-24 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a]">
