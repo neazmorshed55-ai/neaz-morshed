@@ -95,7 +95,7 @@ export default function IPadShowcase() {
 
   return (
     <section
-      className="py-24 sm:py-32 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a] overflow-hidden relative"
+      className="py-12 sm:py-16 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a] overflow-hidden relative"
       onMouseMove={handleMouseMove}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
@@ -104,7 +104,7 @@ export default function IPadShowcase() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-8"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             <span className="text-[#2ecc71]">Our</span> Projects
@@ -115,7 +115,7 @@ export default function IPadShowcase() {
         </motion.div>
 
         {/* iPad Showcase */}
-        <div className="relative min-h-[400px] sm:min-h-[500px] flex items-center justify-center perspective-[2000px]">
+        <div className="relative min-h-[320px] sm:min-h-[400px] flex items-center justify-center perspective-[2000px]">
           <AnimatePresence mode="wait">
             {!isZoomed ? (
               // Grid View - Multiple iPads
