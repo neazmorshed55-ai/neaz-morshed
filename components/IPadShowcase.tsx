@@ -95,7 +95,7 @@ export default function IPadShowcase() {
 
   return (
     <section
-      className="py-12 sm:py-16 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a] overflow-hidden relative"
+      className="pt-8 pb-12 sm:pt-11 sm:pb-16 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a] overflow-hidden relative"
       onMouseMove={handleMouseMove}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
