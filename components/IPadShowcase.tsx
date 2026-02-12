@@ -29,7 +29,7 @@ export default function IPadShowcase() {
           .from('portfolio_items')
           .select('*')
           .order('order_index', { ascending: true })
-          .limit(10);
+          .limit(12);
 
         if (error) throw error;
 
@@ -221,7 +221,7 @@ export default function IPadShowcase() {
                 }}
                 exit={{ opacity: 0, scale: 0.5, rotateY: 20, z: -500 }}
                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-slate-800"
+                className="relative w-full max-w-[540px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-slate-800"
                 style={{
                   transformStyle: 'preserve-3d',
                   boxShadow: '0 50px 100px -20px rgba(46, 204, 113, 0.3), 0 0 60px -15px rgba(39, 174, 96, 0.2)',
