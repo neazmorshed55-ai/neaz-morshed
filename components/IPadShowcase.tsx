@@ -115,7 +115,7 @@ export default function IPadShowcase() {
         </motion.div>
 
         {/* iPad Showcase */}
-        <div className="relative min-h-[600px] sm:min-h-[700px] flex items-center justify-center perspective-[2000px]">
+        <div className="relative min-h-[400px] sm:min-h-[500px] flex items-center justify-center perspective-[2000px]">
           <AnimatePresence mode="wait">
             {!isZoomed ? (
               // Grid View - Multiple iPads
@@ -125,7 +125,7 @@ export default function IPadShowcase() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.2 }}
                 transition={{ duration: 1, ease: "easeInOut" }}
-                className="grid grid-cols-3 sm:grid-cols-4 gap-4 sm:gap-6 w-full max-w-5xl"
+                className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl"
                 style={{
                   transformStyle: 'preserve-3d',
                 }}
@@ -159,7 +159,7 @@ export default function IPadShowcase() {
                         z: 50,
                         transition: { duration: 0.3 }
                       }}
-                      className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl bg-slate-900 border-4 border-slate-800"
+                      className="relative aspect-[4/3] rounded-md overflow-hidden shadow-xl bg-slate-900 border-2 border-slate-800"
                       style={{
                         transformStyle: 'preserve-3d',
                       }}
@@ -221,14 +221,14 @@ export default function IPadShowcase() {
                 }}
                 exit={{ opacity: 0, scale: 0.5, rotateY: 20, z: -500 }}
                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full max-w-4xl aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl bg-slate-900 border-8 border-slate-800"
+                className="relative w-full max-w-2xl aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-slate-800"
                 style={{
                   transformStyle: 'preserve-3d',
                   boxShadow: '0 50px 100px -20px rgba(46, 204, 113, 0.3), 0 0 60px -15px rgba(39, 174, 96, 0.2)',
                 }}
               >
                 {/* iPad Screen Bezel */}
-                <div className="absolute inset-2 bg-black rounded-xl overflow-hidden">
+                <div className="absolute inset-1 bg-black rounded-lg overflow-hidden">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={portfolioItems[currentIndex].id}
@@ -264,12 +264,12 @@ export default function IPadShowcase() {
                       )}
 
                       {/* Overlay Info */}
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6 sm:p-8">
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 sm:p-6">
                         <motion.h3
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.3 }}
-                          className="text-2xl sm:text-3xl font-bold text-white mb-2"
+                          className="text-xl sm:text-2xl font-bold text-white mb-2"
                         >
                           {portfolioItems[currentIndex].title}
                         </motion.h3>
@@ -294,7 +294,7 @@ export default function IPadShowcase() {
                 </div>
 
                 {/* iPad Home Button */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-slate-950 border-2 border-slate-700 shadow-inner" />
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-slate-950 border-2 border-slate-700 shadow-inner" />
               </motion.div>
             )}
           </AnimatePresence>
