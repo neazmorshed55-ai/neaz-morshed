@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Briefcase, Database, Target, Layout, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
+import PortfolioShowcase from '@/components/PortfolioShowcase';
 import {
   HeroSection,
   SkillsSection,
@@ -149,6 +150,9 @@ export default function HomePage() {
         />
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
+
+        {/* Portfolio Grid Showcase */}
+        <PortfolioShowcase />
 
         {services.length > 0 && <ServicesSection services={services} />}
 
