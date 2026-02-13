@@ -15,12 +15,20 @@ interface PortfolioItem {
 }
 
 export default function IPadShowcase() {
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [allPortfolioItems, setAllPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [loading, setLoading] = useState(true);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(allPortfolioItems.length / itemsPerPage);
+  const portfolioItems = allPortfolioItems.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
   useEffect(() => {
     async function fetchPortfolioItems() {
@@ -28,13 +36,12 @@ export default function IPadShowcase() {
         const { data, error } = await supabase
           .from('portfolio_items')
           .select('*')
-          .order('order_index', { ascending: true })
-          .limit(12);
+          .order('order_index', { ascending: true });
 
         if (error) throw error;
 
         if (data && data.length > 0) {
-          setPortfolioItems(data);
+          setAllPortfolioItems(data);
         }
       } catch (error) {
         console.error('Error fetching portfolio items:', error);
@@ -59,7 +66,7 @@ export default function IPadShowcase() {
       // Show first item for 3 seconds
       await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Cycle through items
+      // Cycle through items in current page
       for (let i = 1; i < portfolioItems.length; i++) {
         setCurrentIndex(i);
         await new Promise(resolve => setTimeout(resolve, 3000));
@@ -69,8 +76,11 @@ export default function IPadShowcase() {
       setIsZoomed(false);
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Reset and repeat
+      // Reset index and move to next page
       setCurrentIndex(0);
+
+      // Move to next page (loop back to first page after last)
+      setCurrentPage((prev) => (prev + 1) % totalPages);
     };
 
     const interval = setInterval(() => {
@@ -81,7 +91,7 @@ export default function IPadShowcase() {
     sequence();
 
     return () => clearInterval(interval);
-  }, [portfolioItems]);
+  }, [portfolioItems, totalPages]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();

@@ -51,12 +51,11 @@ export default function SlideManagement() {
     }
 
     try {
-      // Fetch from portfolio_items table (first 12 items)
+      // Fetch ALL portfolio_items (no limit)
       const { data, error } = await supabase
         .from('portfolio_items')
         .select('id, title, description, image_url, video_url, order_index, created_at')
-        .order('order_index', { ascending: true })
-        .limit(12);
+        .order('order_index', { ascending: true });
 
       if (error) throw error;
 
@@ -247,7 +246,7 @@ export default function SlideManagement() {
               </h1>
             </div>
             <p className="text-slate-400">
-              Manage the 12 images/videos that appear in the iPad showcase
+              Manage all portfolio images/videos for the iPad showcase
             </p>
             <Link
               href="/"
@@ -260,19 +259,18 @@ export default function SlideManagement() {
           </div>
           <button
             onClick={() => handleOpenModal()}
-            disabled={slides.length >= 12}
-            className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-[#2ecc71] text-slate-950 px-6 py-3 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all"
           >
             <Plus size={18} />
-            Add Slide {slides.length >= 12 && '(Max 12)'}
+            Add Slide
           </button>
         </div>
 
         {/* Info Box */}
         <div className="bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-xl p-4 mb-6">
           <p className="text-[#2ecc71] text-sm">
-            <strong>Note:</strong> Only the first 12 items will be displayed in the iPad showcase on the homepage.
-            Use the up/down arrows to reorder slides. Current slides: <strong>{slides.length}/12</strong>
+            <strong>Note:</strong> All portfolio items will be shown in the iPad showcase (12 items at a time with automatic pagination).
+            Use the up/down arrows to reorder slides. Current total slides: <strong>{slides.length}</strong>
           </p>
         </div>
 

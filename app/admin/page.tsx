@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   Briefcase, Award, MessageSquare, Wrench, Star,
   TrendingUp, ExternalLink, Plus, ArrowRight, Loader2, BookOpen,
-  BarChart3, Users, Image, LayoutTemplate
+  BarChart3, Users, Image, LayoutTemplate, MonitorPlay
 } from 'lucide-react';
 import ProtectedRoute from '../../components/admin/ProtectedRoute';
 import { supabase } from '../../lib/supabase';
@@ -90,6 +90,7 @@ export default function AdminDashboard() {
     { name: 'Leads', description: 'Manage chatbot leads', icon: Users, href: '/admin/leads', color: '#ff6b6b' },
     { name: 'Skill Portfolio Gallery', description: 'Manage skill portfolio galleries', icon: Image, href: '/admin/skill-portfolio', color: '#2ecc71' },
     { name: 'Homepage', description: 'Manage homepage content', icon: LayoutTemplate, href: '/admin/homepage', color: '#f39c12' },
+    { name: 'Slide', description: 'Manage iPad showcase slides', icon: MonitorPlay, href: '/admin/slide', color: '#9b59b6' },
   ];
 
   const quickActions = [
@@ -150,7 +151,7 @@ export default function AdminDashboard() {
         {/* Analytics & Leads */}
         <div className="mb-10">
           <h2 className="text-xl font-bold text-white mb-4">Management Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {analyticsCards.map((card, index) => {
               const Icon = card.icon;
               return (
@@ -159,22 +160,25 @@ export default function AdminDashboard() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
+                  className="h-full"
                 >
                   <Link
                     href={card.href}
-                    className="flex items-center gap-5 bg-gradient-to-r from-slate-900/80 to-slate-800/40 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all group"
+                    className="flex flex-col items-start gap-4 bg-gradient-to-r from-slate-900/80 to-slate-800/40 border border-white/10 rounded-2xl p-5 hover:border-white/20 transition-all group h-full"
                   >
-                    <div
-                      className="p-4 rounded-2xl"
-                      style={{ backgroundColor: `${card.color}20` }}
-                    >
-                      <Icon size={28} style={{ color: card.color }} />
+                    <div className="flex items-center justify-between w-full">
+                      <div
+                        className="p-3 rounded-xl flex-shrink-0"
+                        style={{ backgroundColor: `${card.color}20` }}
+                      >
+                        <Icon size={24} style={{ color: card.color }} />
+                      </div>
+                      <ArrowRight size={18} className="text-slate-600 group-hover:text-[#2ecc71] group-hover:translate-x-1 transition-all flex-shrink-0" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-white group-hover:text-[#2ecc71] transition-colors">{card.name}</h3>
-                      <p className="text-sm text-slate-500">{card.description}</p>
+                      <h3 className="text-base font-bold text-white group-hover:text-[#2ecc71] transition-colors mb-1 leading-tight">{card.name}</h3>
+                      <p className="text-xs text-slate-500 leading-snug">{card.description}</p>
                     </div>
-                    <ArrowRight size={20} className="text-slate-600 group-hover:text-[#2ecc71] group-hover:translate-x-1 transition-all" />
                   </Link>
                 </motion.div>
               );
