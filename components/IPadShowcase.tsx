@@ -54,27 +54,45 @@ export default function IPadShowcase() {
   }, []);
 
   useEffect(() => {
-    if (portfolioItems.length === 0) return;
+    if (allPortfolioItems.length === 0) return;
+
+    let isCancelled = false;
 
     const sequence = async () => {
+      if (isCancelled) return;
+
+      // Get current page items
+      const currentItems = allPortfolioItems.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+      );
+
+      if (currentItems.length === 0) return;
+
       // Wait 2 seconds in grid view
       await new Promise(resolve => setTimeout(resolve, 2000));
+      if (isCancelled) return;
 
       // Zoom in
       setIsZoomed(true);
 
       // Show first item for 3 seconds
       await new Promise(resolve => setTimeout(resolve, 3000));
+      if (isCancelled) return;
 
       // Cycle through items in current page
-      for (let i = 1; i < portfolioItems.length; i++) {
+      for (let i = 1; i < currentItems.length; i++) {
+        if (isCancelled) return;
         setCurrentIndex(i);
         await new Promise(resolve => setTimeout(resolve, 3000));
       }
 
+      if (isCancelled) return;
+
       // Zoom out
       setIsZoomed(false);
       await new Promise(resolve => setTimeout(resolve, 2000));
+      if (isCancelled) return;
 
       // Reset index and move to next page
       setCurrentIndex(0);
@@ -83,15 +101,13 @@ export default function IPadShowcase() {
       setCurrentPage((prev) => (prev + 1) % totalPages);
     };
 
-    const interval = setInterval(() => {
-      sequence();
-    }, (portfolioItems.length * 3000) + 6000);
-
     // Start first sequence
     sequence();
 
-    return () => clearInterval(interval);
-  }, [portfolioItems, totalPages]);
+    return () => {
+      isCancelled = true;
+    };
+  }, [allPortfolioItems, currentPage, totalPages, itemsPerPage]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
