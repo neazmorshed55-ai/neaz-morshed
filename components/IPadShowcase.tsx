@@ -94,8 +94,12 @@ export default function IPadShowcase() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       if (isCancelled) return;
 
-      // Reset index and move to next page
+      // Reset index first
       setCurrentIndex(0);
+
+      // Wait a moment before page transition for smooth effect
+      await new Promise(resolve => setTimeout(resolve, 500));
+      if (isCancelled) return;
 
       // Move to next page (loop back to first page after last)
       setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -146,11 +150,11 @@ export default function IPadShowcase() {
             {!isZoomed ? (
               // Grid View - Multiple iPads
               <motion.div
-                key="grid"
+                key={`grid-page-${currentPage}`}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 1.2 }}
-                transition={{ duration: 1, ease: "easeInOut" }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
                 className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl"
                 style={{
                   transformStyle: 'preserve-3d',
@@ -235,7 +239,7 @@ export default function IPadShowcase() {
             ) : (
               // Zoomed View - Single iPad
               <motion.div
-                key="zoomed"
+                key={`zoomed-page-${currentPage}`}
                 initial={{ opacity: 0, scale: 0.5, rotateY: -20, z: -500 }}
                 animate={{
                   opacity: 1,
@@ -246,7 +250,7 @@ export default function IPadShowcase() {
                   rotateZ: mouseX.get() * 0.2,
                 }}
                 exit={{ opacity: 0, scale: 0.5, rotateY: 20, z: -500 }}
-                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                 className="relative w-full max-w-[540px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-slate-800"
                 style={{
                   transformStyle: 'preserve-3d',
