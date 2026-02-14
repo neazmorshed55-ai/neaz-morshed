@@ -32,6 +32,7 @@ interface DailyData {
 
 interface RecentVisitor {
   id: string;
+  ip_address?: string;
   country: string;
   city: string;
   page_visited: string;
@@ -321,6 +322,7 @@ export default function AnalyticsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-white/5">
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">IP Address</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Location</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">First Page</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Device</th>
@@ -336,6 +338,9 @@ export default function AnalyticsPage() {
                     ) : (
                       uniqueVisitors.map((visitor) => (
                         <tr key={visitor.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-400 font-mono">{visitor.ip_address || 'Masked'}</span>
+                          </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
                               <MapPin size={14} className="text-[#3498db]" />
@@ -411,6 +416,15 @@ export default function AnalyticsPage() {
                 </table>
               </div>
             </motion.div>
+
+            {/* Data Collection Disclaimer */}
+            <div className="mt-6 p-4 border border-yellow-500/20 bg-yellow-500/5 rounded-xl text-xs text-yellow-500/80">
+              <p className="font-semibold mb-1">Data Collection Note:</p>
+              <p>
+                IP-based location is approximate. Automated collection of personal data (Email, Phone, Exact GPS, Device Name)
+                is not possible without explicit user input due to browser privacy policies and security sandboxing.
+              </p>
+            </div>
           </>
         )}
       </div>
