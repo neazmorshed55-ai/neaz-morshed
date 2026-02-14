@@ -362,10 +362,36 @@ export async function GET(request: NextRequest) {
       const { data: countries, error: countriesError } = await supabase
         .from('visitor_countries')
         .select('*')
-        .limit(10);
+        .limit(50); // Increased limit to show more countries
 
       if (countriesError) throw countriesError;
       return NextResponse.json(countries);
+    }
+
+    if (type === 'unique') {
+      // Get recent distinct sessions
+      // Since Supabase JS client doesn't support DISTICT ON directly on query builder easily,
+      // we'll fetch recent records and deduplicate in JS.
+      const { data: visitors, error: visitorsError } = await supabase
+        .from('visitors')
+        .select('*')
+        .order('visited_at', { ascending: false })
+        .limit(200); // Fetch recent 200 visitors to analyze
+
+      if (visitorsError) throw visitorsError;
+
+      // Deduplicate by session_id
+      const uniqueSessions = new Map();
+      visitors.forEach(visitor => {
+        if (!uniqueSessions.has(visitor.session_id)) {
+          uniqueSessions.set(visitor.session_id, visitor);
+        }
+      });
+
+      // Convert map values to array and take top 50
+      const unique = Array.from(uniqueSessions.values()).slice(0, 50);
+
+      return NextResponse.json(unique);
     }
 
     if (type === 'daily') {

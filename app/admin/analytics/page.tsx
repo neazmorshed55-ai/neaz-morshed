@@ -55,22 +55,25 @@ export default function AnalyticsPage() {
   const [countries, setCountries] = useState<CountryData[]>([]);
   const [dailyData, setDailyData] = useState<DailyData[]>([]);
   const [recentVisitors, setRecentVisitors] = useState<RecentVisitor[]>([]);
+  const [uniqueVisitors, setUniqueVisitors] = useState<RecentVisitor[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [statsRes, countriesRes, dailyRes, recentRes] = await Promise.all([
+      const [statsRes, countriesRes, dailyRes, recentRes, uniqueRes] = await Promise.all([
         fetch('/api/visitors?type=stats'),
         fetch('/api/visitors?type=countries'),
         fetch('/api/visitors?type=daily'),
         fetch('/api/visitors?type=recent'),
+        fetch('/api/visitors?type=unique'),
       ]);
 
       if (statsRes.ok) setStats(await statsRes.json());
       if (countriesRes.ok) setCountries(await countriesRes.json());
       if (dailyRes.ok) setDailyData(await dailyRes.json());
       if (recentRes.ok) setRecentVisitors(await recentRes.json());
+      if (uniqueRes.ok) setUniqueVisitors(await uniqueRes.json());
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -220,7 +223,7 @@ export default function AnalyticsPage() {
                   {countries.length === 0 ? (
                     <p className="text-slate-500 text-sm text-center py-4">No data yet</p>
                   ) : (
-                    countries.slice(0, 8).map((country, index) => (
+                    countries.map((country, index) => (
                       <div key={country.country} className="flex items-center gap-3">
                         <span className="text-2xl">{getCountryFlag(country.country_code)}</span>
                         <div className="flex-1">
@@ -294,6 +297,112 @@ export default function AnalyticsPage() {
                           </td>
                           <td className="py-3 px-4">
                             <span className="text-sm text-slate-500">{formatTime(visitor.visited_at)}</span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+
+            {/* Recent Unique Visitors Table */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mt-6 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
+            >
+              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <Users size={20} className="text-[#3498db]" />
+                Recent Unique Visitors
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Location</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">First Page</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Device</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Browser</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {uniqueVisitors.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="text-center py-8 text-slate-500">No unique visitors yet</td>
+                      </tr>
+                    ) : (
+                      uniqueVisitors.map((visitor) => (
+                        <tr key={visitor.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2">
+                              <MapPin size={14} className="text-[#3498db]" />
+                              <span className="text-sm text-slate-300">
+                                {visitor.city ? `${visitor.city}, ` : ''}{visitor.country || 'Unknown'}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-400 font-mono">{visitor.page_visited}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2 text-slate-400">
+                              {getDeviceIcon(visitor.device_type)}
+                              <span className="text-sm capitalize">{visitor.device_type || 'Desktop'}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-400">{visitor.browser || 'Unknown'}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-500">{formatTime(visitor.visited_at)}</span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+
+            {/* Last 30 Days History Table */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="mt-6 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
+            >
+              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <Clock size={20} className="text-[#f39c12]" />
+                Last 30 Days Visit History
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Date</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Total Visits</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Unique Visitors</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dailyData.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="text-center py-8 text-slate-500">No history data yet</td>
+                      </tr>
+                    ) : (
+                      dailyData.slice(0, 30).map((day) => (
+                        <tr key={day.date} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-300">{formatDate(day.date)}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-400 font-bold">{day.visits}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="text-sm text-slate-400">{day.unique_visitors}</span>
                           </td>
                         </tr>
                       ))

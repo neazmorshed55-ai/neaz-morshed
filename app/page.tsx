@@ -19,7 +19,7 @@ import { supabase } from '@/lib/supabase';
 const defaultHero = {
   hero_subtitle: 'Powering Global Business Growth Since 2014',
   hero_title_prefix: 'I AM',
-  hero_name: 'Neaz Md. Morshed',
+  hero_name: 'NEAZ MORSHED',
   hero_description: 'I handle the heavy lifting of business operations so you can focus on scale. Powered by modern tech stack.',
   hero_typewriter_texts: [
     'Virtual Assistant Expert',
