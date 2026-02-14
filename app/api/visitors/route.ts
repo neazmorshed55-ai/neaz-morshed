@@ -435,6 +435,7 @@ export async function GET(request: NextRequest) {
       const { data: daily, error: dailyError } = await supabase
         .from('daily_visitors')
         .select('*')
+        .order('date', { ascending: false })
         .limit(30);
 
       if (dailyError) throw dailyError;
@@ -445,8 +446,9 @@ export async function GET(request: NextRequest) {
       const { data: recent, error: recentError } = await supabase
         .from('visitors')
         .select('*')
+        .gt('visited_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
         .order('visited_at', { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (recentError) throw recentError;
       return NextResponse.json(recent);

@@ -291,40 +291,7 @@ export default function AnalyticsPage() {
               </div>
             </motion.div>
 
-            {/* Top Pages Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 }}
-              className="mt-6 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
-            >
-              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <Layout size={20} className="text-[#e74c3c]" />
-                Top Visited Pages
-              </h2>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {topPages.length === 0 ? (
-                  <p className="text-slate-500 text-sm col-span-full text-center py-4">No page data yet</p>
-                ) : (
-                  topPages.map((page, index) => (
-                    <div key={page.page} className="bg-slate-800/50 rounded-xl p-4 border border-white/5 flex flex-col">
-                      <div className="text-xs text-slate-500 font-mono mb-2 truncate" title={page.page}>
-                        {page.page}
-                      </div>
-                      <div className="text-2xl font-bold text-white">
-                        {page.visits}
-                      </div>
-                      <div className="mt-1 h-1 bg-slate-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#e74c3c] rounded-full"
-                          style={{ width: `${(page.visits / topPages[0].visits) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </motion.div>
+
 
             {/* Recent Visitors Table */}
             <motion.div
@@ -515,14 +482,7 @@ export default function AnalyticsPage() {
               </div>
             </motion.div>
 
-            {/* Data Collection Disclaimer */}
-            <div className="mt-6 p-4 border border-yellow-500/20 bg-yellow-500/5 rounded-xl text-xs text-yellow-500/80">
-              <p className="font-semibold mb-1">Data Collection Note:</p>
-              <p>
-                IP-based location is approximate. Automated collection of personal data (Email, Phone, Exact GPS, Device Name)
-                is not possible without explicit user input due to browser privacy policies and security sandboxing.
-              </p>
-            </div>
+
           </>
         )}
       </div>
