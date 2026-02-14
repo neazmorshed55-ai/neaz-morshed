@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Users, Globe, MapPin, Clock, TrendingUp, Eye,
-  Monitor, Smartphone, Tablet, ChevronRight, RefreshCw
+  Monitor, Smartphone, Tablet, ChevronRight, RefreshCw, Layout
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 
@@ -24,6 +24,11 @@ interface CountryData {
   unique_visitors: number;
 }
 
+interface TopPage {
+  page: string;
+  visits: number;
+}
+
 interface DailyData {
   date: string;
   visits: number;
@@ -39,6 +44,8 @@ interface RecentVisitor {
   device_type: string;
   browser: string;
   visited_at: string;
+  pages_visited?: string[];
+  visit_count?: number;
 }
 
 // Country flag emoji helper
@@ -57,17 +64,19 @@ export default function AnalyticsPage() {
   const [dailyData, setDailyData] = useState<DailyData[]>([]);
   const [recentVisitors, setRecentVisitors] = useState<RecentVisitor[]>([]);
   const [uniqueVisitors, setUniqueVisitors] = useState<RecentVisitor[]>([]);
+  const [topPages, setTopPages] = useState<TopPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [statsRes, countriesRes, dailyRes, recentRes, uniqueRes] = await Promise.all([
+      const [statsRes, countriesRes, dailyRes, recentRes, uniqueRes, topPagesRes] = await Promise.all([
         fetch('/api/visitors?type=stats'),
         fetch('/api/visitors?type=countries'),
         fetch('/api/visitors?type=daily'),
         fetch('/api/visitors?type=recent'),
         fetch('/api/visitors?type=unique'),
+        fetch('/api/visitors?type=top_pages'),
       ]);
 
       if (statsRes.ok) setStats(await statsRes.json());
@@ -75,6 +84,7 @@ export default function AnalyticsPage() {
       if (dailyRes.ok) setDailyData(await dailyRes.json());
       if (recentRes.ok) setRecentVisitors(await recentRes.json());
       if (uniqueRes.ok) setUniqueVisitors(await uniqueRes.json());
+      if (topPagesRes.ok) setTopPages(await topPagesRes.json());
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -246,6 +256,76 @@ export default function AnalyticsPage() {
               </motion.div>
             </div>
 
+            {/* Top Pages Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="mt-6 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
+            >
+              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <Users size={20} className="text-[#e74c3c]" />
+                Top Visited Pages
+              </h2>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {topPages.length === 0 ? (
+                  <p className="text-slate-500 text-sm col-span-full text-center py-4">No page data yet</p>
+                ) : (
+                  topPages.map((page, index) => (
+                    <div key={page.page} className="bg-slate-800/50 rounded-xl p-4 border border-white/5 flex flex-col">
+                      <div className="text-xs text-slate-500 font-mono mb-2 truncate" title={page.page}>
+                        {page.page}
+                      </div>
+                      <div className="text-2xl font-bold text-white">
+                        {page.visits}
+                      </div>
+                      <div className="mt-1 h-1 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#e74c3c] rounded-full"
+                          style={{ width: `${(page.visits / topPages[0].visits) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+
+            {/* Top Pages Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="mt-6 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
+            >
+              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <Layout size={20} className="text-[#e74c3c]" />
+                Top Visited Pages
+              </h2>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {topPages.length === 0 ? (
+                  <p className="text-slate-500 text-sm col-span-full text-center py-4">No page data yet</p>
+                ) : (
+                  topPages.map((page, index) => (
+                    <div key={page.page} className="bg-slate-800/50 rounded-xl p-4 border border-white/5 flex flex-col">
+                      <div className="text-xs text-slate-500 font-mono mb-2 truncate" title={page.page}>
+                        {page.page}
+                      </div>
+                      <div className="text-2xl font-bold text-white">
+                        {page.visits}
+                      </div>
+                      <div className="mt-1 h-1 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#e74c3c] rounded-full"
+                          style={{ width: `${(page.visits / topPages[0].visits) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+
             {/* Recent Visitors Table */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -325,6 +405,7 @@ export default function AnalyticsPage() {
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">IP Address</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Location</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">First Page</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Journey</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Device</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Browser</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Time</th>
@@ -351,6 +432,23 @@ export default function AnalyticsPage() {
                           </td>
                           <td className="py-3 px-4">
                             <span className="text-sm text-slate-400 font-mono">{visitor.page_visited}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex flex-col gap-1">
+                              <div className="text-xs text-slate-500">{visitor.pages_visited?.length || 1} pages</div>
+                              <div className="flex flex-wrap gap-1">
+                                {visitor.pages_visited?.slice(0, 3).map((p, i) => (
+                                  <span key={i} className="px-1.5 py-0.5 bg-slate-800 rounded text-[10px] text-slate-400 font-mono truncate max-w-[80px]" title={p}>
+                                    {p}
+                                  </span>
+                                ))}
+                                {(visitor.pages_visited?.length || 0) > 3 && (
+                                  <span className="px-1.5 py-0.5 bg-slate-800 rounded text-[10px] text-slate-500">
+                                    +{(visitor.pages_visited?.length || 0) - 3}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2 text-slate-400">

@@ -376,15 +376,29 @@ export async function GET(request: NextRequest) {
         .from('visitors')
         .select('*')
         .order('visited_at', { ascending: false })
-        .limit(200); // Fetch recent 200 visitors to analyze
+        .limit(500); // Fetch recent 500 visitors to analyze journey
 
       if (visitorsError) throw visitorsError;
 
-      // Deduplicate by session_id
+      // Deduplicate by session_id and aggregate pages
       const uniqueSessions = new Map();
+
       visitors.forEach(visitor => {
         if (!uniqueSessions.has(visitor.session_id)) {
-          uniqueSessions.set(visitor.session_id, visitor);
+          // New session found
+          uniqueSessions.set(visitor.session_id, {
+            ...visitor,
+            visit_count: 1,
+            pages_visited: [visitor.page_visited]
+          });
+        } else {
+          // Existing session, add page if not already in list (for this session view)
+          // or just track path. Let's list unique pages visited in this session.
+          const session = uniqueSessions.get(visitor.session_id);
+          if (!session.pages_visited.includes(visitor.page_visited)) {
+            session.pages_visited.push(visitor.page_visited);
+          }
+          session.visit_count += 1;
         }
       });
 
@@ -392,6 +406,29 @@ export async function GET(request: NextRequest) {
       const unique = Array.from(uniqueSessions.values()).slice(0, 50);
 
       return NextResponse.json(unique);
+    }
+
+    if (type === 'top_pages') {
+      const { data: visitors, error: visitorsError } = await supabase
+        .from('visitors')
+        .select('page_visited')
+        .order('visited_at', { ascending: false })
+        .limit(1000);
+
+      if (visitorsError) throw visitorsError;
+
+      const pageCounts: Record<string, number> = {};
+      visitors.forEach(v => {
+        const page = v.page_visited || '/';
+        pageCounts[page] = (pageCounts[page] || 0) + 1;
+      });
+
+      const sortedPages = Object.entries(pageCounts)
+        .map(([page, count]) => ({ page, visits: count }))
+        .sort((a, b) => b.visits - a.visits)
+        .slice(0, 10);
+
+      return NextResponse.json(sortedPages);
     }
 
     if (type === 'daily') {
