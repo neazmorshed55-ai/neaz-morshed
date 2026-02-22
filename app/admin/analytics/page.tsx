@@ -135,7 +135,8 @@ export default function AnalyticsPage() {
   };
 
   // Calculate max for chart scaling
-  const maxVisits = Math.max(...dailyData.map(d => d.visits), 1);
+  const chartData = dailyData.slice(0, 30).reverse();
+  const maxVisitsInPeriod = Math.max(...chartData.map(d => d.visits), 1);
 
   return (
     <ProtectedRoute>
@@ -199,23 +200,23 @@ export default function AnalyticsPage() {
                 className="lg:col-span-2 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
               >
                 <h2 className="text-lg font-bold text-white mb-6">Daily Visitors (Last 30 Days)</h2>
-                <div className="h-[200px] flex items-end gap-1">
-                  {dailyData.slice(0, 30).reverse().map((day, index) => (
+                <div className="h-[250px] flex items-end gap-1 px-2 border-b border-white/5">
+                  {chartData.map((day, index) => (
                     <div
                       key={day.date}
-                      className="flex-1 group relative flex items-end gap-[1px]"
+                      className="flex-1 group relative flex items-end gap-[2px]"
                     >
                       {/* Total Visits Bar */}
                       <div
-                        className="flex-1 bg-[#2ecc71] rounded-t transition-all hover:bg-[#27ae60]"
-                        style={{ height: `${(day.visits / maxVisits) * 100}%`, minHeight: '4px' }}
+                        className="flex-1 bg-[#2ecc71] rounded-t transition-all hover:bg-[#27ae60] hover:scale-x-110 origin-bottom"
+                        style={{ height: `${(day.visits / maxVisitsInPeriod) * 100}%`, minHeight: '4px' }}
                       />
                       {/* Unique Visitors Bar */}
                       <div
-                        className="flex-1 bg-[#3498db] rounded-t transition-all hover:bg-[#2980b9]"
-                        style={{ height: `${(day.unique_visitors / maxVisits) * 100}%`, minHeight: '2px' }}
+                        className="flex-1 bg-[#3498db] rounded-t transition-all hover:bg-[#2980b9] hover:scale-x-110 origin-bottom"
+                        style={{ height: `${(day.unique_visitors / maxVisitsInPeriod) * 100}%`, minHeight: '2px' }}
                       />
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
                         {formatDate(day.date)}: {day.visits} visits, {day.unique_visitors} unique
                       </div>
                     </div>
