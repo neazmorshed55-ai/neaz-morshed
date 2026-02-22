@@ -214,24 +214,45 @@ export default function AnalyticsPage() {
                 className="lg:col-span-2 bg-slate-900/60 border border-white/5 rounded-2xl p-6"
               >
                 <h2 className="text-lg font-bold text-white mb-6">Daily Visitors (Last 30 Days)</h2>
-                <div className="h-[250px] flex items-end gap-1 px-2 border-b border-white/5">
+                <div className="h-[300px] flex items-end gap-1 px-4 border-b border-white/5 relative bg-slate-800/20 rounded-xl pt-10">
+                  {/* Grid Lines */}
+                  {[0, 25, 50, 75, 100].map((percent) => (
+                    <div
+                      key={percent}
+                      className="absolute border-t border-white/5 left-0 right-0 pointer-events-none"
+                      style={{ bottom: `${percent}%` }}
+                    >
+                      <span className="absolute right-full mr-2 -translate-y-1/2 text-[10px] text-slate-600 font-mono">
+                        {Math.round((maxVisitsInPeriod * percent) / 100)}
+                      </span>
+                    </div>
+                  ))}
+
                   {chartData.map((day, index) => (
                     <div
                       key={day.date}
-                      className="flex-1 group relative flex items-end gap-[2px]"
+                      className="flex-1 group relative flex items-end gap-[4px] h-full justify-center"
                     >
                       {/* Total Visits Bar */}
                       <div
-                        className="flex-1 bg-[#2ecc71] rounded-t transition-all hover:bg-[#27ae60] hover:scale-x-110 origin-bottom"
-                        style={{ height: `${(day.visits / maxVisitsInPeriod) * 100}%`, minHeight: '4px' }}
+                        className="w-1/2 max-w-[12px] bg-[#2ecc71] rounded-t-sm transition-all hover:bg-[#27ae60] hover:scale-x-110 origin-bottom shadow-[0_0_10px_rgba(46,204,113,0.3)]"
+                        style={{ height: `${(day.visits / maxVisitsInPeriod) * 100}%`, minHeight: '2px' }}
                       />
                       {/* Unique Visitors Bar */}
                       <div
-                        className="flex-1 bg-[#3498db] rounded-t transition-all hover:bg-[#2980b9] hover:scale-x-110 origin-bottom"
-                        style={{ height: `${(day.unique_visitors / maxVisitsInPeriod) * 100}%`, minHeight: '2px' }}
+                        className="w-1/2 max-w-[10px] bg-[#3498db] rounded-t-sm transition-all hover:bg-[#2980b9] hover:scale-x-110 origin-bottom shadow-[0_0_10px_rgba(52,152,219,0.3)]"
+                        style={{ height: `${(day.unique_visitors / maxVisitsInPeriod) * 100}%`, minHeight: '1px' }}
                       />
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                        {formatDate(day.date)}: {day.visits} visits, {day.unique_visitors} unique
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 px-3 py-1.5 bg-slate-800 border border-white/10 rounded-lg text-xs text-white opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 whitespace-nowrap z-20 pointer-events-none shadow-xl">
+                        <div className="font-bold border-b border-white/10 pb-1 mb-1">{formatDate(day.date)}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-[#2ecc71] rounded-full" />
+                          <span>Total: <strong>{day.visits}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-[#3498db] rounded-full" />
+                          <span>Unique: <strong>{day.unique_visitors}</strong></span>
+                        </div>
                       </div>
                     </div>
                   ))}
