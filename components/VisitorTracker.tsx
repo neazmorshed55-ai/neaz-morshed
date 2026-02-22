@@ -34,9 +34,21 @@ export default function VisitorTracker() {
         const sessionId = getSessionId();
         if (!sessionId) return;
 
-        // Extract source from URL
+        // Extract source from URL or detect from referrer
         const urlParams = new URLSearchParams(window.location.search);
-        const source = urlParams.get('ref') || urlParams.get('source') || urlParams.get('utm_source');
+        let source = urlParams.get('ref') || urlParams.get('source') || urlParams.get('utm_source');
+
+        if (!source && document.referrer) {
+          const referrer = document.referrer.toLowerCase();
+          if (referrer.includes('upwork.com')) source = 'Upwork';
+          else if (referrer.includes('linkedin.com')) source = 'LinkedIn';
+          else if (referrer.includes('facebook.com') || referrer.includes('fb.me')) source = 'Facebook';
+          else if (referrer.includes('instagram.com')) source = 'Instagram';
+          else if (referrer.includes('whatsapp.com') || referrer.includes('wa.me')) source = 'WhatsApp';
+          else if (referrer.includes('tiktok.com')) source = 'TikTok';
+          else if (referrer.includes('reddit.com')) source = 'Reddit';
+          else if (referrer.includes('t.co') || referrer.includes('twitter.com') || referrer.includes('x.com')) source = 'X (Twitter)';
+        }
 
         await fetch('/api/visitors', {
           method: 'POST',

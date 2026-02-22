@@ -50,6 +50,20 @@ interface RecentVisitor {
   visit_count?: number;
 }
 
+const getSourceStyles = (source: string | undefined) => {
+  if (!source) return 'text-slate-500';
+  const s = source.toLowerCase();
+  if (s.includes('upwork')) return 'bg-green-500/10 text-green-500 border border-green-500/20';
+  if (s.includes('linkedin')) return 'bg-blue-600/10 text-blue-600 border border-blue-600/20';
+  if (s.includes('facebook')) return 'bg-blue-500/10 text-blue-500 border border-blue-500/20';
+  if (s.includes('instagram')) return 'bg-pink-500/10 text-pink-500 border border-pink-500/20';
+  if (s.includes('whatsapp')) return 'bg-green-400/10 text-green-400 border border-green-400/20';
+  if (s.includes('tiktok')) return 'bg-red-500/10 text-red-500 border border-red-500/20';
+  if (s.includes('reddit')) return 'bg-orange-500/10 text-orange-500 border border-orange-500/20';
+  if (s.includes('x (twitter)') || s.includes('twitter')) return 'bg-slate-200/10 text-white border border-white/20';
+  return 'bg-[#2ecc71]/10 text-[#2ecc71] border border-[#2ecc71]/20';
+};
+
 // Country flag emoji helper
 const getCountryFlag = (countryCode: string) => {
   if (!countryCode) return '🌍';
@@ -355,7 +369,7 @@ export default function AnalyticsPage() {
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${visitor.source ? 'bg-[#2ecc71]/10 text-[#2ecc71] border border-[#2ecc71]/20' : 'text-slate-500'}`}>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${getSourceStyles(visitor.source)}`}>
                               {visitor.source || 'Direct / Organic'}
                             </span>
                           </td>
@@ -427,7 +441,7 @@ export default function AnalyticsPage() {
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${visitor.source ? 'bg-[#3498db]/10 text-[#3498db] border border-[#3498db]/20' : 'text-slate-500'}`}>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${getSourceStyles(visitor.source)}`}>
                               {visitor.source || 'Direct / Organic'}
                             </span>
                           </td>
