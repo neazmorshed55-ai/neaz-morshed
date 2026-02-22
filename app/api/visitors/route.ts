@@ -255,7 +255,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { sessionId, page, referrer } = body;
+    const { sessionId, page, referrer, source } = body;
 
     // Get IP from headers
     const forwarded = request.headers.get('x-forwarded-for');
@@ -311,6 +311,7 @@ export async function POST(request: NextRequest) {
         timezone: geoData.timezone,
         user_agent: userAgent,
         referrer: referrer,
+        source: source,
         page_visited: page,
         device_type: deviceType,
         browser: browser,

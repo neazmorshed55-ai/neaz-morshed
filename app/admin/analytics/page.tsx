@@ -44,6 +44,8 @@ interface RecentVisitor {
   device_type: string;
   browser: string;
   visited_at: string;
+  source?: string;
+  referrer?: string;
   pages_visited?: string[];
   visit_count?: number;
 }
@@ -201,21 +203,40 @@ export default function AnalyticsPage() {
                   {dailyData.slice(0, 30).reverse().map((day, index) => (
                     <div
                       key={day.date}
-                      className="flex-1 group relative"
+                      className="flex-1 group relative flex items-end gap-[1px]"
                     >
+                      {/* Total Visits Bar */}
                       <div
-                        className="w-full bg-[#2ecc71] rounded-t transition-all hover:bg-[#27ae60]"
+                        className="flex-1 bg-[#2ecc71] rounded-t transition-all hover:bg-[#27ae60]"
                         style={{ height: `${(day.visits / maxVisits) * 100}%`, minHeight: '4px' }}
                       />
+                      {/* Unique Visitors Bar */}
+                      <div
+                        className="flex-1 bg-[#3498db] rounded-t transition-all hover:bg-[#2980b9]"
+                        style={{ height: `${(day.unique_visitors / maxVisits) * 100}%`, minHeight: '2px' }}
+                      />
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 rounded text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                        {formatDate(day.date)}: {day.visits} visits
+                        {formatDate(day.date)}: {day.visits} visits, {day.unique_visitors} unique
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between mt-4 text-xs text-slate-500">
-                  <span>30 days ago</span>
-                  <span>Today</span>
+                <div className="flex justify-between items-center mt-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 bg-[#2ecc71] rounded-sm" />
+                      <span className="text-[10px] text-slate-400">Total Visits</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 bg-[#3498db] rounded-sm" />
+                      <span className="text-[10px] text-slate-400">Unique Visitors</span>
+                    </div>
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    <span>30 days ago</span>
+                    <span className="mx-2">—</span>
+                    <span>Today</span>
+                  </div>
                 </div>
               </motion.div>
 
@@ -309,6 +330,7 @@ export default function AnalyticsPage() {
                   <thead>
                     <tr className="border-b border-white/5">
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Location</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Source</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Page</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Device</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Browser</th>
@@ -330,6 +352,11 @@ export default function AnalyticsPage() {
                                 {visitor.city ? `${visitor.city}, ` : ''}{visitor.country || 'Unknown'}
                               </span>
                             </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${visitor.source ? 'bg-[#2ecc71]/10 text-[#2ecc71] border border-[#2ecc71]/20' : 'text-slate-500'}`}>
+                              {visitor.source || 'Direct / Organic'}
+                            </span>
                           </td>
                           <td className="py-3 px-4">
                             <span className="text-sm text-slate-400 font-mono">{visitor.page_visited}</span>
@@ -371,6 +398,7 @@ export default function AnalyticsPage() {
                     <tr className="border-b border-white/5">
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">IP Address</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Location</th>
+                      <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Source</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">First Page</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Journey</th>
                       <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase">Device</th>
@@ -396,6 +424,11 @@ export default function AnalyticsPage() {
                                 {visitor.city ? `${visitor.city}, ` : ''}{visitor.country || 'Unknown'}
                               </span>
                             </div>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${visitor.source ? 'bg-[#3498db]/10 text-[#3498db] border border-[#3498db]/20' : 'text-slate-500'}`}>
+                              {visitor.source || 'Direct / Organic'}
+                            </span>
                           </td>
                           <td className="py-3 px-4">
                             <span className="text-sm text-slate-400 font-mono">{visitor.page_visited}</span>

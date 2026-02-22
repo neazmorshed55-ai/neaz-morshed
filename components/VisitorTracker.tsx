@@ -34,6 +34,10 @@ export default function VisitorTracker() {
         const sessionId = getSessionId();
         if (!sessionId) return;
 
+        // Extract source from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const source = urlParams.get('ref') || urlParams.get('source') || urlParams.get('utm_source');
+
         await fetch('/api/visitors', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -41,6 +45,7 @@ export default function VisitorTracker() {
             sessionId,
             page: pathname,
             referrer: document.referrer || null,
+            source: source || null,
           }),
         });
       } catch (error) {
