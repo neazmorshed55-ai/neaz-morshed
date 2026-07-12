@@ -30,7 +30,7 @@ const IFRAME_PERMISSIONS =
 function VideoReviewCard({ review, index }: { review: VideoReview; index: number }) {
   const [parsed] = useState<ParsedVideo>(() => parseVideoUrl(review.video_url));
   const [isPlaying, setIsPlaying] = useState(false);
-  const [resolved, setResolved] = useState<{ videoUrl: string; poster: string | null } | null>(null);
+  const [resolved, setResolved] = useState<{ streamUrl: string; poster: string | null } | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
 
@@ -58,7 +58,8 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
   }, [parsed.mode, parsed.originalUrl]);
 
   const poster = review.thumbnail_url || parsed.thumbnail || resolved?.poster || null;
-  const nativeSource = parsed.sourceUrl || resolved?.videoUrl || null;
+  // Google Photos files are served through our own origin — see /api/video-stream.
+  const nativeSource = parsed.sourceUrl || resolved?.streamUrl || null;
 
   const isResolving = parsed.mode === 'resolve' && !resolved && !resolveError;
   const linkOnly =
