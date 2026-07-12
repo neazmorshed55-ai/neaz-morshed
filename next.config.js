@@ -71,6 +71,18 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  async headers() {
+    return [
+      {
+        // Google Photos hotlink-protects its video files: the same MP4 that
+        // returns 200 with no Referer returns 403 when the request carries one
+        // from this origin. Dropping the referrer on the page that embeds them
+        // is what lets the video actually play.
+        source: '/reviews',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

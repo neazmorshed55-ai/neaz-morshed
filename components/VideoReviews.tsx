@@ -32,6 +32,7 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
   const [isPlaying, setIsPlaying] = useState(false);
   const [resolved, setResolved] = useState<{ videoUrl: string; poster: string | null } | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
+  const [playbackFailed, setPlaybackFailed] = useState(false);
 
   // Share-page links (Google Photos) hide the real file — ask the server for it.
   useEffect(() => {
@@ -60,7 +61,10 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
   const nativeSource = parsed.sourceUrl || resolved?.videoUrl || null;
 
   const isResolving = parsed.mode === 'resolve' && !resolved && !resolveError;
-  const linkOnly = parsed.mode === 'unsupported' || (parsed.mode === 'resolve' && !!resolveError);
+  const linkOnly =
+    parsed.mode === 'unsupported' ||
+    (parsed.mode === 'resolve' && !!resolveError) ||
+    playbackFailed;
   const canPlayInline = !linkOnly && !isResolving;
 
   const location = [review.city, review.country_name].filter(Boolean).join(', ');
@@ -75,7 +79,7 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
     >
       {/* Player */}
       <div className="relative aspect-video bg-slate-950">
-        {isPlaying && parsed.mode === 'iframe' && parsed.embedUrl ? (
+        {isPlaying && !playbackFailed && parsed.mode === 'iframe' && parsed.embedUrl ? (
           <iframe
             src={withAutoplay(parsed.embedUrl)}
             title={`Video review by ${review.client_name}`}
@@ -83,14 +87,20 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
             allowFullScreen
             className="absolute inset-0 w-full h-full"
           />
-        ) : isPlaying && nativeSource ? (
+        ) : isPlaying && !playbackFailed && nativeSource ? (
           <video
             src={nativeSource}
             poster={poster || undefined}
             controls
             autoPlay
             playsInline
+            preload="metadata"
             controlsList="nodownload"
+            // Never strand a visitor on a dead player — fall back to the link.
+            onError={() => {
+              setPlaybackFailed(true);
+              setIsPlaying(false);
+            }}
             className="absolute inset-0 w-full h-full bg-black"
           />
         ) : (
