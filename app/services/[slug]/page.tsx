@@ -1294,7 +1294,6 @@ export default function PortfolioCollectionPage() {
             <Link href="/services" className="text-[11px] font-bold tracking-[0.3em] text-[#2ecc71] transition-all uppercase">Services</Link>
             <Link href="/experience" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Experience</Link>
             <Link href="/reviews" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Reviews</Link>
-            <Link href="mailto:neazmd.tamim@gmail.com" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Contact</Link>
             <Link href="/resume" className="bg-[#2ecc71] text-slate-950 px-8 py-4 rounded-2xl font-black text-[11px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#2ecc71]/20 uppercase">Resume</Link>
           </div>
         </div>
@@ -1364,13 +1363,13 @@ export default function PortfolioCollectionPage() {
               </div>
               <h3 className="text-2xl font-black text-slate-400 mb-4">No Projects Yet</h3>
               <p className="text-slate-500 max-w-md mx-auto">
-                Portfolio items for this service will be added soon. Check back later or contact me for custom work.
+                Portfolio items for this service will be added soon. Check back later.
               </p>
               <Link
-                href="mailto:neazmd.tamim@gmail.com"
+                href="/services"
                 className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform"
               >
-                Get in Touch <ArrowRight size={18} />
+                View All Services <ArrowRight size={18} />
               </Link>
             </motion.div>
           ) : (
@@ -1664,14 +1663,14 @@ export default function PortfolioCollectionPage() {
               Need Similar Work?
             </h3>
             <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-              I can create custom {service.title.toLowerCase()} solutions tailored to your specific needs. Let's discuss your project!
+              I can create custom {service.title.toLowerCase()} solutions tailored to your specific needs.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
-                href="mailto:neazmd.tamim@gmail.com"
+                href="/reviews"
                 className="px-10 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm flex items-center gap-3"
               >
-                Start a Project <ArrowRight size={18} />
+                See Client Reviews <ArrowRight size={18} />
               </Link>
               <Link
                 href="/services"
@@ -1976,10 +1975,10 @@ export default function PortfolioCollectionPage() {
                     </a>
                   )}
                   <Link
-                    href="mailto:neazmd.tamim@gmail.com"
+                    href="/services"
                     className="inline-flex items-center gap-3 px-8 py-4 border-2 border-white/20 text-white font-black rounded-2xl hover:border-[#2ecc71] transition-all uppercase tracking-wider"
                   >
-                    Request Similar Work
+                    Explore More Services
                   </Link>
                 </div>
               </div>

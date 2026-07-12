@@ -322,13 +322,13 @@ export default function CategoryPage() {
               Need {category.title} Services?
             </h3>
             <p className="text-slate-400 mb-8">
-              Let&apos;s discuss your project requirements and how I can help.
+              See what past clients say about working with me.
             </p>
             <Link
-              href="/#contact"
+              href="/reviews"
               className="inline-flex items-center gap-3 px-10 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
             >
-              Get in Touch <ArrowRight size={18} />
+              See Client Reviews <ArrowRight size={18} />
             </Link>
           </div>
         </div>
