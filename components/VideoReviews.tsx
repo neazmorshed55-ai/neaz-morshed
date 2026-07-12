@@ -17,6 +17,7 @@ export interface VideoReview {
   video_url: string;
   thumbnail_url?: string | null;
   headline?: string | null;
+  captions_vtt?: string | null;
   rating?: number | null;
   order_index?: number | null;
 }
@@ -33,6 +34,21 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
   const [resolved, setResolved] = useState<{ streamUrl: string; poster: string | null } | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [playbackFailed, setPlaybackFailed] = useState(false);
+  const [captionUrl, setCaptionUrl] = useState<string | null>(null);
+
+  // A <track> needs a URL, not raw text. Serving the stored VTT as a blob keeps
+  // it same-origin, so the browser will actually load it (a cross-origin track
+  // would need CORS and a crossOrigin video, which our proxy doesn't need).
+  useEffect(() => {
+    if (!review.captions_vtt) return;
+
+    const url = URL.createObjectURL(
+      new Blob([review.captions_vtt], { type: 'text/vtt' })
+    );
+    setCaptionUrl(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [review.captions_vtt]);
 
   // Share-page links (Google Photos) hide the real file — ask the server for it.
   useEffect(() => {
@@ -103,7 +119,19 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
               setIsPlaying(false);
             }}
             className="absolute inset-0 w-full h-full bg-black"
-          />
+          >
+            {captionUrl && (
+              // `default` shows captions on load; the player's CC button lets
+              // the viewer turn them back off.
+              <track
+                kind="captions"
+                src={captionUrl}
+                srcLang="en"
+                label="English"
+                default
+              />
+            )}
+          </video>
         ) : (
           <>
             {poster ? (
@@ -218,7 +246,7 @@ export default function VideoReviews() {
         const { data, error } = await supabase
           .from('video_reviews')
           .select(
-            'id, client_name, client_title, client_company, country_code, country_name, city, video_url, thumbnail_url, headline, rating, order_index'
+            'id, client_name, client_title, client_company, country_code, country_name, city, video_url, thumbnail_url, headline, captions_vtt, rating, order_index'
           )
           .eq('is_active', true)
           .order('order_index', { ascending: true });

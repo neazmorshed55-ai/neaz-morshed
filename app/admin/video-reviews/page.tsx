@@ -12,6 +12,7 @@ import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
 import { countries, getFlagUrl, getFlagEmoji } from '../../../lib/countries';
 import { parseVideoUrl, providerLabel } from '../../../lib/video-embed';
+import { parseCaptions, countCues } from '../../../lib/captions';
 
 interface VideoReview {
   id: string;
@@ -24,6 +25,7 @@ interface VideoReview {
   video_url: string;
   thumbnail_url: string | null;
   headline: string | null;
+  captions_vtt: string | null;
   rating: number;
   is_active: boolean;
   order_index: number;
@@ -39,10 +41,53 @@ const emptyForm = {
   video_url: '',
   thumbnail_url: '',
   headline: '',
+  captions_input: '',
   rating: 5,
   is_active: true,
   order_index: 0,
 };
+
+/**
+ * Live feedback on pasted captions. The trap here is a transcript with no
+ * timestamps (a plain TurboScribe/Word export) — it looks fine but can never
+ * become captions, so say so rather than silently dropping it on save.
+ */
+function CaptionStatus({ input }: { input: string }) {
+  if (!input.trim()) {
+    return (
+      <p className="text-slate-600 text-xs mt-2">
+        Optional. Paste an SRT or VTT file — the timestamps are what matter. Viewers get a
+        CC button and can switch captions off.
+      </p>
+    );
+  }
+
+  const vtt = parseCaptions(input);
+
+  if (!vtt) {
+    return (
+      <div className="flex items-start gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl mt-2">
+        <AlertCircle size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+        <p className="text-amber-300 text-xs">
+          No timestamps found, so this can't be used as captions — it'll be ignored on save.
+          A plain transcript isn't enough; captions need cue times like{' '}
+          <span className="font-mono">00:00:03,127 --&gt; 00:00:08,788</span>. Export an SRT or
+          VTT from your transcription tool.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3 p-3 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-xl mt-2">
+      <CheckCircle size={16} className="text-[#2ecc71] flex-shrink-0" />
+      <p className="text-[#2ecc71] text-xs font-bold">
+        {countCues(vtt)} caption cues parsed
+        <span className="text-slate-400 font-normal"> — saved as WebVTT.</span>
+      </p>
+    </div>
+  );
+}
 
 /** Live feedback on a pasted link: what it is, and whether it will play on the page. */
 function LinkStatus({ url }: { url: string }) {
@@ -205,6 +250,7 @@ export default function VideoReviewsManagement() {
         video_url: review.video_url,
         thumbnail_url: review.thumbnail_url || '',
         headline: review.headline || '',
+        captions_input: review.captions_vtt || '',
         rating: review.rating,
         is_active: review.is_active,
         order_index: review.order_index,
@@ -225,8 +271,10 @@ export default function VideoReviewsManagement() {
     if (!formData.client_name || !formData.video_url) return;
     setSaving(true);
 
+    const { captions_input, ...fields } = formData;
+
     const payload = {
-      ...formData,
+      ...fields,
       video_url: formData.video_url.trim(),
       client_title: formData.client_title || null,
       client_company: formData.client_company || null,
@@ -235,6 +283,8 @@ export default function VideoReviewsManagement() {
       city: formData.city || null,
       thumbnail_url: formData.thumbnail_url || null,
       headline: formData.headline || null,
+      // Accepts SRT or VTT; returns null if the text carries no cue timings.
+      captions_vtt: parseCaptions(captions_input),
     };
 
     if (!supabase) {
@@ -391,6 +441,11 @@ export default function VideoReviewsManagement() {
                           <span className="px-2 py-0.5 bg-[#2ecc71]/10 text-[#2ecc71] text-[10px] font-bold rounded-full uppercase">
                             {providerLabel(parsed.provider)}
                           </span>
+                          {review.captions_vtt && (
+                            <span className="px-2 py-0.5 bg-sky-500/10 text-sky-400 text-[10px] font-bold rounded-full uppercase">
+                              CC
+                            </span>
+                          )}
                         </div>
 
                         {review.country_code && (
@@ -606,6 +661,24 @@ export default function VideoReviewsManagement() {
                     <p className="text-slate-600 text-xs mt-2">
                       Optional. Shown over the thumbnail before the video plays.
                     </p>
+                  </div>
+
+                  {/* Captions */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">
+                      Captions (SRT or VTT)
+                    </label>
+                    <textarea
+                      value={formData.captions_input}
+                      onChange={(e) =>
+                        setFormData({ ...formData, captions_input: e.target.value })
+                      }
+                      rows={5}
+                      spellCheck={false}
+                      className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 px-4 text-white text-xs font-mono focus:outline-none focus:border-[#2ecc71]/50 resize-y"
+                      placeholder={'1\n00:00:03,127 --> 00:00:08,788\nHi, my name is David Raff...'}
+                    />
+                    <CaptionStatus input={formData.captions_input} />
                   </div>
 
                   {/* Custom thumbnail */}
