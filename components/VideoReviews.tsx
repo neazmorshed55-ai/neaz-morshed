@@ -243,11 +243,13 @@ export default function VideoReviews() {
       }
 
       try {
+        // Select * rather than naming columns: naming one that doesn't exist yet
+        // makes Postgres reject the whole query, which would hide every video
+        // review until the matching migration ran. Optional columns (captions_vtt)
+        // simply come back undefined until then.
         const { data, error } = await supabase
           .from('video_reviews')
-          .select(
-            'id, client_name, client_title, client_company, country_code, country_name, city, video_url, thumbnail_url, headline, captions_vtt, rating, order_index'
-          )
+          .select('*')
           .eq('is_active', true)
           .order('order_index', { ascending: true });
 
