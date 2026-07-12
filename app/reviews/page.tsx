@@ -12,6 +12,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import Navbar from '../../components/Navbar';
 import VideoBackground from '../../components/VideoBackground';
+import VideoReviews from '../../components/VideoReviews';
 import WorldMap from '../../components/WorldMap';
 import FooterLinks from '../../components/FooterLinks';
 
@@ -255,6 +256,9 @@ export default function ReviewsPage() {
         </section>
 
         {/* Filter Tabs removed */}
+
+        {/* Video Testimonials */}
+        <VideoReviews />
 
         {/* Reviews Grid */}
         <section className="container mx-auto px-6 max-w-7xl">
