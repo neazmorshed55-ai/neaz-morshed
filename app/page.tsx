@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
 import IPadShowcase from '@/components/IPadShowcase';
+import VideoReviews from '@/components/VideoReviews';
 import {
   HeroSection,
   SkillsSection,
@@ -138,6 +139,9 @@ export default function HomePage() {
           description={heroContent.hero_description}
           stats={heroContent.hero_stats}
         />
+
+        {/* Featured video testimonial — the full list lives on /reviews */}
+        <VideoReviews limit={1} className="mt-28" />
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
 
