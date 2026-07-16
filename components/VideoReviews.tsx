@@ -231,7 +231,12 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
   );
 }
 
-export default function VideoReviews() {
+interface VideoReviewsProps {
+  /** Cap how many videos render — the homepage shows one, /reviews shows all. */
+  limit?: number;
+}
+
+export default function VideoReviews({ limit }: VideoReviewsProps = {}) {
   const [videoReviews, setVideoReviews] = useState<VideoReview[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -267,6 +272,8 @@ export default function VideoReviews() {
   // Nothing to show and nothing to say — stay out of the page entirely.
   if (loading || videoReviews.length === 0) return null;
 
+  const visibleReviews = limit ? videoReviews.slice(0, limit) : videoReviews;
+
   return (
     <section className="container mx-auto px-6 max-w-7xl mb-20">
       <motion.div
@@ -285,12 +292,12 @@ export default function VideoReviews() {
 
       <div
         className={
-          videoReviews.length === 1
+          visibleReviews.length === 1
             ? 'max-w-3xl mx-auto'
             : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
         }
       >
-        {videoReviews.map((review, index) => (
+        {visibleReviews.map((review, index) => (
           <VideoReviewCard key={review.id} review={review} index={index} />
         ))}
       </div>
