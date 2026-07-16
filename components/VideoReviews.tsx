@@ -234,9 +234,11 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
 interface VideoReviewsProps {
   /** Cap how many videos render — the homepage shows one, /reviews shows all. */
   limit?: number;
+  /** Extra classes for per-page spacing (e.g. a top margin on the homepage). */
+  className?: string;
 }
 
-export default function VideoReviews({ limit }: VideoReviewsProps = {}) {
+export default function VideoReviews({ limit, className = '' }: VideoReviewsProps = {}) {
   const [videoReviews, setVideoReviews] = useState<VideoReview[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -275,7 +277,7 @@ export default function VideoReviews({ limit }: VideoReviewsProps = {}) {
   const visibleReviews = limit ? videoReviews.slice(0, limit) : videoReviews;
 
   return (
-    <section className="container mx-auto px-6 max-w-7xl mb-20">
+    <section className={`container mx-auto px-6 max-w-7xl mb-20 ${className}`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

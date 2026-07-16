@@ -151,7 +151,7 @@ export default function HomePage() {
         />
 
         {/* Featured video testimonial — the full list lives on /reviews */}
-        <VideoReviews limit={1} />
+        <VideoReviews limit={1} className="mt-28" />
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
 
