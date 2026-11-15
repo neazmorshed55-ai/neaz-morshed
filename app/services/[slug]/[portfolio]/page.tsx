@@ -354,17 +354,17 @@ export default function PortfolioDetailPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
+      <div className="bg-page text-ink min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
       </div>
     );
   }
 
   if (!portfolio || !service) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-page text-ink min-h-screen flex flex-col items-center justify-center">
         <h1 className="text-4xl font-black mb-4">Portfolio Item Not Found</h1>
-        <Link href={`/services/${serviceSlug}`} className="text-[#2ecc71] hover:underline">
+        <Link href={`/services/${serviceSlug}`} className="text-primary hover:underline">
           Back to {serviceSlug?.replace(/-/g, ' ')}
         </Link>
       </div>
@@ -372,31 +372,31 @@ export default function PortfolioDetailPage() {
   }
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       <Navbar />
 
       {/* Hero Section */}
       <section className="pt-32 pb-12 relative overflow-hidden">
-        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-[#2ecc71]/5 rounded-full blur-[180px] pointer-events-none"></div>
+        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[180px] pointer-events-none"></div>
 
         <div className="container mx-auto px-6 max-w-6xl relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-3 mb-8 text-sm flex-wrap">
-            <Link href="/services" className="text-slate-400 hover:text-[#2ecc71] transition-all">
+            <Link href="/services" className="text-body hover:text-primary transition-all">
               Services
             </Link>
-            <span className="text-slate-600">/</span>
-            <Link href={`/services/${serviceSlug}`} className="text-slate-400 hover:text-[#2ecc71] transition-all">
+            <span className="text-muted">/</span>
+            <Link href={`/services/${serviceSlug}`} className="text-body hover:text-primary transition-all">
               {service.title}
             </Link>
-            <span className="text-slate-600">/</span>
-            <span className="text-[#2ecc71] font-bold">{portfolio.title}</span>
+            <span className="text-muted">/</span>
+            <span className="text-primary font-bold">{portfolio.title}</span>
           </div>
 
           {/* Back Button */}
           <Link
             href={`/services/${serviceSlug}`}
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all group mb-8"
+            className="inline-flex items-center gap-2 text-body hover:text-primary transition-all group mb-8"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="font-bold">Back to {service.title}</span>
@@ -409,7 +409,7 @@ export default function PortfolioDetailPage() {
           >
             {/* Featured Badge */}
             {portfolio.is_featured && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#2ecc71]/20 text-[#2ecc71] text-[10px] font-black rounded-full uppercase mb-4">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary text-[10px] font-black rounded-full uppercase mb-4">
                 <CheckCircle2 size={12} />
                 Featured Project
               </span>
@@ -422,20 +422,20 @@ export default function PortfolioDetailPage() {
             {/* Meta Info */}
             <div className="flex flex-wrap gap-6 mb-8">
               {portfolio.client_name && (
-                <div className="flex items-center gap-2 text-slate-400">
-                  <User size={18} className="text-[#2ecc71]" />
+                <div className="flex items-center gap-2 text-body">
+                  <User size={18} className="text-primary" />
                   <span className="font-semibold">{portfolio.client_name}</span>
                 </div>
               )}
               {portfolio.completion_date && (
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Calendar size={18} className="text-[#2ecc71]" />
+                <div className="flex items-center gap-2 text-body">
+                  <Calendar size={18} className="text-primary" />
                   <span className="font-semibold">{portfolio.completion_date}</span>
                 </div>
               )}
               {portfolio.duration && (
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Clock size={18} className="text-[#2ecc71]" />
+                <div className="flex items-center gap-2 text-body">
+                  <Clock size={18} className="text-primary" />
                   <span className="font-semibold">{portfolio.duration}</span>
                 </div>
               )}
@@ -452,7 +452,7 @@ export default function PortfolioDetailPage() {
             <div className="lg:col-span-2 space-y-8">
               {/* Main Image/Video */}
               {portfolio.video_url ? (
-                <div className={`relative overflow-hidden rounded-3xl bg-black border border-white/10 ${isVerticalContent(portfolio.video_url) ? 'aspect-[9/16] max-w-[400px]' : 'aspect-video'}`}>
+                <div className={`relative overflow-hidden rounded-3xl bg-black border border-line ${isVerticalContent(portfolio.video_url) ? 'aspect-[9/16] max-w-[400px]' : 'aspect-video'}`}>
                   {isVideoFile(portfolio.video_url) ? (
                     <video
                       src={portfolio.video_url}
@@ -473,18 +473,18 @@ export default function PortfolioDetailPage() {
                       href={portfolio.video_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                      className="w-full h-full flex items-center justify-center bg-surface hover:bg-surface-2 transition-colors"
                     >
-                      <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                      <div className="text-primary flex flex-col items-center gap-3 p-6">
                         <ExternalLink size={48} />
-                        <span className="text-white font-bold text-lg">Visit External Link</span>
-                        <span className="text-slate-400 text-sm max-w-[80%] truncate">{portfolio.video_url}</span>
+                        <span className="text-ink font-bold text-lg">Visit External Link</span>
+                        <span className="text-body text-sm max-w-[80%] truncate">{portfolio.video_url}</span>
                       </div>
                     </a>
                   )}
                 </div>
               ) : (portfolio.image_url || portfolio.thumbnail_url) && (
-                <div className="aspect-video relative overflow-hidden rounded-3xl border border-white/10">
+                <div className="aspect-video relative overflow-hidden rounded-3xl border border-line">
                   <Image
                     src={portfolio.image_url || portfolio.thumbnail_url || ''}
                     alt={portfolio.image_alt_text || portfolio.thumbnail_alt_text || portfolio.title}
@@ -499,7 +499,7 @@ export default function PortfolioDetailPage() {
               {/* Description */}
               {portfolio.description && (
                 <div className="prose prose-invert prose-lg max-w-none">
-                  <p className="text-slate-300 leading-relaxed text-lg">
+                  <p className="text-body leading-relaxed text-lg">
                     {portfolio.description}
                   </p>
                 </div>
@@ -550,7 +550,7 @@ export default function PortfolioDetailPage() {
                           onClick={() => setSelectedGalleryIndex(index)}
                           className="cursor-pointer group"
                         >
-                          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all aspect-square">
+                          <div className="relative overflow-hidden rounded-2xl border border-line bg-surface hover:border-primary/50 transition-all aspect-square">
                             {isRegularImage ? (
                               <Image
                                 src={item.url}
@@ -570,7 +570,7 @@ export default function PortfolioDetailPage() {
                                 />
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
                                   <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                                    <Play size={24} className="text-white ml-1" />
+                                    <Play size={24} className="text-ink ml-1" />
                                   </div>
                                 </div>
                               </>
@@ -586,7 +586,7 @@ export default function PortfolioDetailPage() {
                               </div>
                             ) : isInstagramPost ? (
                               <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
-                                <div className="text-center text-white">
+                                <div className="text-center text-ink">
                                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                                   </svg>
@@ -598,9 +598,9 @@ export default function PortfolioDetailPage() {
                                 item.url.includes('/document/') ? 'bg-gradient-to-br from-blue-600 to-blue-800' :
                                 item.url.includes('/spreadsheets/') ? 'bg-gradient-to-br from-green-600 to-green-800' :
                                 item.url.includes('/presentation/') ? 'bg-gradient-to-br from-yellow-600 to-yellow-800' :
-                                'bg-gradient-to-br from-slate-700 to-slate-900'
+                                'bg-gradient-to-br from-surface-2 to-surface-2'
                               }`}>
-                                <div className="text-center text-white p-4">
+                                <div className="text-center text-ink p-4">
                                   {item.url.includes('/document/') ? (
                                     <svg className="w-14 h-14 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H8V18H10V19M14,19H10V17H14V19M14,16H10V15H14V16M10,14H8V12H10V14M14,14H10V12H14V14M10,11H8V10H10V11M14,11H10V10H14V11Z" />
@@ -627,14 +627,14 @@ export default function PortfolioDetailPage() {
                                 {/* Animated background pattern */}
                                 <div className="absolute inset-0 opacity-20">
                                   <div className="absolute top-0 left-0 w-full h-full">
-                                    <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/30 rounded-full blur-3xl animate-pulse"></div>
+                                    <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-surface-2 rounded-full blur-3xl animate-pulse"></div>
                                     <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-cyan-300/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
                                   </div>
                                 </div>
 
-                                <div className="text-center text-white relative z-10 p-4 group-hover:blur-[2px] transition-all duration-300">
+                                <div className="text-center text-ink relative z-10 p-4 group-hover:blur-[2px] transition-all duration-300">
                                   {/* Canva Logo Style Icon */}
-                                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shadow-2xl border border-white/20">
+                                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/80 backdrop-blur-md flex items-center justify-center shadow-2xl border border-line">
                                     <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
                                       <path d="M7.5 7.5c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3zm9 0c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3z"/>
                                     </svg>
@@ -645,16 +645,16 @@ export default function PortfolioDetailPage() {
 
                                 {/* Hover Overlay */}
                                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-20">
-                                  <div className="w-20 h-20 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-2xl">
-                                    <ExternalLink size={32} className="text-white" />
+                                  <div className="w-20 h-20 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center transform group-hover:scale-110 transition-transform shadow-2xl">
+                                    <ExternalLink size={32} className="text-ink" />
                                   </div>
                                 </div>
                               </div>
                             ) : (
-                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                                <div className="text-center text-[#2ecc71]">
+                              <div className="w-full h-full bg-surface-2 flex items-center justify-center">
+                                <div className="text-center text-primary">
                                   <ExternalLink className="w-12 h-12 mx-auto mb-2" />
-                                  <span className="font-bold text-xs text-white">Link</span>
+                                  <span className="font-bold text-xs text-ink">Link</span>
                                 </div>
                               </div>
                             )}
@@ -671,13 +671,13 @@ export default function PortfolioDetailPage() {
             <div className="space-y-8">
               {/* Tools Used */}
               {portfolio.tools_used && portfolio.tools_used.length > 0 && (
-                <div className="p-8 bg-slate-900/60 border border-white/10 rounded-3xl">
+                <div className="p-8 bg-surface border border-line rounded-3xl">
                   <h3 className="text-xl font-black uppercase tracking-tight mb-6">Tools & Software</h3>
                   <div className="flex flex-wrap gap-2">
                     {portfolio.tools_used.map((tool, index) => (
                       <span
                         key={index}
-                        className="px-4 py-2 bg-[#2ecc71]/10 border border-[#2ecc71]/20 rounded-full text-sm font-bold text-[#2ecc71]"
+                        className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-bold text-primary"
                       >
                         {tool}
                       </span>
@@ -688,13 +688,13 @@ export default function PortfolioDetailPage() {
 
               {/* Tags */}
               {portfolio.tags && portfolio.tags.length > 0 && (
-                <div className="p-8 bg-slate-900/60 border border-white/10 rounded-3xl">
+                <div className="p-8 bg-surface border border-line rounded-3xl">
                   <h3 className="text-xl font-black uppercase tracking-tight mb-6">Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {portfolio.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-bold text-slate-300"
+                        className="px-4 py-2 bg-surface-2/70 border border-line rounded-full text-sm font-bold text-body"
                       >
                         {tag}
                       </span>
@@ -709,21 +709,21 @@ export default function PortfolioDetailPage() {
                   href={portfolio.project_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 w-full px-8 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
+                  className="flex items-center justify-center gap-3 w-full px-8 py-5 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
                 >
                   View Live Project <ExternalLink size={18} />
                 </a>
               )}
 
               {/* CTA */}
-              <div className="p-8 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-3xl">
+              <div className="p-8 bg-primary/10 border border-primary/30 rounded-3xl">
                 <h3 className="text-xl font-black uppercase tracking-tight mb-4">Want Similar Work?</h3>
-                <p className="text-slate-400 mb-6 text-sm">
+                <p className="text-body mb-6 text-sm">
                   I can create custom solutions tailored to your specific needs. Let&apos;s discuss your project!
                 </p>
                 <Link
                   href="/contact"
-                  className="block w-full text-center px-6 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
+                  className="block w-full text-center px-6 py-4 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
                 >
                   Get in Touch
                 </Link>
@@ -745,7 +745,7 @@ export default function PortfolioDetailPage() {
           {/* Close Button */}
           <button
             onClick={() => setSelectedGalleryIndex(null)}
-            className="absolute top-6 right-6 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+            className="absolute top-6 right-6 z-10 p-3 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
           >
             <X size={24} />
           </button>
@@ -757,7 +757,7 @@ export default function PortfolioDetailPage() {
                 e.stopPropagation();
                 handlePrevGallery();
               }}
-              className="absolute left-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+              className="absolute left-6 z-10 p-4 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
             >
               <ArrowLeft size={28} />
             </button>
@@ -770,7 +770,7 @@ export default function PortfolioDetailPage() {
                 e.stopPropagation();
                 handleNextGallery();
               }}
-              className="absolute right-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+              className="absolute right-6 z-10 p-4 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
             >
               <ArrowRight size={28} />
             </button>
@@ -799,7 +799,7 @@ export default function PortfolioDetailPage() {
               if (isRegularImage) {
                 return (
                   <div className="flex items-center justify-center w-full h-[85vh]">
-                    <div className="relative aspect-video h-[80vh] bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+                    <div className="relative aspect-video h-[80vh] bg-black rounded-2xl overflow-hidden border border-line shadow-2xl">
                       <Image
                         src={item.url}
                         alt={item.alt_text || 'Gallery image'}
@@ -830,7 +830,7 @@ export default function PortfolioDetailPage() {
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#2ecc71] text-slate-900 font-bold rounded-xl hover:scale-105 transition-transform"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:scale-105 transition-transform"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink size={18} />
@@ -844,16 +844,16 @@ export default function PortfolioDetailPage() {
               if (isCanvaDesign) {
                 return (
                   <div className="w-full">
-                    <div className="relative w-full h-[85vh] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
+                    <div className="relative w-full h-[85vh] bg-gradient-to-br from-surface-2 to-surface-2 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center">
                       {/* Canva Design Preview - Show thumbnail/message */}
                       <div className="text-center p-8">
                         <div className="w-32 h-32 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500 flex items-center justify-center shadow-2xl">
-                          <svg className="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-20 h-20 text-ink" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M7.5 7.5c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3zm9 0c-1.5 0-3 1.2-3 3.3 0 1.6 1 2.9 2.4 3.2.1 0 .3-.1.3-.2V12c0-.1 0-.2-.1-.2-.7-.2-1.2-.8-1.2-1.5 0-1 .7-1.8 1.6-1.8s1.6.8 1.6 1.8c0 .7-.5 1.3-1.2 1.5-.1 0-.1.1-.1.2v1.8c0 .1.2.2.3.2 1.4-.3 2.4-1.6 2.4-3.2 0-2.1-1.5-3.3-3-3.3z"/>
                           </svg>
                         </div>
-                        <h3 className="text-3xl font-bold text-white mb-4">Canva Design</h3>
-                        <p className="text-slate-400 mb-8 max-w-md mx-auto">
+                        <h3 className="text-3xl font-bold text-ink mb-4">Canva Design</h3>
+                        <p className="text-body mb-8 max-w-md mx-auto">
                           Click the button below to view this design in Canva
                         </p>
                         <a
@@ -875,7 +875,7 @@ export default function PortfolioDetailPage() {
               // For videos and reels - use bounded container with appropriate aspect ratio
               return (
                 <div className="flex items-center justify-center w-full h-[85vh]">
-                  <div className={`relative bg-black rounded-2xl overflow-hidden border border-white/10 shadow-2xl ${
+                  <div className={`relative bg-black rounded-2xl overflow-hidden border border-line shadow-2xl ${
                     isVerticalVideo
                       ? 'aspect-[9/16] h-[80vh]'
                       : 'aspect-video h-[80vh]'
@@ -898,14 +898,14 @@ export default function PortfolioDetailPage() {
                 /^\d+\.(jpg|jpeg|png)/i.test(altText) // Starts with numbers like "123.jpg"
               );
               return altText && !isFilename && altText.trim() !== '' && (
-                <p className="text-white text-center mt-4 text-lg font-medium">
+                <p className="text-ink text-center mt-4 text-lg font-medium">
                   {altText}
                 </p>
               );
             })()}
 
             {/* Counter */}
-            <p className="text-slate-400 text-center mt-2 text-sm">
+            <p className="text-body text-center mt-2 text-sm">
               {selectedGalleryIndex + 1} / {galleryItems.length}
             </p>
           </div>
@@ -913,14 +913,14 @@ export default function PortfolioDetailPage() {
       )}
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

@@ -97,7 +97,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen selection:bg-[#2ecc71] selection:text-slate-900">
+    <div className="bg-page text-ink min-h-screen selection:bg-primary selection:text-white">
       <Navbar />
 
       <main className="pb-24">
@@ -111,11 +111,11 @@ export default function ContactPage() {
               transition={{ duration: 0.8 }}
               className="text-center"
             >
-              <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Get In Touch</span>
+              <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Get In Touch</span>
               <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
                 Let's <span className="text-gradient">Connect</span>
               </h1>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              <p className="text-body text-lg max-w-2xl mx-auto">
                 Have a project in mind or want to discuss collaboration opportunities? I'm here to help turn your ideas into reality.
               </p>
             </motion.div>
@@ -123,8 +123,8 @@ export default function ContactPage() {
         </section>
 
         {/* Contact Section */}
-        <section className="pt-8 pb-20 bg-slate-900/20 container mx-auto px-6 max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-16">
+        <section className="pt-8 pb-20 bg-surface-2/60 container mx-auto px-6 max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 [&>*]:min-w-0">
             {/* Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -140,17 +140,17 @@ export default function ContactPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                    className="flex items-center gap-6 p-6 bg-slate-900/60 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all"
+                    className="flex items-center gap-4 sm:gap-6 p-5 sm:p-6 bg-surface border border-line shadow-card rounded-3xl hover:border-primary/30 transition-all"
                   >
-                    <div className="p-4 bg-[#2ecc71]/10 rounded-2xl text-[#2ecc71]">
+                    <div className="p-4 bg-primary/10 rounded-2xl text-primary shrink-0">
                       {info.icon}
                     </div>
-                    <div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">{info.label}</span>
+                    <div className="min-w-0">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted block mb-1">{info.label}</span>
                       {info.href ? (
-                        <a href={info.href} className="text-lg font-bold hover:text-[#2ecc71] transition-colors">{info.value}</a>
+                        <a href={info.href} className="text-base sm:text-lg font-bold hover:text-primary transition-colors break-words">{info.value}</a>
                       ) : (
-                        <span className="text-lg font-bold">{info.value}</span>
+                        <span className="text-base sm:text-lg font-bold break-words">{info.value}</span>
                       )}
                     </div>
                   </motion.div>
@@ -167,7 +167,7 @@ export default function ContactPage() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-4 bg-slate-900/60 border border-white/5 rounded-2xl hover:border-[#2ecc71]/30 hover:bg-[#2ecc71]/10 text-slate-400 hover:text-[#2ecc71] transition-all"
+                      className="p-4 bg-surface border border-line rounded-2xl hover:border-primary/30 hover:bg-primary/10 text-body hover:text-primary transition-all"
                     >
                       {social.icon}
                     </a>
@@ -176,10 +176,10 @@ export default function ContactPage() {
               </div>
 
               {/* Map or Additional Info */}
-              <div className="mt-12 p-8 bg-gradient-to-br from-[#2ecc71]/10 to-transparent border border-[#2ecc71]/20 rounded-[3rem]">
-                <MessageSquare className="w-10 h-10 text-[#2ecc71] mb-4" />
+              <div className="mt-12 p-8 bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-[3rem]">
+                <MessageSquare className="w-10 h-10 text-primary mb-4" />
                 <h3 className="text-xl font-black uppercase tracking-tighter mb-3">Quick Response Guaranteed</h3>
-                <p className="text-slate-400">
+                <p className="text-body">
                   I understand the importance of timely communication. Every inquiry receives a response within 12 hours, ensuring your project moves forward without delays.
                 </p>
               </div>
@@ -190,49 +190,49 @@ export default function ContactPage() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="bg-[#0e1526] p-10 lg:p-14 rounded-[4rem] border border-white/10"
+              className="bg-surface p-6 sm:p-10 lg:p-14 rounded-[2.5rem] sm:rounded-[4rem] border border-line shadow-card"
             >
               <h2 className="text-3xl font-black uppercase tracking-tighter mb-8">Send a Message</h2>
 
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Full Name</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 block">Full Name</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="John Doe"
-                    className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold"
+                    className="w-full bg-surface border border-line rounded-2xl p-6 focus:border-primary focus:outline-none transition-all placeholder:text-muted font-bold"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Email Address</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 block">Email Address</label>
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="john@example.com"
-                    className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold"
+                    className="w-full bg-surface border border-line rounded-2xl p-6 focus:border-primary focus:outline-none transition-all placeholder:text-muted font-bold"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Your Message</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 block">Your Message</label>
                   <textarea
                     rows={6}
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Tell me about your project, goals, and how I can help..."
-                    className="w-full bg-slate-900 border border-white/10 rounded-2xl p-6 focus:border-[#2ecc71] focus:outline-none transition-all placeholder:text-slate-700 font-bold resize-none"
+                    className="w-full bg-surface border border-line rounded-2xl p-6 focus:border-primary focus:outline-none transition-all placeholder:text-muted font-bold resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={formStatus === 'loading'}
-                  className="w-full py-6 bg-[#2ecc71] text-slate-900 font-black rounded-2xl text-lg uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-[#2ecc71]/20 flex items-center justify-center gap-4 group disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-6 bg-primary text-white font-black rounded-2xl text-lg uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-4 group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {formStatus === 'loading' ? (
                     <>Processing... <Loader2 className="animate-spin" /></>
@@ -266,25 +266,25 @@ export default function ContactPage() {
               <source src="https://videos.pexels.com/video-files/6774133/6774133-uhd_2732_1440_25fps.mp4" type="video/mp4" />
             </video>
             {/* Dark Overlay */}
-            <div className="absolute inset-0 bg-[#0b0f1a]/85" />
+            <div className="absolute inset-0 bg-page/85" />
             {/* Gradient Overlays for depth */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-[#0b0f1a]/60" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a]/40 via-transparent to-[#0b0f1a]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-page via-transparent to-page/60" />
+            <div className="absolute inset-0 bg-gradient-to-b from-page/40 via-transparent to-page" />
           </div>
 
           {/* Animated Gradient Orbs */}
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#2ecc71]/10 rounded-full blur-[150px] animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[#39ff14]/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-0 w-[300px] h-[300px] bg-[#27ae60]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[150px] animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-0 w-[300px] h-[300px] bg-primary-dark/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
 
           {/* Decorative Border with Glow */}
-          <div className="absolute inset-0 rounded-[3rem] border border-[#2ecc71]/30 shadow-[0_0_50px_rgba(46,204,113,0.1),inset_0_0_50px_rgba(46,204,113,0.05)]" />
+          <div className="absolute inset-0 rounded-[3rem] border border-primary/30 shadow-[0_0_50px_rgba(87,119,255,0.1),inset_0_0_50px_rgba(87,119,255,0.05)]" />
 
           {/* Corner Decorations */}
-          <div className="absolute top-4 left-4 w-20 h-20 border-l-2 border-t-2 border-[#2ecc71]/50 rounded-tl-2xl" />
-          <div className="absolute top-4 right-4 w-20 h-20 border-r-2 border-t-2 border-[#2ecc71]/50 rounded-tr-2xl" />
-          <div className="absolute bottom-4 left-4 w-20 h-20 border-l-2 border-b-2 border-[#2ecc71]/50 rounded-bl-2xl" />
-          <div className="absolute bottom-4 right-4 w-20 h-20 border-r-2 border-b-2 border-[#2ecc71]/50 rounded-br-2xl" />
+          <div className="absolute top-4 left-4 w-20 h-20 border-l-2 border-t-2 border-primary/50 rounded-tl-2xl" />
+          <div className="absolute top-4 right-4 w-20 h-20 border-r-2 border-t-2 border-primary/50 rounded-tr-2xl" />
+          <div className="absolute bottom-4 left-4 w-20 h-20 border-l-2 border-b-2 border-primary/50 rounded-bl-2xl" />
+          <div className="absolute bottom-4 right-4 w-20 h-20 border-r-2 border-b-2 border-primary/50 rounded-br-2xl" />
 
           {/* Section Header */}
           <motion.div
@@ -293,7 +293,7 @@ export default function ContactPage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-8 relative z-20"
           >
-            <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-4 block">Schedule a Call</span>
+            <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-4 block">Schedule a Call</span>
             <h2 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter">
               Book a <span className="text-gradient">Meeting</span>
             </h2>
@@ -312,12 +312,12 @@ export default function ContactPage() {
                   className="relative mb-8"
                 >
                   {/* Outer glow rings */}
-                  <div className="absolute inset-0 w-24 h-24 rounded-full bg-[#2ecc71]/20 animate-ping" />
-                  <div className="absolute inset-0 w-24 h-24 rounded-full bg-[#2ecc71]/10 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                  <div className="absolute inset-0 w-24 h-24 rounded-full bg-primary/20 animate-ping" />
+                  <div className="absolute inset-0 w-24 h-24 rounded-full bg-primary/10 animate-pulse" style={{ animationDelay: '0.5s' }} />
 
                   {/* Calendar Icon Container */}
-                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2ecc71] to-[#27ae60] shadow-[0_0_40px_rgba(46,204,113,0.5)] flex items-center justify-center">
-                    <div className="text-slate-900">
+                  <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-primary to-accent shadow-[0_0_40px_rgba(87,119,255,0.5)] flex items-center justify-center">
+                    <div className="text-white">
                       <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -333,18 +333,18 @@ export default function ContactPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="text-[#2ecc71] text-lg font-black uppercase tracking-widest mb-4"
+                  className="text-primary text-lg font-black uppercase tracking-widest mb-4"
                 >
                   Loading Calendar
                 </motion.p>
 
                 {/* Animated Progress Bar */}
-                <div className="w-48 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-48 h-1.5 bg-surface-2 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="h-full bg-gradient-to-r from-[#2ecc71] via-[#39ff14] to-[#2ecc71] rounded-full shadow-[0_0_10px_rgba(46,204,113,0.5)]"
+                    className="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full shadow-[0_0_10px_rgba(87,119,255,0.5)]"
                   />
                 </div>
 
@@ -353,17 +353,17 @@ export default function ContactPage() {
                   <motion.span
                     animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                    className="w-3 h-3 bg-[#2ecc71] rounded-full shadow-[0_0_10px_rgba(46,204,113,0.5)]"
+                    className="w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_rgba(87,119,255,0.5)]"
                   />
                   <motion.span
                     animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }}
-                    className="w-3 h-3 bg-[#2ecc71] rounded-full shadow-[0_0_10px_rgba(46,204,113,0.5)]"
+                    className="w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_rgba(87,119,255,0.5)]"
                   />
                   <motion.span
                     animate={{ y: [0, -8, 0] }}
                     transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }}
-                    className="w-3 h-3 bg-[#2ecc71] rounded-full shadow-[0_0_10px_rgba(46,204,113,0.5)]"
+                    className="w-3 h-3 bg-primary rounded-full shadow-[0_0_10px_rgba(87,119,255,0.5)]"
                   />
                 </div>
 
@@ -372,7 +372,7 @@ export default function ContactPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="mt-6 text-slate-400 text-sm font-medium"
+                  className="mt-6 text-body text-sm font-medium"
                 >
                   Preparing your scheduling experience...
                 </motion.p>
@@ -394,7 +394,7 @@ export default function ContactPage() {
             >
               <div
                 className="calendly-inline-widget w-full h-full rounded-2xl overflow-hidden"
-                data-url="https://calendly.com/neazmd-tamim/new-meeting?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=0b0f1a&text_color=ffffff&primary_color=2ecc71"
+                data-url="https://calendly.com/neazmd-tamim/new-meeting?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=05100b&primary_color=5777ff"
                 style={{ minWidth: '320px', height: '100%' }}
               />
             </motion.div>
@@ -403,14 +403,14 @@ export default function ContactPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>
@@ -418,12 +418,12 @@ export default function ContactPage() {
 
       <style jsx global>{`
         .text-gradient {
-          background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+          background: linear-gradient(135deg, #5777FF 0%, #625DF5 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
         .text-gradient-neon {
-          background: linear-gradient(135deg, #39ff14 0%, #2ecc71 100%);
+          background: linear-gradient(135deg, #8EA2FF 0%, #5777FF 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }

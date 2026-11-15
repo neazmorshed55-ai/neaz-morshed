@@ -1,26 +1,29 @@
 import './globals.css';
 import React from 'react';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Script from 'next/script';
+import type { Metadata, Viewport } from 'next';
+import localFont from 'next/font/local';
 import VisitorTracker from '../components/VisitorTracker';
 import WhatsAppButton from '../components/WhatsAppButton';
-import AIChatbot from '../components/AIChatbot';
+import LazyChatbot from '../components/LazyChatbot';
+import Preloader, { PRELOADER_HEAD_SCRIPT } from '../components/motion/Preloader';
+import SiteEffects from '../components/motion/SiteEffects';
+import { SITE_URL } from '../lib/site';
 
-// Optimized font loading - preloads and serves locally
-const inter = Inter({
-  subsets: ['latin'],
+// Self-hosted variable font: no request to Google at runtime or build time.
+const urbanist = localFont({
+  src: './fonts/Urbanist-Variable-Latin.woff2',
+  weight: '100 900',
+  style: 'normal',
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-urbanist',
 });
 
-/**
- * Root Layout for the Next.js Portfolio.
- * This file serves as the main entry point for the App Router shell.
- */
+export const viewport: Viewport = {
+  themeColor: '#F8F9FF',
+};
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://neazmorshed.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Neaz Md. Morshed | Virtual Assistant & Outsourcing Expert',
     template: '%s | Neaz Md. Morshed'
@@ -33,14 +36,12 @@ export const metadata: Metadata = {
     icon: '/icon',
     apple: '/apple-icon',
   },
-  // Canonical URL - prevents duplicate content issues
-  alternates: {
-    canonical: '/',
-  },
+  // No site-wide canonical here: a canonical set in the root layout is
+  // inherited by every page and would mark them all as copies of the homepage.
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://neazmorshed.com',
+    url: SITE_URL,
     title: 'Neaz Md. Morshed | Virtual Assistant & Outsourcing Expert',
     description: 'Expert Virtual Assistant & Outsourcing Professional. Scaling businesses with Web Design, Video Editing, and Digital Marketing services.',
     siteName: 'Neaz Md. Morshed Portfolio',
@@ -78,29 +79,21 @@ export default function RootLayout({
   children?: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`scroll-smooth ${inter.variable}`}>
-      <body className={`${inter.className} bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950 antialiased overflow-x-hidden`}>
+    <html lang="en" className={urbanist.variable} suppressHydrationWarning>
+      <head>
+        {/* Decides before first paint whether the intro preloader shows */}
+        <script dangerouslySetInnerHTML={{ __html: PRELOADER_HEAD_SCRIPT }} />
+        <noscript>
+          <style>{'.np-preloader{display:none!important}html.np-loading,html.np-loading body{overflow:auto!important}'}</style>
+        </noscript>
+      </head>
+      <body className="font-sans bg-page text-ink antialiased overflow-x-hidden">
+        <Preloader />
+        <SiteEffects />
         <VisitorTracker />
         {children}
         <WhatsAppButton />
-        <AIChatbot />
-
-        {/* Social Media Embed Scripts */}
-        <Script
-          src="https://www.instagram.com/embed.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          src="https://www.tiktok.com/embed.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          async
-          defer
-          crossOrigin="anonymous"
-          src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0"
-          strategy="lazyOnload"
-        />
+        <LazyChatbot />
       </body>
     </html>
   );

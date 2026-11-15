@@ -223,9 +223,9 @@ export default function AIChatbot() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-[9999] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-slate-800' : 'bg-gradient-to-br from-[#2ecc71] to-[#27ae60]'
+        className={`fixed bottom-6 right-6 z-[9999] w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all ${isOpen ? 'bg-ink' : 'bg-gradient-to-br from-primary to-accent'
           }`}
-        style={{ boxShadow: isOpen ? 'none' : '0 0 30px rgba(46, 204, 113, 0.4)' }}
+        style={{ boxShadow: isOpen ? 'none' : '0 0 30px rgba(87, 119, 255, 0.4)' }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -260,10 +260,10 @@ export default function AIChatbot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-6 z-[9999] w-[380px] max-w-[calc(100vw-48px)] max-h-[calc(100vh-120px)] bg-[#0b0f1a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+            className="fixed bottom-24 right-6 z-[9999] w-[380px] max-w-[calc(100vw-48px)] max-h-[calc(100vh-120px)] bg-white border border-line rounded-3xl shadow-[0_30px_80px_-20px_rgba(16,24,64,0.35)] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#2ecc71] to-[#27ae60] p-5">
+            <div className="bg-gradient-to-r from-primary to-accent p-5">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                   <Sparkles className="w-6 h-6 text-white" />
@@ -276,7 +276,7 @@ export default function AIChatbot() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 min-h-0">
+            <div data-lenis-prevent className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 bg-page">
               {messages.map((message) => (
                 <motion.div
                   key={message.id}
@@ -284,17 +284,17 @@ export default function AIChatbot() {
                   animate={{ opacity: 1, y: 0 }}
                   className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
                 >
-                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${message.role === 'bot' ? 'bg-[#2ecc71]/20' : 'bg-slate-700'
+                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${message.role === 'bot' ? 'bg-primary/20' : 'bg-line'
                     }`}>
                     {message.role === 'bot' ? (
-                      <Bot className="w-4 h-4 text-[#2ecc71]" />
+                      <Bot className="w-4 h-4 text-primary" />
                     ) : (
-                      <User className="w-4 h-4 text-slate-300" />
+                      <User className="w-4 h-4 text-body" />
                     )}
                   </div>
                   <div className={`max-w-[75%] p-3 rounded-2xl ${message.role === 'bot'
-                    ? 'bg-slate-800/80 text-slate-200 rounded-tl-sm'
-                    : 'bg-[#2ecc71] text-slate-900 rounded-tr-sm'
+                    ? 'bg-surface-2 text-ink rounded-tl-sm'
+                    : 'bg-primary text-white rounded-tr-sm'
                     }`}>
                     <p className="text-sm leading-relaxed">{message.content}</p>
                   </div>
@@ -308,14 +308,14 @@ export default function AIChatbot() {
                   animate={{ opacity: 1 }}
                   className="flex gap-3"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#2ecc71]/20 flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-[#2ecc71]" />
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-primary" />
                   </div>
-                  <div className="bg-slate-800/80 p-3 rounded-2xl rounded-tl-sm">
+                  <div className="bg-surface-2 p-3 rounded-2xl rounded-tl-sm">
                     <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 bg-slate-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-2 h-2 bg-muted/40 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-muted/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-muted/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </motion.div>
@@ -340,7 +340,7 @@ export default function AIChatbot() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.05 }}
                       onClick={() => handleQuickReply(reply)}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-[#2ecc71]/20 border border-white/10 hover:border-[#2ecc71]/30 rounded-full text-xs text-slate-300 hover:text-[#2ecc71] transition-all"
+                      className="px-3 py-1.5 bg-surface-2 hover:bg-primary/20 border border-line hover:border-primary/30 rounded-full text-xs text-body hover:text-primary transition-all"
                     >
                       {reply}
                     </motion.button>
@@ -350,7 +350,7 @@ export default function AIChatbot() {
             </AnimatePresence>
 
             {/* Input */}
-            <form onSubmit={handleSubmit} className="p-4 border-t border-white/5">
+            <form onSubmit={handleSubmit} className="p-4 border-t border-line">
               <div className="flex gap-2">
                 <input
                   ref={inputRef}
@@ -359,12 +359,12 @@ export default function AIChatbot() {
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={stage === 'complete' ? 'Chat ended' : 'Type your message...'}
                   disabled={stage === 'complete' || isTyping}
-                  className="flex-1 bg-slate-800/50 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#2ecc71]/50 transition-all disabled:opacity-50"
+                  className="flex-1 bg-surface-2 border border-line rounded-xl px-4 py-3 text-sm text-ink placeholder-muted focus:outline-none focus:border-primary/50 transition-all disabled:opacity-50"
                 />
                 <button
                   type="submit"
                   disabled={!inputValue.trim() || isTyping || stage === 'complete'}
-                  className="p-3 bg-[#2ecc71] hover:bg-[#27ae60] rounded-xl text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="p-3 bg-primary hover:bg-primary-dark rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   <Send className="w-5 h-5" />
                 </button>
@@ -373,7 +373,7 @@ export default function AIChatbot() {
                 <button
                   type="button"
                   onClick={resetChat}
-                  className="w-full mt-2 text-xs text-[#2ecc71] hover:underline"
+                  className="w-full mt-2 text-xs text-primary hover:underline"
                 >
                   Start a new conversation
                 </button>

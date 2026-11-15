@@ -188,23 +188,23 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
+      <div className="bg-page text-ink min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
       </div>
     );
   }
 
   if (!category) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-page text-ink min-h-screen flex flex-col items-center justify-center">
         <h1 className="text-4xl font-black mb-4">Category Not Found</h1>
-        <Link href="/skills/portfolio" className="text-[#2ecc71] hover:underline">Back to Portfolio</Link>
+        <Link href="/skills/portfolio" className="text-primary hover:underline">Back to Portfolio</Link>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       {/* Navigation */}
       <Navbar />
 
@@ -212,18 +212,18 @@ export default function CategoryPage() {
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image src={category.cover_image} alt={category.title} fill priority sizes="100vw" className="object-cover opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a] via-[#0b0f1a]/80 to-[#0b0f1a]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-page via-page/80 to-page"></div>
         </div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-3 mb-8">
-            <Link href="/skills/portfolio" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all group">
+            <Link href="/skills/portfolio" className="inline-flex items-center gap-2 text-body hover:text-primary transition-all group">
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm font-bold uppercase tracking-wider">Portfolio</span>
             </Link>
-            <ArrowRight size={14} className="text-slate-600" />
-            <span className="text-[#2ecc71] text-sm font-bold uppercase tracking-wider">{category.title}</span>
+            <ArrowRight size={14} className="text-muted" />
+            <span className="text-primary text-sm font-bold uppercase tracking-wider">{category.title}</span>
           </div>
 
           <motion.div
@@ -233,7 +233,7 @@ export default function CategoryPage() {
             className="max-w-4xl"
           >
             <div className="flex items-center gap-4 mb-6">
-              <div className="text-[#2ecc71] p-4 bg-white/5 rounded-2xl border border-white/10">
+              <div className="text-primary p-4 bg-surface-2/70 rounded-2xl border border-line">
                 {iconMap[category.icon] || <Briefcase className="w-12 h-12" />}
               </div>
             </div>
@@ -242,16 +242,16 @@ export default function CategoryPage() {
               {category.title}
             </h1>
 
-            <p className="text-slate-300 text-xl leading-relaxed mb-8">
+            <p className="text-body text-xl leading-relaxed mb-8">
               {category.long_description || category.description}
             </p>
 
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[#2ecc71]">
+              <div className="flex items-center gap-2 text-primary">
                 <CheckCircle2 size={20} />
                 <span className="font-bold">{subSkills.length} Services</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-body">
                 <Clock size={20} />
                 <span className="font-bold">10+ Years Experience</span>
               </div>
@@ -276,7 +276,7 @@ export default function CategoryPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Link href={`/skills/portfolio/${categorySlug}/${skill.slug || generateSlug(skill.title)}`}>
-                  <div className="group relative overflow-hidden rounded-3xl border border-white/5 hover:border-[#2ecc71]/40 transition-all duration-500 bg-slate-900/60 h-full">
+                  <div className="group relative overflow-hidden rounded-3xl border border-line hover:border-primary/40 transition-all duration-500 bg-surface h-full">
                     {/* Image */}
                     <div className="aspect-video relative overflow-hidden">
                       <Image
@@ -286,23 +286,23 @@ export default function CategoryPage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-transparent opacity-60"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-page via-transparent to-transparent opacity-60"></div>
 
                       {/* Experience Badge */}
-                      <div className="absolute top-4 right-4 px-3 py-1 bg-[#2ecc71] text-slate-900 text-[10px] font-black rounded-full uppercase">
+                      <div className="absolute top-4 right-4 px-3 py-1 bg-primary text-white text-[10px] font-black rounded-full uppercase">
                         {skill.experience_years}
                       </div>
                     </div>
 
                     {/* Content */}
                     <div className="p-6">
-                      <h3 className="text-xl font-black mb-3 group-hover:text-[#2ecc71] transition-colors uppercase tracking-tight">
+                      <h3 className="text-xl font-black mb-3 group-hover:text-primary transition-colors uppercase tracking-tight">
                         {skill.title}
                       </h3>
-                      <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                      <p className="text-body text-sm leading-relaxed mb-4">
                         {skill.description}
                       </p>
-                      <div className="flex items-center gap-2 text-[#2ecc71] text-sm font-bold group-hover:translate-x-2 transition-transform">
+                      <div className="flex items-center gap-2 text-primary text-sm font-bold group-hover:translate-x-2 transition-transform">
                         Learn More <ArrowRight size={16} />
                       </div>
                     </div>
@@ -317,16 +317,16 @@ export default function CategoryPage() {
       {/* CTA */}
       <section className="py-16">
         <div className="container mx-auto px-6 max-w-4xl">
-          <div className="text-center p-12 bg-slate-900/60 border border-white/10 rounded-[3rem]">
+          <div className="text-center p-12 bg-surface border border-line rounded-[3rem]">
             <h3 className="text-3xl font-black uppercase tracking-tight mb-4">
               Need {category.title} Services?
             </h3>
-            <p className="text-slate-400 mb-8">
+            <p className="text-body mb-8">
               Let&apos;s discuss your project requirements and how I can help.
             </p>
             <Link
               href="/#contact"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
             >
               Get in Touch <ArrowRight size={18} />
             </Link>
@@ -335,14 +335,14 @@ export default function CategoryPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

@@ -78,12 +78,12 @@ export default function FooterLinks() {
   if (loading) {
     return (
       <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-        <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-18 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-14 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
+        <div className="h-4 w-16 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-20 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-18 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-16 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-14 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-20 bg-surface-2 rounded animate-pulse"></div>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function FooterLinks() {
           href={link.url}
           target={link.url.startsWith('http') ? '_blank' : undefined}
           rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-          className="text-slate-500 hover:text-[#2ecc71] transition-all uppercase text-[10px] font-bold tracking-widest"
+          className="text-muted hover:text-primary transition-all uppercase text-[10px] font-bold tracking-widest"
         >
           {link.name}
         </a>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { Reveal, SplitText } from '@/components/motion/Reveal';
 
 interface SectionHeaderProps {
   title: string;
@@ -22,21 +23,36 @@ export default function SectionHeader({
     center: 'text-center',
     right: 'text-right',
   };
+  const labelAlign = {
+    left: 'justify-start',
+    center: 'justify-center',
+    right: 'justify-end',
+  };
 
   return (
-    <div className={`mb-20 ${alignments[align]} ${className}`}>
+    <div className={`mb-14 sm:mb-20 ${alignments[align]} ${className}`}>
       {subtitle && (
-        <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">
-          {subtitle}
-        </span>
+        <Reveal y={16}>
+          <span
+            className={`flex items-center gap-3 ${labelAlign[align]} text-primary text-[11px] font-extrabold uppercase tracking-[0.4em] mb-5`}
+          >
+            <span className="h-px w-8 bg-primary/60" />
+            {subtitle}
+            {align === 'center' && <span className="h-px w-8 bg-primary/60" />}
+          </span>
+        </Reveal>
       )}
-      <h2 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none">
-        {title}
-      </h2>
+      <SplitText
+        as="h2"
+        text={title}
+        className="text-4xl sm:text-5xl lg:text-7xl font-black uppercase tracking-tight leading-[0.95] text-ink"
+      />
       {description && (
-        <p className="text-slate-400 mt-6 max-w-2xl mx-auto">
-          {description}
-        </p>
+        <Reveal y={20} delay={0.15}>
+          <p className={`text-body mt-6 max-w-2xl leading-relaxed ${align === 'center' ? 'mx-auto' : ''}`}>
+            {description}
+          </p>
+        </Reveal>
       )}
     </div>
   );

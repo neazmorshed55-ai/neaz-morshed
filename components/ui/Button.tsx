@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
+import { Magnetic } from '@/components/motion/Reveal';
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -25,40 +26,52 @@ export default function Button({
   className = '',
   target = '_self',
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center gap-3 rounded-2xl font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95';
+  const baseStyles =
+    'relative inline-flex items-center justify-center gap-3 rounded-2xl font-extrabold uppercase tracking-widest transition-all duration-300 active:scale-95 overflow-hidden';
 
   const variants = {
-    primary: 'bg-[#2ecc71] text-slate-950 shadow-[0_20px_50px_rgba(46,204,113,0.3)]',
-    secondary: 'bg-white/5 border border-white/10 text-white hover:bg-[#2ecc71]/10 hover:border-[#2ecc71]/30',
-    ghost: 'text-slate-400 hover:text-[#2ecc71]',
+    primary:
+      'bg-primary text-white shadow-glow hover:bg-primary-dark hover:shadow-[0_22px_44px_-14px_rgba(61,91,239,0.65)]',
+    secondary:
+      'bg-white border border-line text-ink shadow-card hover:border-primary/40 hover:text-primary',
+    ghost: 'text-body hover:text-primary',
   };
 
   const sizes = {
     sm: 'px-6 py-3 text-[10px]',
-    md: 'px-10 py-5 text-sm',
-    lg: 'px-14 py-6 text-sm',
+    md: 'px-9 py-4 text-xs sm:text-sm',
+    lg: 'px-10 sm:px-12 py-5 text-xs sm:text-sm',
   };
 
   const combinedClassName = `${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`;
 
   const content = (
     <>
-      {children}
-      {Icon && <Icon size={20} className="group-hover:translate-x-1 transition-transform" />}
+      <span className="relative z-10">{children}</span>
+      {Icon && (
+        <Icon
+          size={18}
+          className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:-rotate-45"
+        />
+      )}
     </>
   );
 
-  if (href) {
-    return (
-      <Link href={href} className={`${combinedClassName} group`} target={target} rel={target === '_blank' ? 'noopener noreferrer' : undefined}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
+  const element = href ? (
+    <Link
+      href={href}
+      className={`${combinedClassName} group`}
+      target={target}
+      rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+    >
+      {content}
+    </Link>
+  ) : (
     <button onClick={onClick} className={`${combinedClassName} group`}>
       {content}
     </button>
   );
+
+  // Primary calls-to-action get the magnetic hover from the Devix design.
+  return variant === 'primary' ? <Magnetic strength={0.25}>{element}</Magnetic> : element;
 }

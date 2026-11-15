@@ -19,20 +19,21 @@ export default function Card({
   onClick,
 }: CardProps) {
   const variants = {
-    default: 'bg-slate-900/40 border border-white/5',
-    glass: 'bg-white/5 backdrop-blur-2xl border border-white/10',
-    solid: 'bg-slate-900 border border-white/5',
+    default: 'bg-surface border border-line shadow-card',
+    glass: 'bg-white/80 backdrop-blur-2xl border border-line shadow-card',
+    solid: 'bg-surface border border-line shadow-card',
   };
 
   const hoverStyles = hover
-    ? 'hover:border-[#2ecc71]/40 hover:bg-slate-900 cursor-pointer'
+    ? 'hover:border-primary/40 hover:shadow-card-hover cursor-pointer'
     : '';
 
   return (
     <motion.div
-      whileHover={hover ? { scale: 1.02, y: -5 } : {}}
+      whileHover={hover ? { y: -6 } : {}}
+      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
       onClick={onClick}
-      className={`p-8 rounded-3xl transition-all ${variants[variant]} ${hoverStyles} ${className}`}
+      className={`p-8 rounded-3xl transition-[border-color,box-shadow] duration-300 ${variants[variant]} ${hoverStyles} ${className}`}
     >
       {children}
     </motion.div>

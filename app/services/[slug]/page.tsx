@@ -1258,17 +1258,17 @@ export default function PortfolioCollectionPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
+      <div className="bg-page text-ink min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
       </div>
     );
   }
 
   if (!service) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-page text-ink min-h-screen flex flex-col items-center justify-center">
         <h1 className="text-4xl font-black mb-4">Service Not Found</h1>
-        <Link href="/services" className="text-[#2ecc71] hover:underline">
+        <Link href="/services" className="text-primary hover:underline">
           Back to Services
         </Link>
       </div>
@@ -1276,43 +1276,43 @@ export default function PortfolioCollectionPage() {
   }
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-[100] bg-[#0b0f1a]/90 backdrop-blur-2xl border-b border-white/5 py-4">
+      <nav className="fixed top-0 left-0 w-full z-[100] bg-page/90 backdrop-blur-2xl border-b border-line py-4">
         <div className="container mx-auto px-6 lg:px-12 flex justify-between items-center max-w-7xl">
           <Link href="/" className="flex items-center gap-4 group cursor-pointer">
-            <div className="w-12 h-12 bg-[#2ecc71] rounded-2xl flex items-center justify-center font-black text-slate-950 group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]">NM</div>
+            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center font-black text-white group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(87,119,255,0.3)]">NM</div>
             <div className="flex flex-col">
               <span className="text-xl font-extrabold tracking-tighter leading-none">NEAZ MORSHED</span>
-              <span className="text-[10px] text-[#2ecc71] font-bold tracking-[0.2em] mt-1 uppercase">Top Rated Pro</span>
+              <span className="text-[10px] text-primary font-bold tracking-[0.2em] mt-1 uppercase">Top Rated Pro</span>
             </div>
           </Link>
 
           <div className="hidden lg:flex items-center gap-10">
-            <Link href="/" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Home</Link>
-            <Link href="/skills" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Skills</Link>
-            <Link href="/services" className="text-[11px] font-bold tracking-[0.3em] text-[#2ecc71] transition-all uppercase">Services</Link>
-            <Link href="/experience" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Experience</Link>
-            <Link href="/reviews" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Reviews</Link>
-            <Link href="/contact" className="text-[11px] font-bold tracking-[0.3em] text-slate-400 hover:text-[#2ecc71] transition-all uppercase">Contact</Link>
-            <Link href="/resume" className="bg-[#2ecc71] text-slate-950 px-8 py-4 rounded-2xl font-black text-[11px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#2ecc71]/20 uppercase">Resume</Link>
+            <Link href="/" className="text-[11px] font-bold tracking-[0.3em] text-body hover:text-primary transition-all uppercase">Home</Link>
+            <Link href="/skills" className="text-[11px] font-bold tracking-[0.3em] text-body hover:text-primary transition-all uppercase">Skills</Link>
+            <Link href="/services" className="text-[11px] font-bold tracking-[0.3em] text-primary transition-all uppercase">Services</Link>
+            <Link href="/experience" className="text-[11px] font-bold tracking-[0.3em] text-body hover:text-primary transition-all uppercase">Experience</Link>
+            <Link href="/reviews" className="text-[11px] font-bold tracking-[0.3em] text-body hover:text-primary transition-all uppercase">Reviews</Link>
+            <Link href="/contact" className="text-[11px] font-bold tracking-[0.3em] text-body hover:text-primary transition-all uppercase">Contact</Link>
+            <Link href="/resume" className="bg-primary text-white px-8 py-4 rounded-2xl font-black text-[11px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 uppercase">Resume</Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section className="pt-40 pb-20 relative overflow-hidden">
-        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-[#2ecc71]/5 rounded-full blur-[180px] pointer-events-none"></div>
+        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[180px] pointer-events-none"></div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-3 mb-8">
-            <Link href="/services" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all group">
+            <Link href="/services" className="inline-flex items-center gap-2 text-body hover:text-primary transition-all group">
               <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
               <span className="text-sm font-bold uppercase tracking-wider">Services</span>
             </Link>
-            <ArrowRight size={14} className="text-slate-600" />
-            <span className="text-[#2ecc71] text-sm font-bold uppercase tracking-wider">{service.title}</span>
+            <ArrowRight size={14} className="text-muted" />
+            <span className="text-primary text-sm font-bold uppercase tracking-wider">{service.title}</span>
           </div>
 
           <motion.div
@@ -1323,27 +1323,27 @@ export default function PortfolioCollectionPage() {
           >
             <div>
               <div className="flex items-center gap-4 mb-6">
-                <div className="text-[#2ecc71] p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="text-primary p-4 bg-surface-2/70 rounded-2xl border border-line">
                   {iconMap[service.icon] || <Briefcase className="w-8 h-8" />}
                 </div>
-                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em]">Portfolio Collection</span>
+                <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em]">Portfolio Collection</span>
               </div>
               <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-6">
                 {service.title}
               </h1>
-              <p className="text-slate-400 text-lg max-w-2xl leading-relaxed">
+              <p className="text-body text-lg max-w-2xl leading-relaxed">
                 {service.description}
               </p>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="text-center p-8 bg-slate-900/60 border border-white/10 rounded-3xl">
-                <div className="text-4xl font-black text-[#2ecc71]">{portfolioItems.length}</div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Projects</div>
+              <div className="text-center p-8 bg-surface border border-line rounded-3xl">
+                <div className="text-4xl font-black text-primary">{portfolioItems.length}</div>
+                <div className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Projects</div>
               </div>
-              <div className="text-center p-8 bg-slate-900/60 border border-white/10 rounded-3xl">
-                <div className="text-4xl font-black text-[#2ecc71]">{portfolioItems.filter(i => i.is_featured).length}</div>
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Featured</div>
+              <div className="text-center p-8 bg-surface border border-line rounded-3xl">
+                <div className="text-4xl font-black text-primary">{portfolioItems.filter(i => i.is_featured).length}</div>
+                <div className="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Featured</div>
               </div>
             </div>
           </motion.div>
@@ -1359,16 +1359,16 @@ export default function PortfolioCollectionPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-20"
             >
-              <div className="w-24 h-24 mx-auto mb-6 bg-slate-900 rounded-full flex items-center justify-center">
-                {iconMap[service.icon] || <Briefcase className="w-12 h-12 text-slate-600" />}
+              <div className="w-24 h-24 mx-auto mb-6 bg-surface rounded-full flex items-center justify-center">
+                {iconMap[service.icon] || <Briefcase className="w-12 h-12 text-muted" />}
               </div>
-              <h3 className="text-2xl font-black text-slate-400 mb-4">No Projects Yet</h3>
-              <p className="text-slate-500 max-w-md mx-auto">
+              <h3 className="text-2xl font-black text-body mb-4">No Projects Yet</h3>
+              <p className="text-muted max-w-md mx-auto">
                 Portfolio items for this service will be added soon. Check back later or contact me for custom work.
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform"
+                className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform"
               >
                 Get in Touch <ArrowRight size={18} />
               </Link>
@@ -1377,7 +1377,7 @@ export default function PortfolioCollectionPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {portfolioItems.map((item, index) => {
                 const cardContent = (
-                  <div className="relative overflow-hidden rounded-3xl border border-white/5 hover:border-[#2ecc71]/40 transition-all duration-500 bg-slate-900/60 h-full flex flex-col">
+                  <div className="relative overflow-hidden rounded-3xl border border-line hover:border-primary/40 transition-all duration-500 bg-surface h-full flex flex-col">
                     {/* Image */}
                     <div className="aspect-video relative overflow-hidden">
                       {item.thumbnail_url || item.image_url ? (
@@ -1389,24 +1389,24 @@ export default function PortfolioCollectionPage() {
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                       ) : (
-                        <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                          {iconMap[service.icon] || <Briefcase className="w-16 h-16 text-slate-600" />}
+                        <div className="w-full h-full bg-surface-2 flex items-center justify-center">
+                          {iconMap[service.icon] || <Briefcase className="w-16 h-16 text-muted" />}
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-transparent to-transparent opacity-60"></div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-page via-transparent to-transparent opacity-60"></div>
 
                       {/* Play Button for Videos */}
                       {item.video_url && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-16 h-16 bg-[#2ecc71] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-[#2ecc71]/30">
-                            <Play size={28} className="text-slate-900 ml-1" fill="currentColor" />
+                          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/30">
+                            <Play size={28} className="text-white ml-1" fill="currentColor" />
                           </div>
                         </div>
                       )}
 
                       {/* Featured Badge */}
                       {item.is_featured && (
-                        <div className="absolute top-4 right-4 px-3 py-1 bg-[#2ecc71] text-slate-900 text-[9px] font-black rounded-full uppercase">
+                        <div className="absolute top-4 right-4 px-3 py-1 bg-primary text-white text-[9px] font-black rounded-full uppercase">
                           Featured
                         </div>
                       )}
@@ -1422,18 +1422,18 @@ export default function PortfolioCollectionPage() {
 
                     {/* Content */}
                     <div className="p-6 flex-1 flex flex-col">
-                      <h3 className="text-xl font-black mb-2 group-hover:text-[#2ecc71] transition-colors capitalize tracking-tight">
+                      <h3 className="text-xl font-black mb-2 group-hover:text-primary transition-colors capitalize tracking-tight">
                         {item.title}
                       </h3>
 
                       {item.client_name && (
-                        <div className="flex items-center gap-2 text-slate-500 text-sm mb-3">
+                        <div className="flex items-center gap-2 text-muted text-sm mb-3">
                           <User size={14} />
                           <span>{item.client_name}</span>
                         </div>
                       )}
 
-                      <p className="text-slate-400 text-sm line-clamp-2 mb-4 flex-1">
+                      <p className="text-body text-sm line-clamp-2 mb-4 flex-1">
                         {item.description}
                       </p>
 
@@ -1442,7 +1442,7 @@ export default function PortfolioCollectionPage() {
                           {item.tags.slice(0, 3).map((tag, i) => (
                             <span
                               key={i}
-                              className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                              className="px-3 py-1 bg-surface-2/70 border border-line rounded-full text-[10px] font-bold text-body uppercase tracking-wider"
                             >
                               {tag}
                             </span>
@@ -1495,15 +1495,15 @@ export default function PortfolioCollectionPage() {
               className="mb-12"
             >
               <div className="flex items-center gap-4 mb-6">
-                <div className="text-[#2ecc71] p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="text-primary p-4 bg-surface-2/70 rounded-2xl border border-line">
                   <ImageIcon size={32} />
                 </div>
-                <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em]">Project Gallery</span>
+                <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em]">Project Gallery</span>
               </div>
               <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-none">
                 Media Collection
               </h2>
-              <p className="text-slate-400 mt-4 max-w-2xl">
+              <p className="text-body mt-4 max-w-2xl">
                 Browse through our collection of {service.title.toLowerCase()} projects, showcasing images, videos, and documents from our portfolio.
               </p>
             </motion.div>
@@ -1560,7 +1560,7 @@ export default function PortfolioCollectionPage() {
                     onClick={() => setSelectedGalleryIndex(index)}
                     className="cursor-pointer group"
                   >
-                    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all aspect-square">
+                    <div className="relative overflow-hidden rounded-2xl border border-line bg-surface hover:border-primary/50 transition-all aspect-square">
                       {isRegularImage ? (
                         <Image
                           src={item.url}
@@ -1580,7 +1580,7 @@ export default function PortfolioCollectionPage() {
                           />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
                             <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                              <Play size={24} className="text-white ml-1" />
+                              <Play size={24} className="text-ink ml-1" />
                             </div>
                           </div>
                         </>
@@ -1596,7 +1596,7 @@ export default function PortfolioCollectionPage() {
                         </div>
                       ) : isInstagramPost ? (
                         <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
-                          <div className="text-center text-white">
+                          <div className="text-center text-ink">
                             <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                             </svg>
@@ -1608,9 +1608,9 @@ export default function PortfolioCollectionPage() {
                           item.url.includes('/document/') ? 'bg-gradient-to-br from-blue-600 to-blue-800' :
                           item.url.includes('/spreadsheets/') ? 'bg-gradient-to-br from-green-600 to-green-800' :
                           item.url.includes('/presentation/') ? 'bg-gradient-to-br from-yellow-600 to-yellow-800' :
-                          'bg-gradient-to-br from-slate-700 to-slate-900'
+                          'bg-gradient-to-br from-surface-2 to-surface-2'
                         }`}>
-                          <div className="text-center text-white p-4">
+                          <div className="text-center text-ink p-4">
                             {item.url.includes('/document/') ? (
                               <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19H8V18H10V19M14,19H10V17H14V19M14,16H10V15H14V16M10,14H8V12H10V14M14,14H10V12H14V14M10,11H8V10H10V11M14,11H10V10H14V11Z" />
@@ -1630,10 +1630,10 @@ export default function PortfolioCollectionPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="w-full h-full bg-slate-900 flex items-center justify-center">
-                          <div className="text-center text-[#2ecc71]">
+                        <div className="w-full h-full bg-surface flex items-center justify-center">
+                          <div className="text-center text-primary">
                             <ExternalLink className="w-12 h-12 mx-auto mb-2" />
-                            <span className="font-bold text-xs text-white">Link</span>
+                            <span className="font-bold text-xs text-ink">Link</span>
                           </div>
                         </div>
                       )}
@@ -1647,35 +1647,35 @@ export default function PortfolioCollectionPage() {
       )}
 
       {/* CTA Section */}
-      <section className="py-20 bg-slate-900/30">
+      <section className="py-20 bg-surface-2/60">
         <div className="container mx-auto px-6 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center p-12 bg-slate-900/60 border border-white/10 rounded-[3rem] relative overflow-hidden"
+            className="text-center p-12 bg-surface border border-line rounded-[3rem] relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#2ecc71]/10 rounded-full blur-[80px] -z-10"></div>
+            <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/10 rounded-full blur-[80px] -z-10"></div>
 
-            <div className="text-[#2ecc71] p-5 bg-white/5 rounded-2xl border border-white/10 inline-flex mb-6">
+            <div className="text-primary p-5 bg-surface-2/70 rounded-2xl border border-line inline-flex mb-6">
               {iconMap[service.icon] || <Briefcase className="w-10 h-10" />}
             </div>
             <h3 className="text-3xl font-black uppercase tracking-tight mb-4">
               Need Similar Work?
             </h3>
-            <p className="text-slate-400 mb-8 max-w-xl mx-auto">
+            <p className="text-body mb-8 max-w-xl mx-auto">
               I can create custom {service.title.toLowerCase()} solutions tailored to your specific needs. Let's discuss your project!
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="px-10 py-5 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm flex items-center gap-3"
+                className="px-10 py-5 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm flex items-center gap-3"
               >
                 Start a Project <ArrowRight size={18} />
               </Link>
               <Link
                 href="/services"
-                className="px-10 py-5 border-2 border-white/20 text-white font-black rounded-2xl hover:border-[#2ecc71] transition-all uppercase tracking-widest text-sm"
+                className="px-10 py-5 border-2 border-line text-ink font-black rounded-2xl hover:border-primary transition-all uppercase tracking-widest text-sm"
               >
                 View All Services
               </Link>
@@ -1698,13 +1698,13 @@ export default function PortfolioCollectionPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-[#0e1526] rounded-[2rem] md:rounded-[3rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/10 relative my-auto"
+              className="bg-surface rounded-[2rem] md:rounded-[3rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-line relative my-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={() => setSelectedItem(null)}
-                className="absolute top-4 right-4 md:top-6 md:right-6 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-10 p-3 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
               >
                 <X size={24} />
               </button>
@@ -1718,7 +1718,7 @@ export default function PortfolioCollectionPage() {
                       e.stopPropagation();
                       setSelectedItem(portfolioItems[currentIndex - 1]);
                     }}
-                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 p-3 md:p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
+                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 p-3 md:p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-white text-white transition-all group shadow-2xl border border-line"
                     title="Previous project"
                   >
                     <ArrowLeft size={24} className="md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" strokeWidth={2.5} />
@@ -1735,7 +1735,7 @@ export default function PortfolioCollectionPage() {
                       e.stopPropagation();
                       setSelectedItem(portfolioItems[currentIndex + 1]);
                     }}
-                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 p-3 md:p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 p-3 md:p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-white text-white transition-all group shadow-2xl border border-line"
                     title="Next project"
                   >
                     <ArrowRight size={24} className="md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" strokeWidth={2.5} />
@@ -1769,12 +1769,12 @@ export default function PortfolioCollectionPage() {
                       href={selectedItem.video_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full h-full flex items-center justify-center bg-slate-900 hover:bg-slate-800 transition-colors"
+                      className="w-full h-full flex items-center justify-center bg-surface hover:bg-surface-2 transition-colors"
                     >
-                      <div className="text-[#2ecc71] flex flex-col items-center gap-3 p-6">
+                      <div className="text-primary flex flex-col items-center gap-3 p-6">
                         <ExternalLink size={48} />
-                        <span className="text-white font-bold text-lg">Visit External Link</span>
-                        <span className="text-slate-400 text-sm max-w-[80%] truncate">{selectedItem.video_url}</span>
+                        <span className="text-ink font-bold text-lg">Visit External Link</span>
+                        <span className="text-body text-sm max-w-[80%] truncate">{selectedItem.video_url}</span>
                       </div>
                     </a>
                   )}
@@ -1796,7 +1796,7 @@ export default function PortfolioCollectionPage() {
               <div className="p-6 md:p-10">
                 {/* Featured Badge */}
                 {selectedItem.is_featured && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#2ecc71]/20 text-[#2ecc71] text-[10px] font-black rounded-full uppercase mb-4">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary text-[10px] font-black rounded-full uppercase mb-4">
                     <CheckCircle2 size={12} />
                     Featured Project
                   </span>
@@ -1808,27 +1808,27 @@ export default function PortfolioCollectionPage() {
 
                 <div className="flex flex-wrap gap-4 mb-6">
                   {selectedItem.client_name && (
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <User size={16} className="text-[#2ecc71]" />
+                    <div className="flex items-center gap-2 text-body">
+                      <User size={16} className="text-primary" />
                       <span className="text-sm font-semibold">{selectedItem.client_name}</span>
                     </div>
                   )}
                   {selectedItem.completion_date && (
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <Calendar size={16} className="text-[#2ecc71]" />
+                    <div className="flex items-center gap-2 text-body">
+                      <Calendar size={16} className="text-primary" />
                       <span className="text-sm font-semibold">{selectedItem.completion_date}</span>
                     </div>
                   )}
                   {selectedItem.duration && (
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <Clock size={16} className="text-[#2ecc71]" />
+                    <div className="flex items-center gap-2 text-body">
+                      <Clock size={16} className="text-primary" />
                       <span className="text-sm font-semibold">{selectedItem.duration}</span>
                     </div>
                   )}
                 </div>
 
                 {selectedItem.description && (
-                  <p className="text-slate-400 leading-relaxed mb-8">
+                  <p className="text-body leading-relaxed mb-8">
                     {selectedItem.description}
                   </p>
                 )}
@@ -1836,7 +1836,7 @@ export default function PortfolioCollectionPage() {
                 {/* Gallery Section */}
                 {galleryItems.length > 0 && (
                   <div className="mb-8">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 block">Project Gallery</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted mb-4 block">Project Gallery</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {galleryItems.map((item, index) => {
                         // Check if it's a video file or actual video platform URL (not Facebook images)
@@ -1880,7 +1880,7 @@ export default function PortfolioCollectionPage() {
                         return (
                           <div
                             key={item.id}
-                            className="rounded-2xl overflow-hidden border border-white/10 bg-black/50 cursor-pointer group hover:border-[#2ecc71]/50 transition-all"
+                            className="rounded-2xl overflow-hidden border border-line bg-black/50 cursor-pointer group hover:border-primary/50 transition-all"
                             onClick={() => setSelectedGalleryIndex(index)}
                           >
                             <div className="relative aspect-video">
@@ -1901,8 +1901,8 @@ export default function PortfolioCollectionPage() {
                                   loading="lazy"
                                 />
                               ) : (
-                                <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                                  <div className="text-slate-600">
+                                <div className="w-full h-full bg-surface-2 flex items-center justify-center">
+                                  <div className="text-muted">
                                     {isGoogleDrive ? <FileText size={48} /> : isLink ? <ExternalLink size={48} /> : <Eye size={48} />}
                                   </div>
                                 </div>
@@ -1910,13 +1910,13 @@ export default function PortfolioCollectionPage() {
 
                               {/* Overlay with icon based on type - Only show on hover */}
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <div className="w-16 h-16 bg-[#2ecc71] rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform shadow-lg shadow-[#2ecc71]/30">
+                                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform shadow-lg shadow-primary/30">
                                   {isActualVideo ? (
-                                    <Play size={28} className="text-slate-900 ml-1" fill="currentColor" />
+                                    <Play size={28} className="text-white ml-1" fill="currentColor" />
                                   ) : isLink ? (
-                                    <ExternalLink size={28} className="text-slate-900" />
+                                    <ExternalLink size={28} className="text-white" />
                                   ) : (
-                                    <Eye size={28} className="text-slate-900" />
+                                    <Eye size={28} className="text-white" />
                                   )}
                                 </div>
                               </div>
@@ -1932,12 +1932,12 @@ export default function PortfolioCollectionPage() {
                 {/* Tools Used */}
                 {selectedItem.tools_used && selectedItem.tools_used.length > 0 && (
                   <div className="mb-6">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 block">Tools & Software Used</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted mb-3 block">Tools & Software Used</span>
                     <div className="flex flex-wrap gap-2">
                       {selectedItem.tools_used.map((tool, i) => (
                         <span
                           key={i}
-                          className="px-4 py-2 bg-[#2ecc71]/10 border border-[#2ecc71]/20 rounded-full text-sm font-bold text-[#2ecc71]"
+                          className="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-bold text-primary"
                         >
                           {tool}
                         </span>
@@ -1949,12 +1949,12 @@ export default function PortfolioCollectionPage() {
                 {/* Tags */}
                 {selectedItem.tags && selectedItem.tags.length > 0 && (
                   <div className="mb-8">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3 block">Tags</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted mb-3 block">Tags</span>
                     <div className="flex flex-wrap gap-2">
                       {selectedItem.tags.map((tag, i) => (
                         <span
                           key={i}
-                          className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-bold text-slate-300"
+                          className="px-4 py-2 bg-surface-2/70 border border-line rounded-full text-sm font-bold text-body"
                         >
                           {tag}
                         </span>
@@ -1970,14 +1970,14 @@ export default function PortfolioCollectionPage() {
                       href={selectedItem.project_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-wider"
+                      className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-wider"
                     >
                       View Project <ExternalLink size={18} />
                     </a>
                   )}
                   <Link
                     href="/contact"
-                    className="inline-flex items-center gap-3 px-8 py-4 border-2 border-white/20 text-white font-black rounded-2xl hover:border-[#2ecc71] transition-all uppercase tracking-wider"
+                    className="inline-flex items-center gap-3 px-8 py-4 border-2 border-line text-ink font-black rounded-2xl hover:border-primary transition-all uppercase tracking-wider"
                   >
                     Request Similar Work
                   </Link>
@@ -2008,7 +2008,7 @@ export default function PortfolioCollectionPage() {
               {/* Close Button */}
               <button
                 onClick={() => setSelectedGalleryIndex(null)}
-                className="absolute top-4 right-4 z-10 p-3 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all shadow-xl"
+                className="absolute top-4 right-4 z-10 p-3 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-white text-white transition-all shadow-xl"
               >
                 <X size={24} />
               </button>
@@ -2020,7 +2020,7 @@ export default function PortfolioCollectionPage() {
                     e.stopPropagation();
                     setSelectedGalleryIndex(selectedGalleryIndex - 1);
                   }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-white text-white transition-all group shadow-2xl border border-line"
                   title="Previous image"
                 >
                   <ArrowLeft size={32} className="group-hover:-translate-x-1 transition-transform" strokeWidth={2.5} />
@@ -2034,7 +2034,7 @@ export default function PortfolioCollectionPage() {
                     e.stopPropagation();
                     setSelectedGalleryIndex(selectedGalleryIndex + 1);
                   }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-slate-900 text-white transition-all group shadow-2xl border border-white/20"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-4 bg-black/60 backdrop-blur-sm rounded-full hover:bg-white/90 hover:text-white text-white transition-all group shadow-2xl border border-line"
                   title="Next image"
                 >
                   <ArrowRight size={32} className="group-hover:translate-x-1 transition-transform" strokeWidth={2.5} />
@@ -2042,7 +2042,7 @@ export default function PortfolioCollectionPage() {
               )}
 
               {/* Content */}
-              <div className="bg-[#0e1526] rounded-3xl overflow-hidden border border-white/10 w-full max-w-6xl max-h-[90vh]">
+              <div className="bg-surface rounded-3xl overflow-hidden border border-line w-full max-w-6xl max-h-[90vh]">
                 {(() => {
                   const item = (selectedItem ? galleryItems : allGalleryItems)[selectedGalleryIndex];
                   const isActualVideo = isVideoFile(item.url) ||
@@ -2085,18 +2085,18 @@ export default function PortfolioCollectionPage() {
                     );
                   } else if (item.type === 'link' || (item.url.startsWith('http') && !isFacebookImage(item.url) && !isGoogleDriveUrl(item.url) && !/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(item.url))) {
                     return (
-                      <div className="aspect-video flex items-center justify-center p-12 bg-slate-900">
+                      <div className="aspect-video flex items-center justify-center p-12 bg-surface">
                         <div className="text-center">
-                          <div className="w-24 h-24 mx-auto mb-6 bg-[#2ecc71] rounded-full flex items-center justify-center">
-                            <ExternalLink size={48} className="text-slate-900" />
+                          <div className="w-24 h-24 mx-auto mb-6 bg-primary rounded-full flex items-center justify-center">
+                            <ExternalLink size={48} className="text-white" />
                           </div>
-                          <h3 className="text-2xl font-black text-white mb-4">External Link</h3>
-                          <p className="text-slate-400 mb-6 max-w-md break-all">{item.url}</p>
+                          <h3 className="text-2xl font-black text-ink mb-4">External Link</h3>
+                          <p className="text-body mb-6 max-w-md break-all">{item.url}</p>
                           <a
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-wider"
+                            className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-wider"
                           >
                             Open Link <ExternalLink size={18} />
                           </a>
@@ -2120,7 +2120,7 @@ export default function PortfolioCollectionPage() {
                 })()}
 
                 {/* Gallery Counter - Facebook style */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-black/80 backdrop-blur-md text-white text-base font-bold rounded-full shadow-xl border border-white/20">
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-black/80 backdrop-blur-md text-white text-base font-bold rounded-full shadow-xl border border-line">
                   {selectedGalleryIndex + 1} / {(selectedItem ? galleryItems : allGalleryItems).length}
                 </div>
               </div>
@@ -2131,14 +2131,14 @@ export default function PortfolioCollectionPage() {
 
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

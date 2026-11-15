@@ -108,18 +108,18 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
 
     if (loading) {
         return (
-            <div className="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-[#2ecc71] border-t-transparent rounded-full animate-spin"></div>
+            <div className="bg-page text-ink min-h-screen flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (!blog) {
         return (
-            <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col items-center justify-center text-center p-6">
+            <div className="bg-page text-ink min-h-screen flex flex-col items-center justify-center text-center p-6">
                 <h1 className="text-4xl font-black mb-4">Article Not Found</h1>
-                <p className="text-slate-400 mb-8">The article you are looking for does not exist or has been removed.</p>
-                <Link href="/blog" className="px-8 py-4 bg-[#2ecc71] text-slate-900 rounded-xl font-bold uppercase tracking-widest hover:bg-[#27ae60] transition-colors">
+                <p className="text-body mb-8">The article you are looking for does not exist or has been removed.</p>
+                <Link href="/blog" className="px-8 py-4 bg-primary text-white rounded-xl font-bold uppercase tracking-widest hover:bg-primary-dark transition-colors">
                     Back to Blog
                 </Link>
             </div>
@@ -135,10 +135,10 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
     }
 
     return (
-        <div className="bg-[#0b0f1a] text-white min-h-screen selection:bg-[#2ecc71] selection:text-slate-900">
+        <div className="bg-page text-ink min-h-screen selection:bg-primary selection:text-white">
             {/* Reading Progress Bar */}
             <motion.div
-                className="fixed top-0 left-0 right-0 h-1 bg-[#2ecc71] origin-left z-50"
+                className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-50"
                 style={{ scaleX }}
             />
 
@@ -148,14 +148,14 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                 {/* Hero Section with Cover */}
                 <section className="relative pt-32 pb-12">
                     <div className="container mx-auto px-6 max-w-4xl relative z-10">
-                        <Link href="/blog" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all mb-8 group">
+                        <Link href="/blog" className="inline-flex items-center gap-2 text-body hover:text-primary transition-all mb-8 group">
                             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
                             <span className="text-sm font-bold uppercase tracking-wider">Back to Blog</span>
                         </Link>
 
                         <div className="flex flex-wrap gap-4 mb-6">
                             {blog.tags && blog.tags.map(tag => (
-                                <span key={tag} className="px-3 py-1 bg-[#2ecc71]/10 text-[#2ecc71] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#2ecc71]/20">
+                                <span key={tag} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">
                                     {tag}
                                 </span>
                             ))}
@@ -169,26 +169,26 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-slate-400 border-b border-white/10 pb-8 mb-12"
+                            className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-body border-b border-line pb-8 mb-12"
                         >
                             <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 bg-gradient-to-br from-[#2ecc71] to-[#27ae60] rounded-full flex items-center justify-center">
-                                    <User size={18} className="text-slate-900" />
+                                <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+                                    <User size={18} className="text-white" />
                                 </div>
-                                <span className="font-bold text-white">{blog.author || 'Neaz Morshed'}</span>
+                                <span className="font-bold text-ink">{blog.author || 'Neaz Morshed'}</span>
                             </div>
-                            <span className="text-slate-700">•</span>
+                            <span className="text-muted">•</span>
                             <div className="flex items-center gap-2">
-                                <Calendar size={16} className="text-[#2ecc71]" />
+                                <Calendar size={16} className="text-primary" />
                                 <span className="font-medium">{new Date(blog.published_at).toLocaleDateString('en-US', {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric'
                                 })}</span>
                             </div>
-                            <span className="text-slate-700">•</span>
+                            <span className="text-muted">•</span>
                             <div className="flex items-center gap-2">
-                                <Clock size={16} className="text-[#2ecc71]" />
+                                <Clock size={16} className="text-primary" />
                                 <span className="font-medium">{readingTime} min read</span>
                             </div>
                         </motion.div>
@@ -199,7 +199,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                 <section className="container mx-auto px-6 max-w-4xl">
                     {/* Cover Image */}
                     {blog.cover_image && (
-                        <div className="mb-12 rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl relative aspect-video">
+                        <div className="mb-12 rounded-[2rem] overflow-hidden border border-line shadow-2xl relative aspect-video">
                             <Image
                                 src={blog.cover_image}
                                 alt={blog.cover_image_alt_text || blog.title}
@@ -213,7 +213,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
 
                     {/* Video */}
                     {blog.video_url && (
-                        <div className="mb-12 rounded-[2rem] overflow-hidden border border-white/5 shadow-2xl aspect-video">
+                        <div className="mb-12 rounded-[2rem] overflow-hidden border border-line shadow-2xl aspect-video">
                             <iframe
                                 src={blog.video_url.replace('watch?v=', 'embed/')}
                                 title={blog.title}
@@ -229,31 +229,31 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                         className="prose prose-invert max-w-none
-                            prose-headings:tracking-normal prose-headings:scroll-mt-24 prose-headings:text-white
+                            prose-headings:tracking-normal prose-headings:scroll-mt-24 prose-headings:text-ink
                             prose-h1:text-[32px] md:prose-h1:text-[40px] prose-h1:mb-6 prose-h1:mt-10 prose-h1:leading-[1.3] prose-h1:font-black
                             prose-h2:text-[26px] md:prose-h2:text-[32px] prose-h2:mb-5 prose-h2:mt-10 prose-h2:leading-[1.4] prose-h2:font-bold prose-h2:border-none prose-h2:pl-0 prose-h2:bg-transparent prose-h2:py-0
-                            prose-h3:text-[22px] md:prose-h3:text-[26px] prose-h3:text-white prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-[1.4] prose-h3:font-semibold
-                            prose-h4:text-[19px] md:prose-h4:text-[22px] prose-h4:text-white prose-h4:mb-3 prose-h4:mt-6 prose-h4:font-semibold
-                            prose-p:text-slate-300 prose-p:leading-[1.75] prose-p:mb-5 prose-p:text-[17px] md:prose-p:text-[18px] prose-p:font-normal
-                            prose-strong:text-[#2ecc71] prose-strong:font-semibold
-                            prose-em:text-slate-400 prose-em:italic
-                            prose-a:text-[#2ecc71] prose-a:no-underline prose-a:font-medium hover:prose-a:underline prose-a:transition-all
+                            prose-h3:text-[22px] md:prose-h3:text-[26px] prose-h3:text-ink prose-h3:mb-4 prose-h3:mt-8 prose-h3:leading-[1.4] prose-h3:font-semibold
+                            prose-h4:text-[19px] md:prose-h4:text-[22px] prose-h4:text-ink prose-h4:mb-3 prose-h4:mt-6 prose-h4:font-semibold
+                            prose-p:text-body prose-p:leading-[1.75] prose-p:mb-5 prose-p:text-[17px] md:prose-p:text-[18px] prose-p:font-normal
+                            prose-strong:text-primary prose-strong:font-semibold
+                            prose-em:text-body prose-em:italic
+                            prose-a:text-primary prose-a:no-underline prose-a:font-medium hover:prose-a:underline prose-a:transition-all
                             prose-ul:my-6 prose-ul:space-y-2.5 prose-ul:list-none prose-ul:text-[17px] md:prose-ul:text-[18px]
                             prose-ol:my-6 prose-ol:space-y-2.5 prose-ol:list-decimal prose-ol:pl-6 prose-ol:text-[17px] md:prose-ol:text-[18px]
-                            prose-li:text-slate-300 prose-li:pl-2 prose-li:relative prose-li:leading-[1.7]
-                            prose-li:before:absolute prose-li:before:left-[-1.5rem] prose-li:before:content-['▹'] prose-li:before:text-[#2ecc71] prose-li:before:font-bold prose-li:before:text-lg
+                            prose-li:text-body prose-li:pl-2 prose-li:relative prose-li:leading-[1.7]
+                            prose-li:before:absolute prose-li:before:left-[-1.5rem] prose-li:before:content-['▹'] prose-li:before:text-primary prose-li:before:font-bold prose-li:before:text-lg
                             prose-ol>li:before:content-none
-                            prose-li:marker:text-[#2ecc71] prose-li:marker:font-semibold
-                            prose-blockquote:border-l-4 prose-blockquote:border-[#2ecc71] prose-blockquote:bg-gradient-to-r prose-blockquote:from-slate-900/80 prose-blockquote:to-slate-900/20 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-slate-400 prose-blockquote:my-8 prose-blockquote:text-[17px]
-                            prose-code:bg-slate-800/50 prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-code:text-[#2ecc71] prose-code:text-[15px] prose-code:font-mono prose-code:border prose-code:border-[#2ecc71]/20
-                            prose-pre:bg-slate-900 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl prose-pre:p-6 prose-pre:my-8 prose-pre:text-[15px]
-                            prose-img:rounded-2xl prose-img:border prose-img:border-white/10 prose-img:shadow-2xl prose-img:my-8
-                            prose-hr:border-white/10 prose-hr:my-12
+                            prose-li:marker:text-primary prose-li:marker:font-semibold
+                            prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gradient-to-r prose-blockquote:from-surface-2 prose-blockquote:to-surface-2/40 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic prose-blockquote:text-body prose-blockquote:my-8 prose-blockquote:text-[17px]
+                            prose-code:bg-surface-2 prose-code:px-2 prose-code:py-1 prose-code:rounded-lg prose-code:text-primary prose-code:text-[15px] prose-code:font-mono prose-code:border prose-code:border-primary/20
+                            prose-pre:bg-surface prose-pre:border prose-pre:border-line prose-pre:rounded-2xl prose-pre:p-6 prose-pre:my-8 prose-pre:text-[15px]
+                            prose-img:rounded-2xl prose-img:border prose-img:border-line prose-img:shadow-2xl prose-img:my-8
+                            prose-hr:border-line prose-hr:my-12
                             prose-table:border-collapse prose-table:w-full prose-table:my-8 prose-table:text-[16px]
-                            prose-thead:border-b-2 prose-thead:border-[#2ecc71]
-                            prose-th:text-left prose-th:p-4 prose-th:font-semibold prose-th:text-white prose-th:uppercase prose-th:text-sm prose-th:tracking-wider
-                            prose-td:p-4 prose-td:border-b prose-td:border-white/10 prose-td:text-slate-300
-                            prose-tr:transition-colors hover:prose-tr:bg-white/5"
+                            prose-thead:border-b-2 prose-thead:border-primary
+                            prose-th:text-left prose-th:p-4 prose-th:font-semibold prose-th:text-ink prose-th:uppercase prose-th:text-sm prose-th:tracking-wider
+                            prose-td:p-4 prose-td:border-b prose-td:border-line prose-td:text-body
+                            prose-tr:transition-colors hover:prose-tr:bg-surface-2/70"
                     >
                         <div dangerouslySetInnerHTML={{ __html: blog.content || '' }} />
                     </motion.article>
@@ -263,10 +263,10 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mt-16 pt-8 border-t border-white/10"
+                        className="mt-16 pt-8 border-t border-line"
                     >
-                        <h4 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-6 flex items-center gap-2">
-                            <Share2 size={16} className="text-[#2ecc71]" />
+                        <h4 className="text-sm font-black uppercase tracking-widest text-muted mb-6 flex items-center gap-2">
+                            <Share2 size={16} className="text-primary" />
                             Share this article
                         </h4>
                         <div className="flex flex-wrap gap-3">
@@ -274,7 +274,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={shareToTwitter}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#1da1f2] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#1da1f2]"
+                                className="flex items-center gap-2 px-5 py-3 bg-surface rounded-xl hover:bg-[#1da1f2] hover:text-white transition-all text-body font-bold text-sm border border-line hover:border-[#1da1f2]"
                             >
                                 <Twitter size={18} />
                                 <span>Twitter</span>
@@ -283,7 +283,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={shareToLinkedIn}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#0077b5] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#0077b5]"
+                                className="flex items-center gap-2 px-5 py-3 bg-surface rounded-xl hover:bg-[#0077b5] hover:text-white transition-all text-body font-bold text-sm border border-line hover:border-[#0077b5]"
                             >
                                 <Linkedin size={18} />
                                 <span>LinkedIn</span>
@@ -292,7 +292,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={shareToFacebook}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#1877f2] hover:text-white transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#1877f2]"
+                                className="flex items-center gap-2 px-5 py-3 bg-surface rounded-xl hover:bg-[#1877f2] hover:text-white transition-all text-body font-bold text-sm border border-line hover:border-[#1877f2]"
                             >
                                 <Facebook size={18} />
                                 <span>Facebook</span>
@@ -301,7 +301,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={copyLink}
-                                className="flex items-center gap-2 px-5 py-3 bg-slate-900 rounded-xl hover:bg-[#2ecc71] hover:text-slate-900 transition-all text-slate-400 font-bold text-sm border border-white/10 hover:border-[#2ecc71]"
+                                className="flex items-center gap-2 px-5 py-3 bg-surface rounded-xl hover:bg-primary hover:text-white transition-all text-body font-bold text-sm border border-line hover:border-primary"
                             >
                                 {copied ? <Check size={18} /> : <Copy size={18} />}
                                 <span>{copied ? 'Copied!' : 'Copy Link'}</span>
@@ -318,7 +318,7 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0 }}
                     onClick={scrollToTop}
-                    className="fixed bottom-8 right-8 p-4 bg-[#2ecc71] text-slate-900 rounded-full shadow-2xl hover:bg-[#27ae60] transition-colors z-40 group"
+                    className="fixed bottom-8 right-8 p-4 bg-primary text-white rounded-full shadow-2xl hover:bg-primary-dark transition-colors z-40 group"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                 >
@@ -327,14 +327,14 @@ export default function BlogDetailPage({ params }: { params: { slug: string } })
             )}
 
             {/* Footer */}
-            <footer className="py-6 sm:py-8 border-t border-white/5">
+            <footer className="py-6 sm:py-8 border-t border-line">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
                         <FooterLinks />
-                        <p className="text-slate-400 text-xs sm:text-sm font-medium">
+                        <p className="text-body text-xs sm:text-sm font-medium">
                             Designed and Developed by{' '}
-                            <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-                            <span className="text-slate-500">Copyright © 2026</span>
+                            <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+                            <span className="text-muted">Copyright © 2026</span>
                         </p>
                     </div>
                 </div>

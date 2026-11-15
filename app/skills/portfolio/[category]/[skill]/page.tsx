@@ -309,17 +309,17 @@ export default function SkillDetailPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
+      <div className="bg-page text-ink min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
       </div>
     );
   }
 
   if (!skill) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex flex-col items-center justify-center">
+      <div className="bg-page text-ink min-h-screen flex flex-col items-center justify-center">
         <h1 className="text-4xl font-black mb-4">Skill Not Found</h1>
-        <Link href={`/skills/portfolio/${categorySlug}`} className="text-[#2ecc71] hover:underline">Back to Category</Link>
+        <Link href={`/skills/portfolio/${categorySlug}`} className="text-primary hover:underline">Back to Category</Link>
       </div>
     );
   }
@@ -327,7 +327,7 @@ export default function SkillDetailPage() {
   const categoryTitle = categorySlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       {/* Navigation */}
       <Navbar />
 
@@ -335,17 +335,17 @@ export default function SkillDetailPage() {
       <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image src={skill.cover_image} alt={skill.title} fill priority sizes="100vw" className="object-cover opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a] via-[#0b0f1a]/90 to-[#0b0f1a]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-page via-page/90 to-page"></div>
         </div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
           {/* Breadcrumb */}
           <div className="flex flex-wrap items-center gap-3 mb-8 text-sm">
-            <Link href="/skills/portfolio" className="text-slate-400 hover:text-[#2ecc71] transition-all">Portfolio</Link>
-            <ArrowRight size={14} className="text-slate-600" />
-            <Link href={`/skills/portfolio/${categorySlug}`} className="text-slate-400 hover:text-[#2ecc71] transition-all">{categoryTitle}</Link>
-            <ArrowRight size={14} className="text-slate-600" />
-            <span className="text-[#2ecc71] font-bold">{skill.title}</span>
+            <Link href="/skills/portfolio" className="text-body hover:text-primary transition-all">Portfolio</Link>
+            <ArrowRight size={14} className="text-muted" />
+            <Link href={`/skills/portfolio/${categorySlug}`} className="text-body hover:text-primary transition-all">{categoryTitle}</Link>
+            <ArrowRight size={14} className="text-muted" />
+            <span className="text-primary font-bold">{skill.title}</span>
           </div>
 
           <motion.div
@@ -357,31 +357,31 @@ export default function SkillDetailPage() {
               {skill.title}
             </h1>
 
-            <p className="text-slate-300 text-xl leading-relaxed mb-8 max-w-3xl">
+            <p className="text-body text-xl leading-relaxed mb-8 max-w-3xl">
               {skill.description}
             </p>
 
             {/* Stats */}
             <div className="flex flex-wrap gap-6 mb-8">
-              <div className="flex items-center gap-3 px-6 py-4 bg-white/5 rounded-2xl border border-white/10">
-                <Clock className="text-[#2ecc71]" size={24} />
+              <div className="flex items-center gap-3 px-6 py-4 bg-surface-2/70 rounded-2xl border border-line">
+                <Clock className="text-primary" size={24} />
                 <div>
                   <div className="text-2xl font-black">{skill.experience_years}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500">Experience</div>
+                  <div className="text-[10px] uppercase tracking-widest text-muted">Experience</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 px-6 py-4 bg-white/5 rounded-2xl border border-white/10">
-                <Briefcase className="text-[#2ecc71]" size={24} />
+              <div className="flex items-center gap-3 px-6 py-4 bg-surface-2/70 rounded-2xl border border-line">
+                <Briefcase className="text-primary" size={24} />
                 <div>
                   <div className="text-2xl font-black">{skill.project_count}+</div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500">Projects</div>
+                  <div className="text-[10px] uppercase tracking-widest text-muted">Projects</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 px-6 py-4 bg-white/5 rounded-2xl border border-white/10">
-                <Star className="text-[#2ecc71]" size={24} />
+              <div className="flex items-center gap-3 px-6 py-4 bg-surface-2/70 rounded-2xl border border-line">
+                <Star className="text-primary" size={24} />
                 <div>
                   <div className="text-2xl font-black">100%</div>
-                  <div className="text-[10px] uppercase tracking-widest text-slate-500">Satisfaction</div>
+                  <div className="text-[10px] uppercase tracking-widest text-muted">Satisfaction</div>
                 </div>
               </div>
             </div>
@@ -392,7 +392,7 @@ export default function SkillDetailPage() {
                 href="https://www.upwork.com/freelancers/~01cb6294ba2d3d41d3"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
               >
                 Hire Me <ArrowRight size={18} />
               </a>
@@ -400,7 +400,7 @@ export default function SkillDetailPage() {
                 href="https://www.fiverr.com/neaz222"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 px-8 py-4 border-2 border-white/20 text-white font-black rounded-2xl hover:border-[#2ecc71] transition-all uppercase tracking-widest text-sm"
+                className="inline-flex items-center gap-3 px-8 py-4 border-2 border-line text-ink font-black rounded-2xl hover:border-primary transition-all uppercase tracking-widest text-sm"
               >
                 View on Fiverr <ExternalLink size={18} />
               </a>
@@ -420,7 +420,7 @@ export default function SkillDetailPage() {
               </h2>
               <div className="prose prose-invert prose-lg max-w-none">
                 {skill.long_description?.split('\n').map((paragraph, index) => (
-                  <p key={index} className="text-slate-300 leading-relaxed mb-4">
+                  <p key={index} className="text-body leading-relaxed mb-4">
                     {paragraph}
                   </p>
                 ))}
@@ -471,7 +471,7 @@ export default function SkillDetailPage() {
                           className="group cursor-pointer"
                           onClick={() => setSelectedGalleryIndex(index)}
                         >
-                          <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900 hover:border-[#2ecc71]/50 transition-all relative aspect-video">
+                          <div className="rounded-2xl overflow-hidden border border-line bg-surface hover:border-primary/50 transition-all relative aspect-video">
                             {isRegularImage ? (
                               <Image
                                 src={item.url}
@@ -491,7 +491,7 @@ export default function SkillDetailPage() {
                                 />
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
                                   <div className="w-20 h-20 rounded-full bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
-                                    <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-10 h-10 text-ink ml-1" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M8 5v14l11-7z" />
                                     </svg>
                                   </div>
@@ -499,7 +499,7 @@ export default function SkillDetailPage() {
                               </>
                             ) : isTikTok ? (
                               <div className="w-full h-full bg-gradient-to-br from-[#00f2ea] via-[#ff0050] to-[#000] flex items-center justify-center">
-                                <div className="text-center text-white">
+                                <div className="text-center text-ink">
                                   <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                                   </svg>
@@ -508,7 +508,7 @@ export default function SkillDetailPage() {
                               </div>
                             ) : isFacebook ? (
                               <div className="w-full h-full bg-[#1877f2] flex items-center justify-center">
-                                <div className="text-center text-white">
+                                <div className="text-center text-ink">
                                   <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                   </svg>
@@ -517,7 +517,7 @@ export default function SkillDetailPage() {
                               </div>
                             ) : isInstagram ? (
                               <div className="w-full h-full bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
-                                <div className="text-center text-white">
+                                <div className="text-center text-ink">
                                   <svg className="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                                   </svg>
@@ -525,19 +525,19 @@ export default function SkillDetailPage() {
                                 </div>
                               </div>
                             ) : isGoogleDrive ? (
-                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                                <div className="text-center text-[#2ecc71]">
+                              <div className="w-full h-full bg-surface-2 flex items-center justify-center">
+                                <div className="text-center text-primary">
                                   <svg className="w-16 h-16 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                   </svg>
-                                  <span className="font-bold text-sm text-white">Google Drive</span>
+                                  <span className="font-bold text-sm text-ink">Google Drive</span>
                                 </div>
                               </div>
                             ) : (
-                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                                <div className="text-center text-[#2ecc71]">
+                              <div className="w-full h-full bg-surface-2 flex items-center justify-center">
+                                <div className="text-center text-primary">
                                   <ExternalLink className="w-16 h-16 mx-auto mb-3" />
-                                  <span className="font-bold text-sm text-white">External Link</span>
+                                  <span className="font-bold text-sm text-ink">External Link</span>
                                 </div>
                               </div>
                             )}
@@ -553,7 +553,7 @@ export default function SkillDetailPage() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="aspect-video rounded-2xl overflow-hidden border border-white/10 relative"
+                        className="aspect-video rounded-2xl overflow-hidden border border-line relative"
                       >
                         <Image src={img} alt={`${skill.title} example ${index + 1}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover hover:scale-110 transition-transform duration-500" />
                       </motion.div>
@@ -568,13 +568,13 @@ export default function SkillDetailPage() {
               <div className="sticky top-32 space-y-8">
                 {/* Tools Used */}
                 {skill.tools_used && skill.tools_used.length > 0 && (
-                  <div className="p-8 bg-slate-900/60 border border-white/10 rounded-3xl">
+                  <div className="p-8 bg-surface border border-line rounded-3xl">
                     <h3 className="text-xl font-black uppercase tracking-tight mb-6">Tools & Software</h3>
                     <div className="flex flex-wrap gap-2">
                       {skill.tools_used.map((tool, index) => (
                         <span
                           key={index}
-                          className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm font-semibold text-slate-300"
+                          className="px-4 py-2 bg-surface-2/70 border border-line rounded-full text-sm font-semibold text-body"
                         >
                           {tool}
                         </span>
@@ -584,12 +584,12 @@ export default function SkillDetailPage() {
                 )}
 
                 {/* Why Choose Me */}
-                <div className="p-8 bg-slate-900/60 border border-white/10 rounded-3xl">
+                <div className="p-8 bg-surface border border-line rounded-3xl">
                   <h3 className="text-xl font-black uppercase tracking-tight mb-6">Why Choose Me</h3>
                   <ul className="space-y-4">
                     {['Fast turnaround time', 'Unlimited revisions', 'Quality guaranteed', '24/7 communication', 'Competitive pricing'].map((item, index) => (
-                      <li key={index} className="flex items-center gap-3 text-slate-300">
-                        <CheckCircle2 className="text-[#2ecc71] flex-shrink-0" size={18} />
+                      <li key={index} className="flex items-center gap-3 text-body">
+                        <CheckCircle2 className="text-primary flex-shrink-0" size={18} />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -597,14 +597,14 @@ export default function SkillDetailPage() {
                 </div>
 
                 {/* Quick Contact */}
-                <div className="p-8 bg-[#2ecc71]/10 border border-[#2ecc71]/30 rounded-3xl">
+                <div className="p-8 bg-primary/10 border border-primary/30 rounded-3xl">
                   <h3 className="text-xl font-black uppercase tracking-tight mb-4">Ready to Start?</h3>
-                  <p className="text-slate-400 mb-6 text-sm">
+                  <p className="text-body mb-6 text-sm">
                     Let&apos;s discuss your project and bring your vision to life.
                   </p>
                   <Link
                     href="/#contact"
-                    className="block w-full text-center px-6 py-4 bg-[#2ecc71] text-slate-900 font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
+                    className="block w-full text-center px-6 py-4 bg-primary text-white font-black rounded-2xl hover:scale-105 transition-transform uppercase tracking-widest text-sm"
                   >
                     Get in Touch
                   </Link>
@@ -616,11 +616,11 @@ export default function SkillDetailPage() {
       </section>
 
       {/* Back Navigation */}
-      <section className="py-8 border-t border-white/5">
+      <section className="py-8 border-t border-line">
         <div className="container mx-auto px-6 max-w-7xl">
           <Link
             href={`/skills/portfolio/${categorySlug}`}
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all group"
+            className="inline-flex items-center gap-2 text-body hover:text-primary transition-all group"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="font-bold">Back to {categoryTitle}</span>
@@ -641,7 +641,7 @@ export default function SkillDetailPage() {
             {/* Close Button */}
             <button
               onClick={() => setSelectedGalleryIndex(null)}
-              className="absolute top-6 right-6 z-10 p-3 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+              className="absolute top-6 right-6 z-10 p-3 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
             >
               <X size={24} />
             </button>
@@ -653,7 +653,7 @@ export default function SkillDetailPage() {
                   e.stopPropagation();
                   handlePrevGallery();
                 }}
-                className="absolute left-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+                className="absolute left-6 z-10 p-4 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
               >
                 <ArrowLeft size={28} />
               </button>
@@ -666,7 +666,7 @@ export default function SkillDetailPage() {
                   e.stopPropagation();
                   handleNextGallery();
                 }}
-                className="absolute right-6 z-10 p-4 bg-white/10 rounded-full hover:bg-[#2ecc71] hover:text-slate-900 transition-all"
+                className="absolute right-6 z-10 p-4 bg-surface-2 rounded-full hover:bg-primary hover:text-white transition-all"
               >
                 <ArrowRight size={28} />
               </button>
@@ -708,13 +708,13 @@ export default function SkillDetailPage() {
 
               {/* Caption */}
               {galleryItems[selectedGalleryIndex].alt_text && (
-                <p className="text-white text-center mt-4 text-lg font-medium">
+                <p className="text-ink text-center mt-4 text-lg font-medium">
                   {galleryItems[selectedGalleryIndex].alt_text}
                 </p>
               )}
 
               {/* Counter */}
-              <p className="text-slate-400 text-center mt-2 text-sm">
+              <p className="text-body text-center mt-2 text-sm">
                 {selectedGalleryIndex + 1} / {galleryItems.length}
               </p>
             </div>
@@ -723,14 +723,14 @@ export default function SkillDetailPage() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

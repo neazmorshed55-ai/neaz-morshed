@@ -1,161 +1,109 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabase';
+import React from 'react';
+import Link from 'next/link';
+import NextImage from 'next/image';
+import { ArrowRight } from 'lucide-react';
+import { Reveal, SplitText } from '@/components/motion/Reveal';
 
-interface PortfolioItem {
+export interface PortfolioShowcaseItem {
   id: string;
   title: string;
-  description: string;
-  image_url: string;
-  video_url?: string;
-  thumbnail_url?: string;
+  description: string | null;
+  image_url: string | null;
+  video_url?: string | null;
+  thumbnail_url?: string | null;
   order_index: number;
 }
 
-export default function PortfolioShowcase() {
-  const [items, setItems] = useState<PortfolioItem[]>([]);
-  const [loading, setLoading] = useState(true);
+// Hosts next/image is allowed to optimise (see next.config.js remotePatterns)
+const OPTIMIZABLE = /^https:\/\/([a-z0-9-]+\.supabase\.co\/storage\/|images\.unsplash\.com\/|lh3\.googleusercontent\.com\/|img\.youtube\.com\/)/;
 
-  useEffect(() => {
-    fetchPortfolio();
-  }, []);
-
-  async function fetchPortfolio() {
-    try {
-      const { data, error } = await supabase
-        .from('portfolio_items')
-        .select('*')
-        .order('order_index', { ascending: true })
-        .limit(12);
-
-      if (error) throw error;
-      if (data) setItems(data);
-    } catch (error) {
-      console.error('Error fetching portfolio:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  if (loading) {
-    return (
-      <section className="py-24 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a]">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#2ecc71] border-r-transparent"></div>
-        </div>
-      </section>
-    );
-  }
-
-  if (items.length === 0) {
-    return null;
-  }
+/**
+ * Homepage project grid. Items come from the server; images are resized by
+ * next/image (≈30-80 KB each instead of multi-MB originals) and lazy-loaded.
+ */
+export default function PortfolioShowcase({ items }: { items: PortfolioShowcaseItem[] }) {
+  if (!items || items.length === 0) return null;
 
   return (
-    <section className="py-16 sm:py-24 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a]">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
-
+    <section className="py-16 sm:py-24 bg-surface relative overflow-hidden">
+      <div className="absolute inset-0 bg-dots opacity-40 [mask-image:linear-gradient(180deg,#000,transparent_70%)] pointer-events-none" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl relative">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            <span className="text-[#2ecc71]">Our</span> Projects
+        <div className="text-center mb-12 sm:mb-16">
+          <Reveal y={16}>
+            <span className="flex items-center justify-center gap-3 text-primary text-[11px] font-extrabold uppercase tracking-[0.4em] mb-5">
+              <span className="h-px w-8 bg-primary/60" />
+              Portfolio
+              <span className="h-px w-8 bg-primary/60" />
+            </span>
+          </Reveal>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95] mb-5 text-ink">
+            <SplitText text="Our" wordClassName="text-gradient" /> <SplitText text="Projects" delay={0.08} />
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Explore our diverse portfolio of successful projects
-          </p>
-        </motion.div>
+          <Reveal y={20} delay={0.1}>
+            <p className="text-body text-lg max-w-2xl mx-auto">
+              Explore our diverse portfolio of successful projects
+            </p>
+          </Reveal>
+        </div>
 
         {/* Portfolio Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {items.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              className="group relative aspect-video rounded-xl overflow-hidden bg-slate-900 border-2 border-slate-800 hover:border-[#2ecc71]/50 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[#2ecc71]/20"
-            >
-              {/* Image/Video */}
-              <div className="relative w-full h-full">
-                {item.video_url ? (
-                  <video
-                    src={item.video_url}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    muted
-                    loop
-                    playsInline
-                  />
-                ) : item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                ) : item.thumbnail_url ? (
-                  <img
-                    src={item.thumbnail_url}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#2ecc71]/20 to-[#27ae60]/20 flex items-center justify-center">
-                    <p className="text-white/50 text-sm text-center px-4">{item.title}</p>
-                  </div>
-                )}
-
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <h3 className="text-white font-bold text-base sm:text-lg mb-1 line-clamp-1">
-                    {item.title}
-                  </h3>
-                  {item.description && (
-                    <p className="text-slate-300 text-xs sm:text-sm line-clamp-2">
-                      {item.description}
-                    </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+          {items.map((item, index) => {
+            const src = item.thumbnail_url || item.image_url;
+            return (
+              <Reveal key={item.id} delay={(index % 4) * 0.08} y={30}>
+                <div className="group relative aspect-video rounded-2xl overflow-hidden bg-surface-2 border border-line shadow-card hover:shadow-card-hover hover:border-primary/40 transition-all duration-300">
+                  {src ? (
+                    <NextImage
+                      src={src}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      quality={70}
+                      unoptimized={!OPTIMIZABLE.test(src)}
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/15 to-accent/15 flex items-center justify-center">
+                      <p className="text-body text-sm text-center px-4 font-semibold">{item.title}</p>
+                    </div>
                   )}
-                </div>
 
-                {/* Index Badge */}
-                <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-white text-xs font-semibold">
-                    #{index + 1}
-                  </span>
-                </div>
-              </div>
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <h3 className="text-white font-bold text-base sm:text-lg mb-1 line-clamp-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      {item.title}
+                    </h3>
+                    {item.description && (
+                      <p className="text-white/80 text-xs sm:text-sm line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Glow Effect on Hover */}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#2ecc71]/0 to-[#27ae60]/0 group-hover:from-[#2ecc71]/20 group-hover:to-[#27ae60]/20 blur-xl -z-10 transition-all duration-500" />
-            </motion.div>
-          ))}
+                  {/* Index Badge */}
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-card">
+                    <span className="text-ink text-xs font-bold">#{index + 1}</span>
+                  </div>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
 
         {/* View All Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-center mt-12"
-        >
-          <button className="group px-8 py-4 bg-[#2ecc71] text-slate-950 font-bold rounded-xl hover:bg-[#27ae60] transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-[#2ecc71]/30 flex items-center gap-2">
+        <Reveal y={20} className="flex justify-center mt-12">
+          <Link
+            href="/services"
+            className="group px-8 py-4 bg-primary text-white font-extrabold uppercase tracking-widest text-xs sm:text-sm rounded-2xl hover:bg-primary-dark transition-all duration-300 active:scale-95 shadow-glow flex items-center gap-2"
+          >
             View All Projects
-            <svg
-              className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </button>
-        </motion.div>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+          </Link>
+        </Reveal>
       </div>
     </section>
   );

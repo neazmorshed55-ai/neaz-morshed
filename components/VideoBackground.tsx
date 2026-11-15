@@ -1,61 +1,45 @@
 "use client";
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
 
 interface VideoBackgroundProps {
   type: 'skills' | 'services' | 'experience' | 'reviews' | 'contact' | 'calendar';
+  /** Kept for API compatibility with the old video version. */
   opacity?: number;
 }
 
-// Professional video URLs for different page types
-const videoSources: Record<string, string> = {
-  skills: 'https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_30fps.mp4', // Abstract tech particles
-  services: 'https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_30fps.mp4', // Digital network
-  experience: 'https://videos.pexels.com/video-files/856428/856428-hd_1920_1080_25fps.mp4', // Time-lapse city/progress
-  reviews: 'https://videos.pexels.com/video-files/3255275/3255275-uhd_2560_1440_25fps.mp4', // Soft abstract light
-  contact: 'https://videos.pexels.com/video-files/852388/852388-hd_1920_1080_30fps.mp4', // Globe/connection theme
-  calendar: 'https://videos.pexels.com/video-files/6774133/6774133-uhd_2732_1440_25fps.mp4', // Calendar/Schedule theme
+// Each page gets a slightly different soft glow so headers don't all look alike.
+const glows: Record<VideoBackgroundProps['type'], { a: string; b: string }> = {
+  skills: { a: '20% 10%', b: '85% 60%' },
+  services: { a: '80% 0%', b: '10% 70%' },
+  experience: { a: '15% 20%', b: '90% 40%' },
+  reviews: { a: '70% 10%', b: '20% 80%' },
+  contact: { a: '85% 15%', b: '15% 60%' },
+  calendar: { a: '50% 0%', b: '50% 90%' },
 };
 
-export default function VideoBackground({ type, opacity = 0.3 }: VideoBackgroundProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1.2]);
+/**
+ * Light decorative header background.
+ *
+ * This used to stream a full-screen 2560px stock video behind every page
+ * header (tens of MB per page). It is now pure CSS: same props, no download.
+ */
+export default function VideoBackground({ type }: VideoBackgroundProps) {
+  const glow = glows[type] || glows.services;
 
   return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden z-0">
-      {/* Video element with Parallax */}
-      <motion.div
-        style={{ y, scale }}
-        className="absolute inset-0 w-full h-full"
-      >
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-          style={{ opacity }}
-        >
-          <source src={videoSources[type]} type="video/mp4" />
-        </video>
-      </motion.div>
-
-      {/* Dark Overlay for "Dark Overlay Effect" */}
-      <div className="absolute inset-0 bg-[#0b0f1a]/80" />
-
-      {/* Gradient Overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-[#0b0f1a]/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a] via-transparent to-[#0b0f1a]/40" />
-
-      {/* Subtle color tint based on brand */}
-      <div className="absolute inset-0 bg-[#2ecc71]/5 mix-blend-overlay" />
+    <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none" aria-hidden="true">
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(55% 55% at ${glow.a}, rgba(87, 119, 255, 0.16) 0%, rgba(87, 119, 255, 0) 70%),
+            radial-gradient(45% 45% at ${glow.b}, rgba(98, 93, 245, 0.12) 0%, rgba(98, 93, 245, 0) 70%),
+            linear-gradient(180deg, #FFFFFF 0%, #F8F9FF 100%)`,
+        }}
+      />
+      <div className="absolute inset-0 bg-dots opacity-60 [mask-image:radial-gradient(70%_60%_at_50%_30%,#000_0%,transparent_100%)]" />
+      <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full border border-primary/10 animate-subtle-pulse" />
+      <div className="absolute -bottom-32 -left-20 w-[360px] h-[360px] rounded-full border border-accent/10 animate-subtle-pulse" />
     </div>
   );
 }
