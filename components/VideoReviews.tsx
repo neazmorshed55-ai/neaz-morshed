@@ -178,7 +178,7 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
             </div>
 
             {review.headline && (
-              <p className="absolute bottom-4 left-5 right-5 text-ink font-bold text-sm drop-shadow-lg line-clamp-2">
+              <p className="absolute bottom-4 left-5 right-5 text-white font-bold text-sm drop-shadow-lg line-clamp-2">
                 {review.headline}
               </p>
             )}

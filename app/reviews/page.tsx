@@ -465,9 +465,6 @@ export default function ReviewsPage() {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
-        html {
-          scroll-behavior: smooth;
-        }
       `}</style>
     </div>
   );
