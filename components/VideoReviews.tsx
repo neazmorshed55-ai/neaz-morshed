@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Star, Loader2, ExternalLink, Video } from 'lucide-react';
+import { Play, Star, Loader2, Video } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getFlagEmoji } from '../lib/flag-emoji';
 import { parseVideoUrl, withAutoplay, type ParsedVideo } from '../lib/video-embed';
@@ -90,10 +90,10 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="bg-slate-900/60 border border-white/5 rounded-[2rem] overflow-hidden hover:border-[#2ecc71]/30 transition-all group"
+      className="bg-surface border border-line rounded-[2rem] overflow-hidden hover:border-primary/30 transition-all group"
     >
       {/* Player */}
-      <div className="relative aspect-video bg-slate-950">
+      <div className="relative aspect-video bg-ink">
         {isPlaying && !playbackFailed && parsed.mode === 'iframe' && parsed.embedUrl ? (
           <iframe
             src={withAutoplay(parsed.embedUrl)}
@@ -140,8 +140,8 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
                 loading="lazy"
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950">
-                <Video className="w-12 h-12 text-slate-700" />
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-surface-2 to-surface-2">
+                <Video className="w-12 h-12 text-muted" />
               </div>
             )}
 
@@ -154,24 +154,20 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
                   type="button"
                   onClick={() => setIsPlaying(true)}
                   aria-label={`Play video review by ${review.client_name}`}
-                  className="flex items-center justify-center w-20 h-20 rounded-full bg-[#2ecc71] text-slate-950 shadow-2xl shadow-[#2ecc71]/30 hover:scale-110 active:scale-95 transition-transform"
+                  className="flex items-center justify-center w-20 h-20 rounded-full bg-primary text-white shadow-2xl shadow-primary/30 hover:scale-110 active:scale-95 transition-transform"
                 >
-                  <Play className="w-8 h-8 ml-1 fill-slate-950" />
+                  <Play className="w-8 h-8 ml-1 fill-white" />
                 </button>
               ) : isResolving ? (
-                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-slate-900/80 border border-white/10">
-                  <Loader2 className="w-8 h-8 text-[#2ecc71] animate-spin" />
+                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-surface border border-line">
+                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
                 </div>
               ) : (
-                <a
-                  href={review.video_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-[#2ecc71] text-slate-950 font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform"
-                >
-                  Watch Video
-                  <ExternalLink className="w-4 h-4" />
-                </a>
+                // Portfolio variant: never link out, even when inline playback fails
+                <div className="flex items-center gap-3 px-6 py-4 rounded-2xl bg-white/90 text-ink font-black text-xs uppercase tracking-widest">
+                  <Video className="w-4 h-4 text-primary" />
+                  Video unavailable
+                </div>
               )}
             </div>
 
@@ -188,7 +184,7 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
       <div className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="font-black text-white text-lg">{review.client_name}</h3>
+            <h3 className="font-black text-ink text-lg">{review.client_name}</h3>
 
             {location && (
               <div className="flex items-center gap-1.5 mt-1.5">
@@ -197,12 +193,12 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
                     {getFlagEmoji(review.country_code)}
                   </span>
                 )}
-                <span className="text-[11px] text-slate-400">{location}</span>
+                <span className="text-[11px] text-body">{location}</span>
               </div>
             )}
 
             {(review.client_title || review.client_company) && (
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-2">
+              <p className="text-[10px] text-muted uppercase tracking-wider mt-2">
                 {[review.client_title, review.client_company].filter(Boolean).join(' • ')}
               </p>
             )}
@@ -214,8 +210,8 @@ function VideoReviewCard({ review, index }: { review: VideoReview; index: number
                 key={i}
                 className={`w-3.5 h-3.5 ${
                   i < (review.rating ?? 5)
-                    ? 'text-[#2ecc71] fill-[#2ecc71]'
-                    : 'text-slate-700'
+                    ? 'text-primary fill-primary'
+                    : 'text-muted'
                 }`}
               />
             ))}
@@ -279,7 +275,7 @@ export default function VideoReviews({ limit, className = '' }: VideoReviewsProp
         viewport={{ once: true }}
         className="text-center mb-12"
       >
-        <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-4 block">
+        <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-4 block">
           In Their Own Words
         </span>
         <h2 className="text-3xl lg:text-5xl font-black uppercase tracking-tighter">

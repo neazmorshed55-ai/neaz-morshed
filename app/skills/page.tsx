@@ -65,7 +65,7 @@ export default function SkillsPage() {
   const pdfUrl = "https://3a1ca1eb-d638-4203-b0b1-2302cab10e23.filesusr.com/ugd/d8469f_9322816617d04ddb9ef23edefa7fad5b.pdf";
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       <Navbar />
 
       {/* Hero Section - Skill Showcase */}
@@ -73,8 +73,8 @@ export default function SkillsPage() {
         <VideoBackground type="skills" opacity={0.4} />
 
         {/* Additional decorative elements */}
-        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-[#2ecc71]/5 rounded-full blur-[150px] pointer-events-none"></div>
-        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-[#2ecc71]/5 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
 
         <div className="container mx-auto px-6 max-w-4xl relative z-10">
           <motion.div
@@ -85,22 +85,22 @@ export default function SkillsPage() {
           >
             {/* Decorative Arc */}
             <div className="flex justify-center mb-8">
-              <svg width="200" height="60" viewBox="0 0 200 60" fill="none" className="text-[#2ecc71]">
+              <svg width="200" height="60" viewBox="0 0 200 60" fill="none" className="text-primary">
                 <path d="M10 50 Q100 0 190 50" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" />
               </svg>
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-8">
-              <span className="text-[#2ecc71]">SKILL</span> SHOWCASE
+              <span className="text-primary">SKILL</span> SHOWCASE
             </h1>
 
-            <p className="text-slate-300 text-lg max-w-2xl mx-auto leading-relaxed mb-12">
+            <p className="text-body text-lg max-w-2xl mx-auto leading-relaxed mb-12">
               If you want one stop administrative support then you can give your attention to this profile. You can spend few time to save your valuable time. I have 10+ years working experience in online and offline marketplace.
             </p>
 
             <Link
               href="/skills/portfolio"
-              className="inline-flex items-center gap-3 px-10 py-5 border-2 border-[#2ecc71] text-white font-black rounded-xl hover:bg-[#2ecc71] hover:text-slate-900 transition-all uppercase tracking-widest text-sm group"
+              className="inline-flex items-center gap-3 px-10 py-5 border-2 border-primary text-ink font-black rounded-xl hover:bg-primary hover:text-white transition-all uppercase tracking-widest text-sm group"
             >
               View Full Skill Portfolio
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -110,12 +110,12 @@ export default function SkillsPage() {
       </section>
 
       {/* Technical Competence Section */}
-      <section className="py-20 bg-slate-900/20">
+      <section className="py-20 bg-surface-2/60">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center mb-16">
-            <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Expertise</span>
+            <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Expertise</span>
             <h2 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none">
-              Technical <span className="text-slate-600">Competence</span>
+              Technical <span className="text-primary">Competence</span>
             </h2>
           </div>
 
@@ -131,16 +131,16 @@ export default function SkillsPage() {
               {skills.map((skill, index) => (
                 <div key={skill.name}>
                   <div className="flex justify-between mb-3">
-                    <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-slate-400">{skill.name}</span>
-                    <span className="text-[#2ecc71] font-black">{skill.level}%</span>
+                    <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-body">{skill.name}</span>
+                    <span className="text-primary font-black">{skill.level}%</span>
                   </div>
-                  <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-surface-2 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       whileInView={{ width: `${skill.level}%` }}
                       viewport={{ once: true }}
                       transition={{ duration: 1.2, delay: index * 0.1, ease: "easeOut" }}
-                      className="h-full bg-[#2ecc71] rounded-full shadow-[0_0_20px_rgba(46,204,113,0.5)]"
+                      className="h-full bg-primary rounded-full shadow-[0_0_20px_rgba(87,119,255,0.5)]"
                     />
                   </div>
                 </div>
@@ -155,15 +155,15 @@ export default function SkillsPage() {
               transition={{ duration: 0.6 }}
               className="grid grid-cols-2 gap-6"
             >
-              <div className="p-10 bg-[#2ecc71] rounded-[3rem] text-slate-950 flex flex-col justify-center items-center text-center aspect-square shadow-2xl shadow-[#2ecc71]/20">
+              <div className="p-10 bg-primary rounded-[3rem] text-white flex flex-col justify-center items-center text-center aspect-square shadow-2xl shadow-primary/20">
                 <TrendingUp className="w-10 h-10 mb-4" />
                 <div className="text-5xl font-black mb-1">98%</div>
                 <div className="text-[10px] font-black uppercase tracking-widest opacity-80">Accuracy</div>
               </div>
-              <div className="p-10 bg-slate-900 border border-white/10 rounded-[3rem] flex flex-col justify-center items-center text-center aspect-square">
-                <Star className="text-[#2ecc71] w-10 h-10 mb-4" />
+              <div className="p-10 bg-surface border border-line rounded-[3rem] flex flex-col justify-center items-center text-center aspect-square">
+                <Star className="text-primary w-10 h-10 mb-4" />
                 <div className="text-4xl font-black mb-1">Top Rated</div>
-                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Global Status</div>
+                <div className="text-[10px] text-muted font-bold uppercase tracking-widest">Global Status</div>
               </div>
             </motion.div>
           </div>
@@ -174,9 +174,9 @@ export default function SkillsPage() {
       <section className="py-20">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center mb-16">
-            <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Capabilities</span>
+            <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Capabilities</span>
             <h2 className="text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none">
-              Skill <span className="text-slate-600">Categories</span>
+              Skill <span className="text-primary">Categories</span>
             </h2>
           </div>
 
@@ -188,16 +188,16 @@ export default function SkillsPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="p-8 bg-slate-900/60 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all group"
+                className="p-8 bg-surface border border-line rounded-3xl hover:border-primary/30 transition-all group"
               >
-                <div className="text-[#2ecc71] mb-6 p-4 bg-white/5 rounded-2xl inline-flex group-hover:scale-110 transition-transform">
+                <div className="text-primary mb-6 p-4 bg-surface-2/70 rounded-2xl inline-flex group-hover:scale-110 transition-transform">
                   {category.icon}
                 </div>
                 <h3 className="text-xl font-black uppercase tracking-tight mb-6">{category.title}</h3>
                 <div className="space-y-3">
                   {category.skills.map((skill) => (
-                    <div key={skill} className="flex items-center gap-3 text-slate-400 text-sm">
-                      <CheckCircle2 size={14} className="text-[#2ecc71]" />
+                    <div key={skill} className="flex items-center gap-3 text-body text-sm">
+                      <CheckCircle2 size={14} className="text-primary" />
                       <span>{skill}</span>
                     </div>
                   ))}
@@ -209,12 +209,12 @@ export default function SkillsPage() {
       </section>
 
       {/* Technical Experience Summary */}
-      <section className="py-20 bg-slate-900/20">
+      <section className="py-20 bg-surface-2/60">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="text-center mb-16">
-            <span className="text-[#2ecc71] text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Experience</span>
+            <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Experience</span>
             <h2 className="text-5xl lg:text-6xl font-black uppercase tracking-tighter leading-none">
-              Years of <span className="text-slate-600">Expertise</span>
+              Years of <span className="text-primary">Expertise</span>
             </h2>
           </div>
 
@@ -227,15 +227,15 @@ export default function SkillsPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 whileHover={{ scale: 1.03, y: -5 }}
-                className="flex items-center justify-between p-8 bg-slate-900 border border-white/5 rounded-3xl hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
+                className="flex items-center justify-between p-8 bg-surface border border-line rounded-3xl hover:border-primary/30 transition-all cursor-pointer group"
               >
                 <div className="flex items-center gap-5">
-                  <div className="p-4 bg-[#2ecc71]/10 rounded-2xl text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-slate-900 transition-all">
+                  <div className="p-4 bg-primary/10 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all">
                     {exp.icon}
                   </div>
                   <span className="text-lg font-bold uppercase tracking-tighter">{exp.label}</span>
                 </div>
-                <span className="text-[#2ecc71] font-black tracking-widest text-sm uppercase">{exp.years}</span>
+                <span className="text-primary font-black tracking-widest text-sm uppercase">{exp.years}</span>
               </motion.div>
             ))}
           </div>
@@ -245,14 +245,14 @@ export default function SkillsPage() {
       {/* CTA Section removed */}
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

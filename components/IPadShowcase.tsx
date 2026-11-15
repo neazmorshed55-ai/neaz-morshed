@@ -2,24 +2,34 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import NextImage from 'next/image';
 import { supabase } from '@/lib/supabase';
+import { canOptimizeImage } from '@/lib/image-src';
+import { Reveal, SplitText } from '@/components/motion/Reveal';
 
 interface PortfolioItem {
   id: string;
   title: string;
-  description: string;
-  thumbnail_url?: string;
-  image_url?: string;
-  video_url?: string;
-  service_id: string;
+  description: string | null;
+  thumbnail_url?: string | null;
+  image_url?: string | null;
+  video_url?: string | null;
+  service_id?: string;
 }
 
-export default function IPadShowcase() {
-  const [allPortfolioItems, setAllPortfolioItems] = useState<PortfolioItem[]>([]);
+/** Smaller thumbnail when one exists, otherwise the full image. */
+const coverOf = (item: PortfolioItem) => item.thumbnail_url || item.image_url || null;
+
+/**
+ * Items can be passed in from the server (homepage); without them the
+ * component fetches on its own as before.
+ */
+export default function IPadShowcase({ items }: { items?: PortfolioItem[] } = {}) {
+  const [allPortfolioItems, setAllPortfolioItems] = useState<PortfolioItem[]>(items || []);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!items);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -31,11 +41,16 @@ export default function IPadShowcase() {
   );
 
   useEffect(() => {
+    if (items) return;
     async function fetchPortfolioItems() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
       try {
         const { data, error } = await supabase
           .from('portfolio_items')
-          .select('*')
+          .select('id, title, description, thumbnail_url, image_url, video_url, service_id, order_index')
           .order('order_index', { ascending: true });
 
         if (error) throw error;
@@ -51,7 +66,7 @@ export default function IPadShowcase() {
     }
 
     fetchPortfolioItems();
-  }, []);
+  }, [items]);
 
   useEffect(() => {
     if (allPortfolioItems.length === 0) return;
@@ -125,24 +140,28 @@ export default function IPadShowcase() {
 
   return (
     <section
-      className="pt-8 pb-12 sm:pt-11 sm:pb-16 bg-gradient-to-b from-[#0b0f1a] via-[#0f1419] to-[#0b0f1a] overflow-hidden relative"
+      className="pt-16 pb-16 sm:pt-24 sm:pb-24 bg-surface overflow-hidden relative"
       onMouseMove={handleMouseMove}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-8"
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            <span className="text-[#2ecc71]">Our</span> Projects
+        <div className="text-center mb-10 sm:mb-14">
+          <Reveal y={16}>
+            <span className="flex items-center justify-center gap-3 text-primary text-[11px] font-extrabold uppercase tracking-[0.4em] mb-5">
+              <span className="h-px w-8 bg-primary/60" />
+              Portfolio
+              <span className="h-px w-8 bg-primary/60" />
+            </span>
+          </Reveal>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight leading-[0.95] mb-5 text-ink">
+            <SplitText text="Our" wordClassName="text-gradient" /> <SplitText text="Projects" delay={0.08} />
           </h2>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Explore our diverse portfolio of successful projects
-          </p>
-        </motion.div>
+          <Reveal y={20} delay={0.1}>
+            <p className="text-body text-lg max-w-2xl mx-auto">
+              Explore our diverse portfolio of successful projects
+            </p>
+          </Reveal>
+        </div>
 
         {/* iPad Showcase */}
         <div className="relative min-h-[320px] sm:min-h-[400px] flex items-center justify-center perspective-[2000px]">
@@ -171,7 +190,7 @@ export default function IPadShowcase() {
                       key={item.id}
                       initial={{ opacity: 0, y: 20, rotateY: -10 }}
                       animate={{
-                        opacity: index === currentIndex ? 1 : 0.5,
+                        opacity: index === currentIndex ? 1 : 0.78,
                         y: 0,
                         rotateY: 0,
                         scale: index === currentIndex ? 1.1 : 1,
@@ -189,31 +208,34 @@ export default function IPadShowcase() {
                         z: 50,
                         transition: { duration: 0.3 }
                       }}
-                      className="relative aspect-[4/3] rounded-md overflow-hidden shadow-xl bg-slate-900 border-2 border-slate-800"
+                      className="relative aspect-[4/3] rounded-md overflow-hidden shadow-[0_18px_40px_-18px_rgba(16,24,64,0.45)] bg-ink border-2 border-ink-soft"
                       style={{
                         transformStyle: 'preserve-3d',
                       }}
                     >
                     {/* iPad Screen */}
                     <div className="absolute inset-1 bg-black rounded-md overflow-hidden">
-                      {item.video_url ? (
+                      {coverOf(item) ? (
+                        <NextImage
+                          src={coverOf(item)!}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 640px) 33vw, 220px"
+                          quality={65}
+                          unoptimized={!canOptimizeImage(coverOf(item))}
+                          className="object-cover"
+                        />
+                      ) : item.video_url ? (
                         <video
                           src={item.video_url}
                           className="w-full h-full object-cover"
                           muted
-                          loop
                           playsInline
-                          autoPlay
-                        />
-                      ) : item.image_url ? (
-                        <img
-                          src={item.image_url}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
+                          preload="metadata"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#2ecc71]/20 to-[#27ae60]/20 flex items-center justify-center">
-                          <p className="text-white/50 text-xs text-center px-2">{item.title}</p>
+                        <div className="w-full h-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center">
+                          <p className="text-white/80 text-xs text-center px-2">{item.title}</p>
                         </div>
                       )}
                     </div>
@@ -221,7 +243,7 @@ export default function IPadShowcase() {
                     {/* Glow effect for current item */}
                     {index === currentIndex && (
                       <motion.div
-                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#2ecc71]/30 to-[#27ae60]/30 blur-xl -z-10"
+                        className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/40 to-accent/40 blur-xl -z-10"
                         animate={{
                           opacity: [0.3, 0.6, 0.3],
                         }}
@@ -251,10 +273,10 @@ export default function IPadShowcase() {
                 }}
                 exit={{ opacity: 0, scale: 0.5, rotateY: 20, z: -500 }}
                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full max-w-[540px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-slate-900 border-4 border-slate-800"
+                className="relative w-full max-w-[540px] aspect-[4/3] rounded-xl overflow-hidden shadow-2xl bg-ink border-4 border-ink-soft"
                 style={{
                   transformStyle: 'preserve-3d',
-                  boxShadow: '0 50px 100px -20px rgba(46, 204, 113, 0.3), 0 0 60px -15px rgba(39, 174, 96, 0.2)',
+                  boxShadow: '0 50px 100px -20px rgba(61, 91, 239, 0.35), 0 0 60px -15px rgba(98, 93, 245, 0.25)',
                 }}
               >
                 {/* iPad Screen Bezel */}
@@ -279,14 +301,18 @@ export default function IPadShowcase() {
                           playsInline
                           autoPlay
                         />
-                      ) : portfolioItems[currentIndex].image_url ? (
-                        <img
-                          src={portfolioItems[currentIndex].image_url}
+                      ) : coverOf(portfolioItems[currentIndex]) ? (
+                        <NextImage
+                          src={portfolioItems[currentIndex].image_url || coverOf(portfolioItems[currentIndex])!}
                           alt={portfolioItems[currentIndex].title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 640px) 90vw, 540px"
+                          quality={70}
+                          unoptimized={!canOptimizeImage(portfolioItems[currentIndex].image_url || coverOf(portfolioItems[currentIndex]))}
+                          className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#2ecc71]/30 to-[#27ae60]/30 flex items-center justify-center">
+                        <div className="w-full h-full bg-gradient-to-br from-primary/40 to-accent/40 flex items-center justify-center">
                           <p className="text-white/70 text-xl text-center px-8">
                             {portfolioItems[currentIndex].title}
                           </p>
@@ -307,7 +333,7 @@ export default function IPadShowcase() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.4 }}
-                          className="text-slate-300 text-sm sm:text-base line-clamp-2"
+                          className="text-white/80 text-sm sm:text-base line-clamp-2"
                         >
                           {portfolioItems[currentIndex].description}
                         </motion.p>
@@ -324,7 +350,7 @@ export default function IPadShowcase() {
                 </div>
 
                 {/* iPad Home Button */}
-                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-slate-950 border-2 border-slate-700 shadow-inner" />
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-black border-2 border-ink-soft shadow-inner" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -332,7 +358,7 @@ export default function IPadShowcase() {
 
         {/* Enhanced Decorative Elements */}
         <motion.div
-          className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-[#2ecc71]/5 rounded-full blur-3xl pointer-events-none"
+          className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -346,7 +372,7 @@ export default function IPadShowcase() {
           }}
         />
         <motion.div
-          className="absolute top-1/3 right-1/4 -translate-y-1/2 w-96 h-96 bg-[#27ae60]/5 rounded-full blur-3xl pointer-events-none"
+          className="absolute top-1/3 right-1/4 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none"
           animate={{
             scale: [1, 1.3, 1],
             opacity: [0.2, 0.4, 0.2],
@@ -360,7 +386,7 @@ export default function IPadShowcase() {
           }}
         />
         <motion.div
-          className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-[#2ecc71]/3 rounded-full blur-3xl pointer-events-none"
+          className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-primary/5 rounded-full blur-3xl pointer-events-none"
           animate={{
             scale: [1, 1.4, 1],
             opacity: [0.2, 0.35, 0.2],

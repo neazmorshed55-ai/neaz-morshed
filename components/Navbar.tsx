@@ -41,57 +41,74 @@ const defaultBranding: SiteBranding = {
   site_name: 'NEAZ MORSHED',
   tagline: 'Top Rated Pro',
   logo_image_url: null,
-  primary_color: '#2ecc71',
+  primary_color: '#5777FF',
 };
+
+// Portfolio variant (shared on freelance marketplaces): internal pages only —
+// no contact page, no external, mail or phone links.
+const isAllowedNavItem = (item: NavItem) =>
+  item.href.startsWith('/') && !item.href.startsWith('//') && item.href !== '/contact';
+
+// Navigation rarely changes: fetch it once per visit and reuse it on every
+// page instead of re-querying (and flickering) on each client-side navigation.
+let navCache: { items: NavItem[]; branding: SiteBranding } | null = null;
+let navRequest: Promise<void> | null = null;
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [navItems, setNavItems] = useState<NavItem[]>(defaultNavItems);
-  const [branding, setBranding] = useState<SiteBranding>(defaultBranding);
+  const [navItems, setNavItems] = useState<NavItem[]>(navCache?.items ?? defaultNavItems);
+  const [branding, setBranding] = useState<SiteBranding>(navCache?.branding ?? defaultBranding);
   const pathname = usePathname();
 
-  // Fetch navigation items from Supabase
+  // Fetch navigation items + branding from Supabase (in parallel, once)
   useEffect(() => {
-    const fetchNavigation = async () => {
-      if (!supabase) return;
-
-      try {
-        // Fetch navigation items
-        const { data: navData, error: navError } = await supabase
-          .from('navigation_items')
-          .select('*')
-          .eq('is_visible', true)
-          .order('order_index', { ascending: true });
-
-        if (!navError && navData && navData.length > 0) {
-          // Filter out contact page link
-          const filteredNavData = navData.filter(item => item.href !== '/contact');
-          setNavItems(filteredNavData);
-        }
-
-        // Fetch site branding
-        const { data: brandingData, error: brandingError } = await supabase
-          .from('site_branding')
-          .select('*')
-          .limit(1)
-          .single();
-
-        if (!brandingError && brandingData) {
-          setBranding(brandingData);
-        }
-      } catch (error) {
-        console.log('Using default navigation');
+    let active = true;
+    const apply = () => {
+      if (active && navCache) {
+        setNavItems(navCache.items);
+        setBranding(navCache.branding);
       }
     };
+    if (navCache) {
+      apply();
+      return;
+    }
+    if (!supabase) return;
 
-    fetchNavigation();
+    navRequest =
+      navRequest ||
+      (async () => {
+        try {
+          const [navRes, brandingRes] = await Promise.all([
+            supabase!
+              .from('navigation_items')
+              .select('*')
+              .eq('is_visible', true)
+              .order('order_index', { ascending: true }),
+            supabase!.from('site_branding').select('*').limit(1).maybeSingle(),
+          ]);
+          const items = (navRes.data || []).filter(isAllowedNavItem);
+          navCache = {
+            items: !navRes.error && items.length > 0 ? items : defaultNavItems,
+            branding: !brandingRes.error && brandingRes.data ? brandingRes.data : defaultBranding,
+          };
+        } catch (error) {
+          console.log('Using default navigation');
+        }
+      })();
+
+    navRequest.then(apply);
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Handle scroll
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -108,7 +125,7 @@ export default function Navbar() {
     <>
       <nav
         className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${isScrolled
-          ? 'bg-[#0b0f1a]/90 backdrop-blur-2xl border-b border-white/5 py-4'
+          ? 'bg-white/85 backdrop-blur-2xl border-b border-line shadow-[0_10px_30px_-24px_rgba(16,24,64,0.35)] py-4'
           : 'bg-transparent py-8'
           }`}
       >
@@ -119,23 +136,21 @@ export default function Navbar() {
               <img
                 src={branding.logo_image_url}
                 alt={branding.site_name}
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl object-cover group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl object-cover group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(87,119,255,0.3)]"
               />
             ) : (
               <div
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center font-black text-sm sm:text-base text-slate-950 group-hover:rotate-6 transition-all shadow-[0_0_30px_rgba(46,204,113,0.3)]"
-                style={{ backgroundColor: branding.primary_color }}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center font-black text-sm sm:text-base text-white bg-gradient-to-br from-primary to-accent group-hover:rotate-6 transition-all shadow-[0_10px_30px_-6px_rgba(87,119,255,0.55)]"
               >
                 {branding.logo_text}
               </div>
             )}
             <div className="flex flex-col">
-              <span className="text-base sm:text-lg md:text-xl font-extrabold tracking-tighter leading-none text-white">
+              <span className="text-base sm:text-lg md:text-xl font-extrabold tracking-tighter leading-none text-ink">
                 {branding.site_name}
               </span>
               <span
-                className="text-[9px] sm:text-[10px] font-bold tracking-[0.15em] sm:tracking-[0.2em] mt-0.5 sm:mt-1 uppercase"
-                style={{ color: branding.primary_color }}
+                className="text-[9px] sm:text-[10px] font-bold tracking-[0.15em] sm:tracking-[0.2em] mt-0.5 sm:mt-1 uppercase text-primary"
               >
                 {branding.tagline}
               </span>
@@ -150,10 +165,13 @@ export default function Navbar() {
                 href={item.href}
                 target={item.open_in_new_tab ? '_blank' : undefined}
                 rel={item.open_in_new_tab ? 'noopener noreferrer' : undefined}
-                className={`text-[11px] font-bold tracking-[0.3em] transition-all uppercase ${isActive(item.href) ? 'text-[#2ecc71]' : 'text-slate-400 hover:text-[#2ecc71]'
+                className={`group relative py-2 text-[11px] font-bold tracking-[0.3em] transition-colors uppercase ${isActive(item.href) ? 'text-primary' : 'text-body hover:text-primary'
                   }`}
               >
                 {item.label}
+                <span
+                  className={`absolute left-0 -bottom-0.5 h-[2px] rounded-full bg-primary transition-all duration-300 ${isActive(item.href) ? 'w-full' : 'w-0 group-hover:w-full'}`}
+                />
               </Link>
             ))}
             {buttonItems.map((item) => (
@@ -163,8 +181,8 @@ export default function Navbar() {
                 target={item.open_in_new_tab ? '_blank' : undefined}
                 rel={item.open_in_new_tab ? 'noopener noreferrer' : undefined}
                 className={`px-8 py-4 rounded-2xl font-black text-[11px] tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg uppercase ${isActive(item.href)
-                  ? 'bg-white text-slate-950 shadow-white/20'
-                  : 'bg-[#2ecc71] text-slate-950 shadow-[#2ecc71]/20'
+                  ? 'bg-ink text-white shadow-ink/20'
+                  : 'bg-primary text-white shadow-primary/30 hover:bg-primary-dark'
                   }`}
               >
                 {item.label}
@@ -174,7 +192,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 text-[#2ecc71]"
+            className="lg:hidden p-2 text-primary"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
@@ -189,10 +207,10 @@ export default function Navbar() {
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
-            className="lg:hidden fixed inset-0 bg-[#0b0f1a] z-[110] flex flex-col items-center justify-center gap-8 p-6"
+            className="lg:hidden fixed inset-0 bg-page z-[110] flex flex-col items-center justify-center gap-8 p-6"
           >
             <button
-              className="absolute top-8 right-8 text-[#2ecc71]"
+              className="absolute top-8 right-8 text-primary"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <X size={40} />
@@ -205,8 +223,8 @@ export default function Navbar() {
                 rel={item.open_in_new_tab ? 'noopener noreferrer' : undefined}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`text-4xl font-black transition-colors uppercase tracking-tighter ${isActive(item.href) || item.is_button
-                  ? 'text-[#2ecc71]'
-                  : 'text-white hover:text-[#2ecc71]'
+                  ? 'text-primary'
+                  : 'text-ink hover:text-primary'
                   }`}
               >
                 {item.label}

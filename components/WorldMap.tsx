@@ -246,31 +246,31 @@ export default function WorldMap() {
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="relative bg-slate-900/40 border border-white/5 rounded-[2rem] lg:rounded-[3rem] p-4 lg:p-8 overflow-hidden"
+        className="relative bg-surface border border-line rounded-[2rem] lg:rounded-[3rem] p-4 lg:p-8 overflow-hidden"
       >
         {/* Top Left - International Presence */}
         <div ref={percentageRef} className="absolute top-4 left-4 lg:top-8 lg:left-8 z-10">
-          <div className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="text-[10px] lg:text-[11px] font-bold text-body uppercase tracking-wider">
             International Presence
           </div>
-          <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">
+          <div className="text-2xl lg:text-3xl font-black text-primary">
             {animatedPercentage}%
           </div>
         </div>
 
         {/* Top Right - Top 3 Countries */}
         <div className="absolute top-4 right-4 lg:top-8 lg:right-8 z-10">
-          <div className="text-[10px] lg:text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+          <div className="text-[10px] lg:text-[11px] font-bold text-body uppercase tracking-wider mb-2">
             Top Countries
           </div>
           <div className="space-y-1.5">
             {top3Countries.map((country, index) => (
               <div key={country.country_code} className="flex items-center gap-2">
                 <span className="text-2xl">{getFlagEmoji(country.country_code)}</span>
-                <span className="text-white text-xs lg:text-sm font-medium">
+                <span className="text-ink text-xs lg:text-sm font-medium">
                   {country.country_name}
                 </span>
-                <span className="text-[#2ecc71] text-xs lg:text-sm font-bold ml-auto">
+                <span className="text-primary text-xs lg:text-sm font-bold ml-auto">
                   {country.count}
                 </span>
               </div>
@@ -280,22 +280,22 @@ export default function WorldMap() {
 
         {/* Bottom Left - Countries */}
         <div ref={countriesRef} className="absolute bottom-4 left-4 lg:bottom-8 lg:left-8 z-10">
-          <div className="text-2xl lg:text-3xl font-black text-white">{animatedCountries}</div>
-          <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <div className="text-2xl lg:text-3xl font-black text-ink">{animatedCountries}</div>
+          <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-muted">
             Countries
           </div>
         </div>
 
         {/* Bottom Right - Total Sales */}
         <div ref={salesRef} className="absolute bottom-4 right-4 lg:bottom-8 lg:right-8 z-10 text-right">
-          <div className="text-2xl lg:text-3xl font-black text-[#2ecc71]">{animatedSales}</div>
-          <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <div className="text-2xl lg:text-3xl font-black text-primary">{animatedSales}</div>
+          <div className="text-[9px] lg:text-[10px] font-bold uppercase tracking-widest text-muted">
             Total Sales
           </div>
         </div>
         {isLoading ? (
           <div className="flex items-center justify-center h-[300px] lg:h-[450px]">
-            <div className="w-12 h-12 border-4 border-[#2ecc71]/20 border-t-[#2ecc71] rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : (
           <ComposableMap
@@ -324,21 +324,21 @@ export default function WorldMap() {
                       onMouseMove={handleMouseMove}
                       style={{
                         default: {
-                          fill: highlighted ? "#2ecc71" : "#1e293b",
-                          stroke: "#0f172a",
+                          fill: highlighted ? "#5777FF" : "#DCE1F2",
+                          stroke: "#FFFFFF",
                           strokeWidth: 0.5,
                           outline: "none",
                           transition: "all 0.3s ease"
                         },
                         hover: {
-                          fill: highlighted ? "#27ae60" : "#334155",
-                          stroke: highlighted ? "#2ecc71" : "#475569",
+                          fill: highlighted ? "#3D5BEF" : "#C9D1EC",
+                          stroke: highlighted ? "#5777FF" : "#FFFFFF",
                           strokeWidth: highlighted ? 1.5 : 0.5,
                           outline: "none",
                           cursor: highlighted ? "pointer" : "default"
                         },
                         pressed: {
-                          fill: highlighted ? "#27ae60" : "#334155",
+                          fill: highlighted ? "#3D5BEF" : "#C9D1EC",
                           outline: "none"
                         }
                       }}
@@ -354,7 +354,7 @@ export default function WorldMap() {
                 {/* Location Pin SVG */}
                 <path
                   d="M12 0C7.03 0 3 4.03 3 9c0 6.75 9 15 9 15s9-8.25 9-15c0-4.97-4.03-9-9-9z"
-                  fill="#2ecc71"
+                  fill="#5777FF"
                   stroke="#fff"
                   strokeWidth="1.5"
                 />
@@ -381,7 +381,7 @@ export default function WorldMap() {
             >
               <div className="relative">
                 {/* Tooltip Box */}
-                <div className="bg-slate-800 rounded-lg px-4 py-2 shadow-xl">
+                <div className="bg-ink rounded-lg px-4 py-2 shadow-xl">
                   <span className="text-white font-medium text-sm whitespace-nowrap">
                     {tooltip.countryName} - {tooltip.salesCount} {tooltip.salesCount === 1 ? 'Sale' : 'Sales'}
                   </span>
@@ -392,7 +392,7 @@ export default function WorldMap() {
                   style={{
                     borderLeft: '8px solid transparent',
                     borderRight: '8px solid transparent',
-                    borderTop: '8px solid #1e293b'
+                    borderTop: '8px solid #05100B'
                   }}
                 />
               </div>

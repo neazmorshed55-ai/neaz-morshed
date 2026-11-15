@@ -10,7 +10,10 @@ export default function AdminLayout({
 }) {
   return (
     <AdminAuthProvider>
-      {children}
+      {/* The public site is light now; the admin keeps its original dark look. */}
+      <div className="min-h-screen bg-[#0b0f1a] text-slate-50 selection:bg-[#2ecc71] selection:text-slate-950">
+        {children}
+      </div>
     </AdminAuthProvider>
   );
 }

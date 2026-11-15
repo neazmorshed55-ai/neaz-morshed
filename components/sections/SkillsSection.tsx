@@ -15,7 +15,7 @@ interface SkillsSectionProps {
 
 export default function SkillsSection({ skills }: SkillsSectionProps) {
   return (
-    <section id="skills" className="py-16 sm:py-24 lg:py-32 bg-slate-900/10">
+    <section id="skills" className="py-8 sm:py-12 lg:py-16 bg-surface-2/60">
       <Container>
         <SectionHeader
           subtitle="Expertise"
@@ -44,12 +44,11 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
               label="Global Status"
               value={0}
               suffix=""
-              icon={Star}
               variant="default"
             >
-              <Star className="text-[#2ecc71] w-8 h-8 sm:w-12 sm:h-12 mb-4" />
+              <Star className="text-primary w-8 h-8 sm:w-12 sm:h-12 mb-4" />
               <div className="text-3xl sm:text-4xl font-black mb-1">Top Rated</div>
-              <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Global Status</div>
+              <div className="text-[10px] text-muted font-bold uppercase tracking-widest">Global Status</div>
             </StatCard>
           </div>
         </div>

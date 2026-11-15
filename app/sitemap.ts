@@ -1,139 +1,117 @@
 import { MetadataRoute } from 'next';
 import { supabase } from '../lib/supabase';
+import { SITE_URL } from '../lib/site';
 
-// Your actual domain
-const BASE_URL = 'https://neazmorshed.com';
+const BASE_URL = SITE_URL;
 
-// Helper to get all blog slugs
-async function getBlogSlugs() {
+// Rebuilt at most once an hour so new projects/posts get listed.
+export const revalidate = 3600;
+
+type Row = Record<string, any>;
+
+async function rows(table: string, columns: string, activeOnly = false): Promise<Row[]> {
     if (!supabase) return [];
-    const { data } = await supabase
-        .from('blogs')
-        .select('slug, updated_at')
-        .eq('is_published', true);
-    return data || [];
+    let query = supabase.from(table).select(columns);
+    if (activeOnly) query = query.eq('is_active', true);
+    const { data, error } = await query;
+    if (error) {
+        console.error(`sitemap: could not read ${table}:`, error.message);
+        return [];
+    }
+    return (data as unknown as Row[]) || [];
 }
 
-// Helper to get all service slugs from database
-async function getServiceSlugs() {
-    if (!supabase) return [];
-    const { data } = await supabase
-        .from('services')
-        .select('slug, updated_at');
-    return data || [];
-}
-
-// Helper to get portfolio items
-async function getPortfolioItems() {
-    if (!supabase) return [];
-    const { data } = await supabase
-        .from('portfolio_items')
-        .select('slug, updated_at, category');
-    return data || [];
+// Tolerates missing or malformed timestamps instead of failing the whole sitemap
+function lastModified(...values: Array<string | null | undefined>): Date {
+    for (const value of values) {
+        if (!value) continue;
+        const date = new Date(value);
+        if (!Number.isNaN(date.getTime())) return date;
+    }
+    return new Date();
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    // Static Routes
-    const staticRoutes: MetadataRoute.Sitemap = [
-        {
-            url: BASE_URL,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 1,
-        },
-        {
-            url: `${BASE_URL}/skills`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.9,
-        },
-        {
-            url: `${BASE_URL}/skills/portfolio`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.8,
-        },
-        {
-            url: `${BASE_URL}/services`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.9,
-        },
-        {
-            url: `${BASE_URL}/experience`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-        },
-        {
-            url: `${BASE_URL}/reviews`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly',
-            priority: 0.7,
-        },
-        {
-            url: `${BASE_URL}/contact`,
-            lastModified: new Date(),
-            changeFrequency: 'yearly',
-            priority: 0.6,
-        },
-        {
-            url: `${BASE_URL}/blog`,
-            lastModified: new Date(),
-            changeFrequency: 'daily',
-            priority: 0.8,
-        },
-        {
-            url: `${BASE_URL}/resume`,
-            lastModified: new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.5,
-        },
+    const now = new Date();
+    const staticPaths: Array<[string, MetadataRoute.Sitemap[number]['changeFrequency'], number]> = [
+        ['', 'weekly', 1],
+        ['/skills', 'monthly', 0.9],
+        ['/skills/portfolio', 'weekly', 0.8],
+        ['/services', 'monthly', 0.9],
+        ['/experience', 'monthly', 0.7],
+        ['/reviews', 'weekly', 0.7],
+        ['/blog', 'daily', 0.8],
+        ['/resume', 'monthly', 0.5],
     ];
-
-    // Dynamic Blog Routes
-    const blogPosts = await getBlogSlugs();
-    const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-        url: `${BASE_URL}/blog/${post.slug}`,
-        lastModified: new Date(post.updated_at),
-        changeFrequency: 'weekly',
-        priority: 0.7,
+    const staticRoutes: MetadataRoute.Sitemap = staticPaths.map(([path, changeFrequency, priority]) => ({
+        url: `${BASE_URL}${path}`,
+        lastModified: now,
+        changeFrequency,
+        priority,
     }));
 
-    // Dynamic Service Routes from database
-    const services = await getServiceSlugs();
-    const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
-        url: `${BASE_URL}/services/${service.slug}`,
-        lastModified: new Date(service.updated_at),
-        changeFrequency: 'monthly',
-        priority: 0.9,
-    }));
+    const [blogs, services, portfolioItems, categories, subSkills] = await Promise.all([
+        rows('blogs', 'slug, updated_at, published_at, is_published'),
+        rows('services', 'id, slug, created_at', true),
+        rows('portfolio_items', 'slug, service_id, updated_at, created_at'),
+        rows('skill_categories', 'id, slug, updated_at', true),
+        rows('sub_skills', 'slug, category_id, updated_at', true),
+    ]);
 
-    // Dynamic Portfolio Routes
-    const portfolioItems = await getPortfolioItems();
+    const blogRoutes: MetadataRoute.Sitemap = blogs
+        .filter((post) => post.is_published && post.slug)
+        .map((post) => ({
+            url: `${BASE_URL}/blog/${post.slug}`,
+            lastModified: lastModified(post.updated_at, post.published_at),
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        }));
 
-    // Get unique categories for portfolio category pages
-    const categories = [...new Set(portfolioItems.map(item => item.category))];
-    const categoryRoutes: MetadataRoute.Sitemap = categories.map((category) => ({
-        url: `${BASE_URL}/skills/portfolio/${category}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly',
-        priority: 0.7,
-    }));
+    const serviceSlugById = new Map(services.map((service) => [service.id, service.slug]));
+    const serviceRoutes: MetadataRoute.Sitemap = services
+        .filter((service) => service.slug)
+        .map((service) => ({
+            url: `${BASE_URL}/services/${service.slug}`,
+            lastModified: lastModified(service.created_at),
+            changeFrequency: 'monthly',
+            priority: 0.9,
+        }));
 
-    // Individual portfolio item routes (if you have detail pages)
-    const portfolioRoutes: MetadataRoute.Sitemap = portfolioItems.map((item) => ({
-        url: `${BASE_URL}/skills/portfolio/${item.category}/${item.slug}`,
-        lastModified: new Date(item.updated_at),
-        changeFrequency: 'monthly',
-        priority: 0.6,
-    }));
+    // Project pages live at /services/[service]/[project]
+    const portfolioRoutes: MetadataRoute.Sitemap = portfolioItems
+        .filter((item) => item.slug && serviceSlugById.has(item.service_id))
+        .map((item) => ({
+            url: `${BASE_URL}/services/${serviceSlugById.get(item.service_id)}/${item.slug}`,
+            lastModified: lastModified(item.updated_at, item.created_at),
+            changeFrequency: 'monthly',
+            priority: 0.6,
+        }));
+
+    // Skill portfolio pages live at /skills/portfolio/[category]/[skill]
+    const categorySlugById = new Map(categories.map((category) => [category.id, category.slug]));
+    const categoryRoutes: MetadataRoute.Sitemap = categories
+        .filter((category) => category.slug)
+        .map((category) => ({
+            url: `${BASE_URL}/skills/portfolio/${category.slug}`,
+            lastModified: lastModified(category.updated_at),
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        }));
+    const skillRoutes: MetadataRoute.Sitemap = subSkills
+        .filter((skill) => skill.slug && categorySlugById.has(skill.category_id))
+        .map((skill) => ({
+            url: `${BASE_URL}/skills/portfolio/${categorySlugById.get(skill.category_id)}/${skill.slug}`,
+            lastModified: lastModified(skill.updated_at),
+            changeFrequency: 'monthly',
+            priority: 0.6,
+        }));
 
     return [
         ...staticRoutes,
         ...serviceRoutes,
+        ...portfolioRoutes,
         ...blogRoutes,
         ...categoryRoutes,
-        ...portfolioRoutes,
+        ...skillRoutes,
     ];
 }

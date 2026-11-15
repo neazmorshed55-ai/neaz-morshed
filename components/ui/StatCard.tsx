@@ -53,8 +53,8 @@ export default function StatCard({
   }, [value, duration, hasAnimated]);
 
   const variants = {
-    default: 'bg-slate-900/60 border-white/5',
-    highlight: 'bg-[#2ecc71] text-slate-950',
+    default: 'bg-surface border-line shadow-card',
+    highlight: 'bg-gradient-to-br from-primary to-accent text-white border-transparent shadow-glow',
   };
 
   return (
@@ -63,13 +63,13 @@ export default function StatCard({
       whileHover={{ scale: 1.05, y: -5 }}
       className={`p-6 sm:p-8 lg:p-12 rounded-[3rem] sm:rounded-[4rem] border flex flex-col justify-center items-center text-center transition-all aspect-square ${variants[variant]}`}
     >
-      {Icon && <Icon className={`w-8 h-8 sm:w-12 sm:h-12 mb-4 ${variant === 'highlight' ? 'text-slate-950' : 'text-[#2ecc71]'}`} />}
+      {Icon && <Icon className={`w-8 h-8 sm:w-12 sm:h-12 mb-4 ${variant === 'highlight' ? 'text-white' : 'text-primary'}`} />}
       {children || (
         <>
-          <div className={`text-3xl sm:text-4xl lg:text-5xl font-black mb-1 ${variant === 'default' ? 'text-white' : ''}`}>
+          <div className={`text-3xl sm:text-4xl lg:text-5xl font-black mb-1 ${variant === 'default' ? 'text-ink' : ''}`}>
             {count.toLocaleString()}{suffix}
           </div>
-          <div className={`text-[10px] font-black uppercase tracking-widest ${variant === 'highlight' ? 'opacity-80' : 'text-slate-500'}`}>
+          <div className={`text-[10px] font-black uppercase tracking-widest ${variant === 'highlight' ? 'opacity-80' : 'text-muted'}`}>
             {label}
           </div>
         </>

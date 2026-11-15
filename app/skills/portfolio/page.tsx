@@ -134,26 +134,26 @@ export default function SkillPortfolioPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#0b0f1a] text-white min-h-screen flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-[#2ecc71] animate-spin" />
+      <div className="bg-page text-ink min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       {/* Navigation */}
       <Navbar />
 
       {/* Main Content */}
       <section className="pt-32 pb-20 relative overflow-hidden min-h-screen">
         {/* Background */}
-        <div className="absolute left-0 top-0 w-1/4 h-full bg-[#1a1f2e]"></div>
-        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-[#2ecc71]/5 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute left-0 top-0 w-1/4 h-full bg-surface"></div>
+        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
           {/* Back Link */}
-          <Link href="/skills" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all mb-8 group">
+          <Link href="/skills" className="inline-flex items-center gap-2 text-body hover:text-primary transition-all mb-8 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-bold uppercase tracking-wider">Back to Skills</span>
           </Link>
@@ -166,9 +166,9 @@ export default function SkillPortfolioPage() {
             className="text-center mb-12"
           >
             <h1 className="text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-4">
-              Skill <span className="text-[#2ecc71]">Portfolio</span>
+              Skill <span className="text-primary">Portfolio</span>
             </h1>
-            <p className="text-slate-400 max-w-xl mx-auto">
+            <p className="text-body max-w-xl mx-auto">
               Explore my expertise across different categories. Click on any skill to learn more.
             </p>
           </motion.div>
@@ -184,12 +184,12 @@ export default function SkillPortfolioPage() {
                 className="lg:col-span-3 hidden lg:block"
               >
                 <div className="sticky top-32">
-                  <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden border-4 border-white/10 bg-slate-900 relative">
+                  <div className="w-full aspect-[3/4] rounded-3xl overflow-hidden border-4 border-line bg-surface relative">
                     <NextImage src={profileImage} alt="Neaz Md. Morshed" fill sizes="25vw" className="object-cover" priority />
                   </div>
-                  <div className="mt-6 p-4 bg-slate-900/50 rounded-2xl border border-white/5">
-                    <div className="text-[#2ecc71] text-3xl font-black mb-1">10+</div>
-                    <div className="text-slate-400 text-xs uppercase tracking-wider">Years Experience</div>
+                  <div className="mt-6 p-4 bg-surface rounded-2xl border border-line">
+                    <div className="text-primary text-3xl font-black mb-1">10+</div>
+                    <div className="text-body text-xs uppercase tracking-wider">Years Experience</div>
                   </div>
                 </div>
               </motion.div>
@@ -215,8 +215,8 @@ export default function SkillPortfolioPage() {
                       transition={{ duration: 0.4, delay: index * 0.05 }}
                       className={`rounded-2xl overflow-hidden border transition-all duration-300 ${
                         isExpanded
-                          ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/5'
-                          : 'bg-slate-900/40 border-white/5 hover:border-white/10'
+                          ? 'bg-surface border-primary/30 shadow-lg shadow-primary/5'
+                          : 'bg-surface border-line hover:border-line'
                       }`}
                       onMouseEnter={() => setExpandedCategory(category.id)}
                     >
@@ -224,14 +224,14 @@ export default function SkillPortfolioPage() {
                       <div className="flex items-center gap-4 p-5 cursor-pointer">
                         {/* Number */}
                         <div className={`text-2xl font-black w-12 text-center transition-colors ${
-                          isExpanded ? 'text-[#2ecc71]' : 'text-slate-600'
+                          isExpanded ? 'text-primary' : 'text-muted'
                         }`}>
                           {String(index + 1).padStart(2, '0')}
                         </div>
 
                         {/* Icon */}
                         <div className={`p-3 rounded-xl transition-all ${
-                          isExpanded ? 'bg-[#2ecc71] text-slate-900' : 'bg-white/5 text-slate-400'
+                          isExpanded ? 'bg-primary text-white' : 'bg-surface-2/70 text-body'
                         }`}>
                           {iconMap[category.icon] || <Briefcase className="w-5 h-5" />}
                         </div>
@@ -239,24 +239,24 @@ export default function SkillPortfolioPage() {
                         {/* Title & Info */}
                         <div className="flex-1">
                           <Link href={`/skills/portfolio/${getCategorySlug(category)}`}>
-                            <h3 className={`text-lg font-bold transition-colors hover:text-[#2ecc71] ${
-                              isExpanded ? 'text-white' : 'text-slate-300'
+                            <h3 className={`text-lg font-bold transition-colors hover:text-primary ${
+                              isExpanded ? 'text-ink' : 'text-body'
                             }`}>
                               {category.title}
                             </h3>
                           </Link>
-                          <p className="text-slate-500 text-xs mt-1">{categorySkills.length} services available</p>
+                          <p className="text-muted text-xs mt-1">{categorySkills.length} services available</p>
                         </div>
 
                         {/* Expand Arrow */}
                         <div className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                          <ChevronDown size={20} className={isExpanded ? 'text-[#2ecc71]' : 'text-slate-600'} />
+                          <ChevronDown size={20} className={isExpanded ? 'text-primary' : 'text-muted'} />
                         </div>
 
                         {/* View All Link */}
                         <Link
                           href={`/skills/portfolio/${getCategorySlug(category)}`}
-                          className="text-[10px] font-bold uppercase tracking-wider text-[#2ecc71] hover:underline px-3 py-2 bg-[#2ecc71]/10 rounded-lg"
+                          className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline px-3 py-2 bg-primary/10 rounded-lg"
                         >
                           View All
                         </Link>
@@ -281,8 +281,8 @@ export default function SkillPortfolioPage() {
                                   transition={{ duration: 0.2, delay: skillIndex * 0.05 }}
                                 >
                                   <Link href={`/skills/portfolio/${getCategorySlug(category)}/${skill.slug || generateSlug(skill.title)}`}>
-                                    <div className="flex items-center gap-3 p-3 bg-[#c9a089] hover:bg-[#d4b19a] text-slate-900 rounded-xl transition-all hover:translate-x-1 hover:shadow-md group cursor-pointer">
-                                      <ChevronRight size={16} className="text-slate-700 group-hover:translate-x-1 transition-transform" />
+                                    <div className="flex items-center gap-3 p-3 bg-[#c9a089] hover:bg-[#d4b19a] text-white rounded-xl transition-all hover:translate-x-1 hover:shadow-md group cursor-pointer">
+                                      <ChevronRight size={16} className="text-muted group-hover:translate-x-1 transition-transform" />
                                       <span className="font-semibold text-sm">{skill.title}</span>
                                       <ArrowRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </div>
@@ -303,14 +303,14 @@ export default function SkillPortfolioPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

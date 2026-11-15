@@ -702,7 +702,7 @@ export default function ResumePage() {
   };
 
   return (
-    <div className="bg-[#0b0f1a] text-white min-h-screen">
+    <div className="bg-page text-ink min-h-screen">
       {/* Navigation */}
       <Navbar />
 
@@ -710,7 +710,7 @@ export default function ResumePage() {
       <main className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           {/* Back Link */}
-          <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-[#2ecc71] transition-all mb-8 group">
+          <Link href="/" className="inline-flex items-center gap-2 text-body hover:text-primary transition-all mb-8 group">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-bold uppercase tracking-wider">Back to Home</span>
           </Link>
@@ -720,10 +720,10 @@ export default function ResumePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative bg-gradient-to-r from-[#2ecc71]/20 via-[#2ecc71]/10 to-transparent p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl md:rounded-[3rem] border border-white/10 mb-8 sm:mb-10 md:mb-12 overflow-hidden"
+            className="relative bg-gradient-to-r from-primary/20 via-primary/10 to-transparent p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl md:rounded-[3rem] border border-line mb-8 sm:mb-10 md:mb-12 overflow-hidden"
           >
             {/* Animated Background */}
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2ecc71]/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
 
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
               <div>
@@ -739,7 +739,7 @@ export default function ResumePage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-[#2ecc71] text-sm sm:text-base md:text-lg font-bold mb-3 sm:mb-4"
+                  className="text-primary text-sm sm:text-base md:text-lg font-bold mb-3 sm:mb-4"
                 >
                   {personalInfo.title}
                 </motion.p>
@@ -759,13 +759,13 @@ export default function ResumePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ scale: 1.05, y: -5 }}
-                className="p-3 sm:p-4 md:p-5 bg-slate-900/60 rounded-xl sm:rounded-2xl text-center border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
+                className="p-3 sm:p-4 md:p-5 bg-surface rounded-xl sm:rounded-2xl text-center border border-line hover:border-primary/30 transition-all cursor-pointer group"
               >
-                <div className="flex justify-center mb-2 text-[#2ecc71] group-hover:scale-110 transition-transform">
+                <div className="flex justify-center mb-2 text-primary group-hover:scale-110 transition-transform">
                   {getIcon(stat.icon)}
                 </div>
-                <div className="text-xl sm:text-2xl font-black text-[#2ecc71]">{stat.value}</div>
-                <div className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider mt-1">{stat.label}</div>
+                <div className="text-xl sm:text-2xl font-black text-primary">{stat.value}</div>
+                <div className="text-[10px] sm:text-xs text-body uppercase tracking-wider mt-1">{stat.label}</div>
               </motion.div>
             ))}
           </div>
@@ -778,17 +778,17 @@ export default function ResumePage() {
               viewport={{ once: true }}
               className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
-              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
-                <Briefcase className="text-[#2ecc71]" size={28} />
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Briefcase className="text-primary" size={28} />
               </div>
               Work Experience
-              <span className="text-sm text-slate-500 font-normal ml-2">({experiences.length} positions)</span>
+              <span className="text-sm text-muted font-normal ml-2">({experiences.length} positions)</span>
             </motion.h2>
 
             {/* Experience Tabs */}
             <div className="flex flex-wrap gap-2 sm:gap-3 mb-6 sm:mb-8">
               {[
-                { key: 'full-time', label: 'Full-Time', color: 'bg-[#2ecc71]' },
+                { key: 'full-time', label: 'Full-Time', color: 'bg-primary' },
                 { key: 'part-time', label: 'Part-Time', color: 'bg-blue-500' },
                 { key: 'project', label: 'Project-Based', color: 'bg-purple-500' }
               ].map((tab) => (
@@ -798,12 +798,12 @@ export default function ResumePage() {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
                   className={`px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 ${activeTab === tab.key
-                      ? `${tab.color} text-slate-900 shadow-lg`
-                      : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/10 hover:border-white/20'
+                      ? `${tab.color} text-white shadow-lg`
+                      : 'bg-surface text-body hover:text-ink border border-line hover:border-line'
                     }`}
                 >
                   {tab.label}
-                  <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === tab.key ? 'bg-slate-900/20' : 'bg-white/10'
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === tab.key ? 'bg-surface-2/60' : 'bg-surface-2'
                     }`}>
                     {experiences.filter(e => e.type === tab.key).length}
                   </span>
@@ -821,8 +821,8 @@ export default function ResumePage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ delay: i * 0.05 }}
                     className={`rounded-2xl border transition-all duration-300 overflow-hidden ${expandedExp === exp.id
-                        ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg shadow-[#2ecc71]/5'
-                        : 'bg-slate-900/60 border-white/5 hover:border-white/10'
+                        ? 'bg-surface border-primary/30 shadow-lg shadow-primary/5'
+                        : 'bg-surface border-line hover:border-line'
                       }`}
                   >
                     <div
@@ -831,19 +831,19 @@ export default function ResumePage() {
                     >
                       <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-2 mb-2">
                         <div className="flex-1">
-                          <h3 className={`text-lg font-bold transition-colors ${expandedExp === exp.id ? 'text-[#2ecc71]' : 'text-white'
+                          <h3 className={`text-lg font-bold transition-colors ${expandedExp === exp.id ? 'text-primary' : 'text-ink'
                             }`}>{exp.position}</h3>
-                          <p className="text-[#2ecc71] font-semibold text-sm">{exp.company}</p>
-                          <p className="text-slate-500 text-xs mt-1">{exp.location}</p>
+                          <p className="text-primary font-semibold text-sm">{exp.company}</p>
+                          <p className="text-muted text-xs mt-1">{exp.location}</p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-lg">
+                          <div className="flex items-center gap-2 text-xs text-body bg-surface-2 px-3 py-1.5 rounded-lg">
                             <Calendar size={12} />
                             <span>{exp.start_date} - {exp.end_date}</span>
                           </div>
                           <ChevronDown
                             size={18}
-                            className={`text-slate-400 transition-transform duration-300 ${expandedExp === exp.id ? 'rotate-180 text-[#2ecc71]' : ''
+                            className={`text-body transition-transform duration-300 ${expandedExp === exp.id ? 'rotate-180 text-primary' : ''
                               }`}
                           />
                         </div>
@@ -859,7 +859,7 @@ export default function ResumePage() {
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 pb-5 pt-2 border-t border-white/5">
+                          <div className="px-5 pb-5 pt-2 border-t border-line">
                             <ul className="space-y-2">
                               {exp.description.map((desc, j) => (
                                 <motion.li
@@ -867,9 +867,9 @@ export default function ResumePage() {
                                   initial={{ opacity: 0, x: -10 }}
                                   animate={{ opacity: 1, x: 0 }}
                                   transition={{ delay: j * 0.1 }}
-                                  className="text-slate-300 text-sm flex items-start gap-2"
+                                  className="text-body text-sm flex items-start gap-2"
                                 >
-                                  <CheckCircle2 size={14} className="text-[#2ecc71] mt-0.5 flex-shrink-0" />
+                                  <CheckCircle2 size={14} className="text-primary mt-0.5 flex-shrink-0" />
                                   <span>{desc}</span>
                                 </motion.li>
                               ))}
@@ -892,8 +892,8 @@ export default function ResumePage() {
               viewport={{ once: true }}
               className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
-              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
-                <GraduationCap className="text-[#2ecc71]" size={28} />
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <GraduationCap className="text-primary" size={28} />
               </div>
               Education
             </motion.h2>
@@ -908,22 +908,22 @@ export default function ResumePage() {
                   whileHover={{ scale: 1.02, y: -3 }}
                   onClick={() => setExpandedEdu(expandedEdu === edu.id ? null : edu.id)}
                   className={`p-6 rounded-2xl border transition-all cursor-pointer ${expandedEdu === edu.id
-                      ? 'bg-[#1a1f2e] border-[#2ecc71]/30 shadow-lg'
-                      : 'bg-slate-900/60 border-white/5 hover:border-[#2ecc71]/20'
+                      ? 'bg-surface border-primary/30 shadow-lg'
+                      : 'bg-surface border-line hover:border-primary/20'
                     }`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className={`p-2 rounded-lg transition-colors ${expandedEdu === edu.id ? 'bg-[#2ecc71] text-slate-900' : 'bg-[#2ecc71]/10 text-[#2ecc71]'
+                    <div className={`p-2 rounded-lg transition-colors ${expandedEdu === edu.id ? 'bg-primary text-white' : 'bg-primary/10 text-primary'
                       }`}>
                       <GraduationCap size={20} />
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <div className="flex items-center gap-2 text-xs text-body">
                       <Calendar size={12} />
                       <span>{edu.end_date.split(' ').pop()}</span>
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-1">{edu.degree} in {edu.field}</h3>
-                  <p className="text-[#2ecc71] font-semibold text-sm">{edu.institution}</p>
+                  <h3 className="text-lg font-bold text-ink mb-1">{edu.degree} in {edu.field}</h3>
+                  <p className="text-primary font-semibold text-sm">{edu.institution}</p>
 
                   <AnimatePresence>
                     {expandedEdu === edu.id && (
@@ -933,12 +933,12 @@ export default function ResumePage() {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="pt-4 mt-4 border-t border-white/10">
-                          <div className="flex items-center gap-2 text-slate-400 text-sm mb-2">
+                        <div className="pt-4 mt-4 border-t border-line">
+                          <div className="flex items-center gap-2 text-body text-sm mb-2">
                             <MapPin size={14} />
                             <span>{edu.location}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-slate-400 text-sm">
+                          <div className="flex items-center gap-2 text-body text-sm">
                             <Calendar size={14} />
                             <span>{edu.start_date} - {edu.end_date}</span>
                           </div>
@@ -959,8 +959,8 @@ export default function ResumePage() {
               viewport={{ once: true }}
               className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
-              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
-                <Cpu className="text-[#2ecc71]" size={28} />
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Cpu className="text-primary" size={28} />
               </div>
               Capstone Project
             </motion.h2>
@@ -969,30 +969,30 @@ export default function ResumePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.01 }}
-              className="p-8 bg-gradient-to-br from-slate-900/80 to-slate-900/40 rounded-3xl border border-white/10 hover:border-[#2ecc71]/30 transition-all relative overflow-hidden group"
+              className="p-8 bg-gradient-to-br from-surface-2 to-surface-2 rounded-3xl border border-line hover:border-primary/30 transition-all relative overflow-hidden group"
             >
-              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-[#2ecc71]/5 rounded-full blur-[80px] group-hover:bg-[#2ecc71]/10 transition-all"></div>
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/5 rounded-full blur-[80px] group-hover:bg-primary/10 transition-all"></div>
 
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="px-3 py-1 bg-[#2ecc71]/20 text-[#2ecc71] text-xs font-bold rounded-full uppercase tracking-wider">
+                  <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-full uppercase tracking-wider">
                     IEEE Published
                   </span>
-                  <span className="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full uppercase tracking-wider">
+                  <span className="px-3 py-1 bg-blue-500/20 text-blue-600 text-xs font-bold rounded-full uppercase tracking-wider">
                     2015
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-4 leading-tight">
+                <h3 className="text-xl font-bold text-ink mb-4 leading-tight">
                   Microcontroller Based Home Automation System Using Bluetooth, GSM, Wi-Fi and DTMF
                 </h3>
 
-                <p className="text-slate-400 text-sm mb-4 leading-relaxed">
+                <p className="text-body text-sm mb-4 leading-relaxed">
                   Neaz Md. Morshed, G M Muid Ur Rahman, Md. Rezaul Karim and Hasan U. Zaman, Proc. 3rd Intl. Conference on Advances in Electrical Engineering (ICAEE'15), pp. 101-104, Dhaka, Bangladesh, December 17-19, 2015
                 </p>
 
-                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
-                  <span className="text-slate-500 text-xs font-mono">DOI: 10.1109/ICAEE.2015.7506806</span>
+                <div className="flex items-center gap-4 pt-4 border-t border-line">
+                  <span className="text-muted text-xs font-mono">DOI: 10.1109/ICAEE.2015.7506806</span>
                   {/* External link removed for Upwork portfolio */}
                 </div>
               </div>
@@ -1007,11 +1007,11 @@ export default function ResumePage() {
               viewport={{ once: true }}
               className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
-              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
-                <Award className="text-[#2ecc71]" size={28} />
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Award className="text-primary" size={28} />
               </div>
               Certifications
-              <span className="text-sm text-slate-500 font-normal ml-2">({certifications.length})</span>
+              <span className="text-sm text-muted font-normal ml-2">({certifications.length})</span>
             </motion.h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {certifications.map((cert, i) => (
@@ -1022,10 +1022,10 @@ export default function ResumePage() {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ scale: 1.03, y: -5 }}
-                  className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 hover:border-[#2ecc71]/30 transition-all cursor-pointer group"
+                  className="p-5 bg-surface rounded-2xl border border-line hover:border-primary/30 transition-all cursor-pointer group"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className="p-2 bg-[#2ecc71]/10 rounded-lg text-[#2ecc71] group-hover:bg-[#2ecc71] group-hover:text-slate-900 transition-all">
+                    <div className="p-2 bg-primary/10 rounded-lg text-primary group-hover:bg-primary group-hover:text-white transition-all">
                       <Award size={18} />
                     </div>
                     {cert.expiry && (
@@ -1034,9 +1034,9 @@ export default function ResumePage() {
                       </span>
                     )}
                   </div>
-                  <h3 className="text-base font-bold text-white mb-1 group-hover:text-[#2ecc71] transition-colors">{cert.title}</h3>
-                  <p className="text-slate-400 text-sm font-medium">{cert.issuer}</p>
-                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-3">
+                  <h3 className="text-base font-bold text-ink mb-1 group-hover:text-primary transition-colors">{cert.title}</h3>
+                  <p className="text-body text-sm font-medium">{cert.issuer}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted mt-3">
                     <Calendar size={12} />
                     <span>Issued {cert.date}</span>
                   </div>
@@ -1053,8 +1053,8 @@ export default function ResumePage() {
               viewport={{ once: true }}
               className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight mb-6 sm:mb-8"
             >
-              <div className="p-3 bg-[#2ecc71]/10 rounded-xl">
-                <Code className="text-[#2ecc71]" size={28} />
+              <div className="p-3 bg-primary/10 rounded-xl">
+                <Code className="text-primary" size={28} />
               </div>
               Skills & Expertise
             </motion.h2>
@@ -1069,11 +1069,11 @@ export default function ResumePage() {
                   onMouseEnter={() => setHoveredSkill(category)}
                   onMouseLeave={() => setHoveredSkill(null)}
                   className={`p-5 rounded-2xl border transition-all duration-300 ${hoveredSkill === category
-                      ? 'bg-[#1a1f2e] border-[#2ecc71]/40 shadow-lg shadow-[#2ecc71]/10 scale-[1.02]'
-                      : 'bg-slate-900/60 border-white/5'
+                      ? 'bg-surface border-primary/40 shadow-lg shadow-primary/10 scale-[1.02]'
+                      : 'bg-surface border-line'
                     }`}
                 >
-                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 transition-colors ${hoveredSkill === category ? 'text-[#2ecc71]' : 'text-slate-400'
+                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 transition-colors ${hoveredSkill === category ? 'text-primary' : 'text-body'
                     }`}>{category}</h3>
                   <div className="flex flex-wrap gap-2">
                     {skillList.map((skill, j) => (
@@ -1084,8 +1084,8 @@ export default function ResumePage() {
                         viewport={{ once: true }}
                         transition={{ delay: j * 0.03 }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${hoveredSkill === category
-                            ? 'bg-[#2ecc71]/20 text-[#2ecc71] border border-[#2ecc71]/30'
-                            : 'bg-slate-800 text-slate-300'
+                            ? 'bg-primary/20 text-primary border border-primary/30'
+                            : 'bg-surface-2 text-body'
                           }`}
                       >
                         {skill}
@@ -1102,14 +1102,14 @@ export default function ResumePage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 sm:py-8 border-t border-white/5">
+      <footer className="py-6 sm:py-8 border-t border-line">
         <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
             <FooterLinks />
-            <p className="text-slate-400 text-xs sm:text-sm font-medium">
+            <p className="text-body text-xs sm:text-sm font-medium">
               Designed and Developed by{' '}
-              <span className="text-[#2ecc71] font-semibold">Neaz Morshed</span> •{' '}
-              <span className="text-slate-500">Copyright © 2026</span>
+              <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+              <span className="text-muted">Copyright © 2026</span>
             </p>
           </div>
         </div>

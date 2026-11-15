@@ -1,55 +1,45 @@
 "use client";
 
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
 
 interface VideoBackgroundProps {
   type: 'skills' | 'services' | 'experience' | 'reviews' | 'contact' | 'calendar';
+  /** Kept for API compatibility with the old video version. */
   opacity?: number;
 }
 
-// Animated gradient backgrounds for different page types (replacing external videos)
-const gradientBackgrounds: Record<string, string> = {
-  skills: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Purple tech gradient
-  services: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Pink to red
-  experience: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Blue gradient
-  reviews: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Green to cyan
-  contact: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', // Pink to yellow
-  calendar: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', // Cyan to purple
+// Each page gets a slightly different soft glow so headers don't all look alike.
+const glows: Record<VideoBackgroundProps['type'], { a: string; b: string }> = {
+  skills: { a: '20% 10%', b: '85% 60%' },
+  services: { a: '80% 0%', b: '10% 70%' },
+  experience: { a: '15% 20%', b: '90% 40%' },
+  reviews: { a: '70% 10%', b: '20% 80%' },
+  contact: { a: '85% 15%', b: '15% 60%' },
+  calendar: { a: '50% 0%', b: '50% 90%' },
 };
 
-export default function VideoBackground({ type, opacity = 0.3 }: VideoBackgroundProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1.2]);
+/**
+ * Light decorative header background.
+ *
+ * This used to stream a full-screen 2560px stock video behind every page
+ * header (tens of MB per page). It is now pure CSS: same props, no download.
+ */
+export default function VideoBackground({ type }: VideoBackgroundProps) {
+  const glow = glows[type] || glows.services;
 
   return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden z-0">
-      {/* Animated Gradient Background (replacing video) */}
-      <motion.div
+    <div className="absolute inset-0 overflow-hidden z-0 pointer-events-none" aria-hidden="true">
+      <div
+        className="absolute inset-0"
         style={{
-          y,
-          scale,
-          background: gradientBackgrounds[type],
-          opacity
+          background: `radial-gradient(55% 55% at ${glow.a}, rgba(87, 119, 255, 0.16) 0%, rgba(87, 119, 255, 0) 70%),
+            radial-gradient(45% 45% at ${glow.b}, rgba(98, 93, 245, 0.12) 0%, rgba(98, 93, 245, 0) 70%),
+            linear-gradient(180deg, #FFFFFF 0%, #F8F9FF 100%)`,
         }}
-        className="absolute inset-0 w-full h-full"
       />
-
-      {/* Dark Overlay for "Dark Overlay Effect" */}
-      <div className="absolute inset-0 bg-[#0b0f1a]/80" />
-
-      {/* Gradient Overlays for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-[#0b0f1a]/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f1a] via-transparent to-[#0b0f1a]/40" />
-
-      {/* Subtle color tint based on brand */}
-      <div className="absolute inset-0 bg-[#2ecc71]/5 mix-blend-overlay" />
+      <div className="absolute inset-0 bg-dots opacity-60 [mask-image:radial-gradient(70%_60%_at_50%_30%,#000_0%,transparent_100%)]" />
+      <div className="absolute -top-24 -right-24 w-[420px] h-[420px] rounded-full border border-primary/10 animate-subtle-pulse" />
+      <div className="absolute -bottom-32 -left-20 w-[360px] h-[360px] rounded-full border border-accent/10 animate-subtle-pulse" />
     </div>
   );
 }

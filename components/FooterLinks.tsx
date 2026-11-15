@@ -73,12 +73,12 @@ export default function FooterLinks() {
   if (loading) {
     return (
       <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
-        <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-18 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-14 bg-slate-800/50 rounded animate-pulse"></div>
-        <div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse"></div>
+        <div className="h-4 w-16 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-20 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-18 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-16 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-14 bg-surface-2 rounded animate-pulse"></div>
+        <div className="h-4 w-20 bg-surface-2 rounded animate-pulse"></div>
       </div>
     );
   }
