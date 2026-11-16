@@ -1,0 +1,251 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import Image from '../../components/SiteImage';
+import {
+    ArrowRight, ArrowLeft, Loader2, Calendar, User,
+    ExternalLink, Search, Tag, Clock
+} from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import Navbar from '../../components/Navbar';
+import VideoBackground from '../../components/VideoBackground';
+import FooterLinks from '../../components/FooterLinks';
+
+export interface BlogPost {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content?: string; // Optional for listing
+    cover_image: string;
+    cover_image_alt_text?: string | null;
+    video_url?: string; // Optional for listing
+    external_link?: string;
+    author?: string; // Optional for listing
+    tags: string[];
+    published_at: string;
+}
+
+export default function BlogPage({ initial }: { initial?: BlogPost[] | null }) {
+    const [blogs, setBlogs] = useState<BlogPost[]>(initial ?? []);
+    const [loading, setLoading] = useState(!initial);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (initial) return;
+        async function fetchBlogs() {
+            if (!supabase) {
+                setLoading(false);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('blogs')
+                .select('id, title, slug, excerpt, cover_image, cover_image_alt_text, external_link, tags, published_at')
+                .eq('is_published', true)
+                .order('published_at', { ascending: false });
+
+            if (!error && data) {
+                setBlogs(data);
+            }
+            setLoading(false);
+        }
+
+        fetchBlogs();
+    }, []);
+
+    // Filter blogs
+    const filteredBlogs = blogs.filter(blog => {
+        const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesTag = selectedTag ? blog.tags?.includes(selectedTag) : true;
+        return matchesSearch && matchesTag;
+    });
+
+    // Get all unique tags
+    const allTags = Array.from(new Set(blogs.flatMap(blog => blog.tags || [])));
+
+    return (
+        <div className="bg-page text-ink min-h-screen selection:bg-primary selection:text-white">
+            <Navbar />
+
+            <main className="pb-24">
+                {/* Hero Section */}
+                <section className="pt-32 pb-20 relative overflow-hidden min-h-[50vh] flex flex-col justify-center">
+                    <div className="absolute inset-0 bg-page">
+                        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-page opacity-30"></div>
+                        {/* Abstract Shapes */}
+                        <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] rounded-full np-orb [--c:87_119_255] [--a:0.11]"></div>
+                    </div>
+
+                    <div className="container mx-auto px-6 max-w-7xl relative z-10 text-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <span className="text-primary text-[11px] font-black uppercase tracking-[0.5em] mb-6 block">Insights & Updates</span>
+                            <h1 className="text-5xl lg:text-8xl font-black uppercase tracking-tighter leading-none mb-8">
+                                My <span className="text-primary">Blog</span>
+                            </h1>
+                            <p className="text-body text-xl max-w-2xl mx-auto leading-relaxed">
+                                Thoughts on Virtual Assistance, Web Development, AI, and the future of remote work.
+                            </p>
+                        </motion.div>
+                    </div>
+                </section>
+
+                {/* Search & Filter */}
+                <section className="container mx-auto px-6 max-w-7xl mb-12">
+                    <div className="flex flex-col md:flex-row gap-6 justify-between items-center">
+                        {/* Search */}
+                        <div className="relative w-full md:w-96">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={20} />
+                            <input
+                                type="text"
+                                placeholder="Search articles..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-12 pr-4 py-4 bg-surface border border-line rounded-2xl text-ink focus:border-primary outline-none transition-colors"
+                            />
+                        </div>
+
+                        {/* Tags */}
+                        {allTags.length > 0 && (
+                            <div className="flex flex-wrap justify-center gap-2">
+                                <button
+                                    onClick={() => setSelectedTag(null)}
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${selectedTag === null ? 'bg-primary text-white' : 'bg-surface text-body hover:text-ink'
+                                        }`}
+                                >
+                                    All
+                                </button>
+                                {allTags.map(tag => (
+                                    <button
+                                        key={tag}
+                                        onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+                                        className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${selectedTag === tag ? 'bg-primary text-white' : 'bg-surface text-body hover:text-ink'
+                                            }`}
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* Blog Grid */}
+                <section className="container mx-auto px-6 max-w-7xl">
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                        </div>
+                    ) : filteredBlogs.length === 0 ? (
+                        <div className="text-center py-20">
+                            <p className="text-body text-lg">No articles found matching your criteria.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredBlogs.map((blog, index) => (
+                                <motion.div
+                                    key={blog.id}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                                    className="group flex flex-col h-full bg-surface border border-line rounded-[2rem] overflow-hidden hover:border-primary/30 transition-all duration-300 hover:-translate-y-2"
+                                >
+                                    {/* Cover Image */}
+                                    <div className="relative h-64 overflow-hidden">
+                                        <div className="absolute inset-0 bg-surface animate-pulse" /> {/* Placeholder */}
+                                        {blog.cover_image && (
+                                            <Image
+                                                src={blog.cover_image}
+                                                alt={blog.cover_image_alt_text || blog.title}
+                                                fill
+                                                sizes="(max-width: 768px) 60vw, (max-width: 1200px) 40vw, 28vw"
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                        )}
+                                        {/* Overlay */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-page to-transparent opacity-60"></div>
+
+                                        {/* External Link Indicator */}
+                                        {blog.external_link && (
+                                            <div className="absolute top-4 right-4 bg-surface backdrop-blur-sm p-2 rounded-full text-primary border border-primary/20">
+                                                <ExternalLink size={16} />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="p-8 flex flex-col flex-grow">
+                                        {/* Meta */}
+                                        <div className="flex items-center gap-4 text-xs text-muted mb-4 font-bold uppercase tracking-wider">
+                                            <div className="flex items-center gap-2">
+                                                <Calendar size={12} className="text-primary" />
+                                                <span>{new Date(blog.published_at || blog.id).toLocaleDateString()}</span>
+                                            </div>
+                                            {blog.tags && blog.tags.length > 0 && (
+                                                <div className="flex items-center gap-2">
+                                                    <Tag size={12} className="text-primary" />
+                                                    <span>{blog.tags[0]}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <h2 className="text-2xl font-black mb-4 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                            {blog.title}
+                                        </h2>
+
+                                        <p className="text-body text-sm leading-relaxed mb-6 line-clamp-3">
+                                            {blog.excerpt}
+                                        </p>
+
+                                        <div className="mt-auto">
+                                            {// External link logic
+                                                blog.external_link ? (
+                                                    <a
+                                                        href={blog.external_link}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-xs group-hover:translate-x-2 transition-transform"
+                                                    >
+                                                        Read on {blog.external_link.includes('linkedin') ? 'LinkedIn' : 'External Site'} <ExternalLink size={14} />
+                                                    </a>
+                                                ) : (
+                                                    <Link
+                                                        href={`/blog/${blog.slug}`}
+                                                        className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-xs group-hover:translate-x-2 transition-transform"
+                                                    >
+                                                        Read Article <ArrowRight size={14} />
+                                                    </Link>
+                                                )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            </main>
+
+            {/* Footer */}
+            <footer className="py-6 sm:py-8 border-t border-line">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-12 max-w-7xl">
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
+                        <FooterLinks />
+                        <p className="text-body text-xs sm:text-sm font-medium">
+                            Designed and Developed by{' '}
+                            <span className="text-primary font-semibold">Neaz Morshed</span> •{' '}
+                            <span className="text-muted">Copyright © 2026</span>
+                        </p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+}
