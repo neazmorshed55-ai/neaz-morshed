@@ -12,6 +12,34 @@ import Navbar from '../../components/Navbar';
 import FooterLinks from '../../components/FooterLinks';
 import { defaultExperiences, type Experience } from '../../lib/experienceData';
 
+// One clear colour per job type: used by the year chip, badge, card edge and tint
+const TYPE_STYLE = {
+  'full-time': {
+    chip: 'from-primary to-accent',
+    chipShadow: 'shadow-[0_14px_30px_-12px_rgba(87,119,255,0.75)]',
+    badge: 'bg-primary text-white',
+    card: 'border-primary/25 border-l-primary bg-gradient-to-br from-white via-white to-primary-soft',
+    glow: 'hover:shadow-[0_24px_50px_-24px_rgba(87,119,255,0.55)]',
+    dot: 'bg-primary',
+  },
+  'part-time': {
+    chip: 'from-amber-500 to-orange-500',
+    chipShadow: 'shadow-[0_14px_30px_-12px_rgba(245,158,11,0.75)]',
+    badge: 'bg-amber-500 text-white',
+    card: 'border-amber-300/60 border-l-amber-500 bg-gradient-to-br from-white via-white to-amber-50',
+    glow: 'hover:shadow-[0_24px_50px_-24px_rgba(245,158,11,0.55)]',
+    dot: 'bg-amber-500',
+  },
+  project: {
+    chip: 'from-fuchsia-500 to-purple-600',
+    chipShadow: 'shadow-[0_14px_30px_-12px_rgba(192,38,211,0.7)]',
+    badge: 'bg-fuchsia-600 text-white',
+    card: 'border-fuchsia-300/60 border-l-fuchsia-500 bg-gradient-to-br from-white via-white to-fuchsia-50',
+    glow: 'hover:shadow-[0_24px_50px_-24px_rgba(192,38,211,0.5)]',
+    dot: 'bg-fuchsia-500',
+  },
+} as const;
+
 // Helper function to parse date string and return sortable value
 const parseDate = (dateStr: string): number => {
   if (dateStr === 'Present') return Date.now();
@@ -46,49 +74,55 @@ const ExperienceCard = memo(({ exp, index, expandedId, setExpandedId }: {
   const isExpanded = expandedId === exp.id;
 
   return (
-    <div
-      className={`relative flex flex-col md:flex-row gap-8 mb-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+    <motion.div
+      initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50, y: 20 }}
+      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+      transition={{ type: 'spring', stiffness: 90, damping: 18 }}
+      className={`relative flex flex-col md:flex-row gap-8 mb-10 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
     >
       {/* Timeline Dot */}
-      <div className="absolute left-0 md:left-1/2 w-4 h-4 bg-primary rounded-full transform -translate-x-1/2 border-4 border-page shadow-[0_0_20px_rgba(87,119,255,0.5)] z-10"></div>
+      <div className="absolute left-0 md:left-1/2 top-6 md:top-1/2 z-10 -translate-x-1/2 md:-translate-y-1/2">
+        <span className={`absolute inset-0 rounded-full ${TYPE_STYLE[exp.type].dot} opacity-40 animate-ping`} />
+        <span className={`relative block w-5 h-5 rounded-full ${TYPE_STYLE[exp.type].dot} border-4 border-white shadow-lg`} />
+      </div>
 
       {/* Year Badge - Desktop */}
       <div className={`hidden md:flex md:w-1/2 items-center ${index % 2 === 0 ? 'justify-end pr-12' : 'justify-start pl-12'}`}>
         <div className="text-center">
-          <div className="text-5xl font-black text-primary/20">
+          <motion.div
+            initial={{ scale: 0.6, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.1 }}
+            className={`inline-block px-7 py-3 rounded-2xl bg-gradient-to-br ${TYPE_STYLE[exp.type].chip} ${TYPE_STYLE[exp.type].chipShadow} text-white text-4xl lg:text-5xl font-black tracking-tight leading-none`}
+          >
             {exp.start_date.split(' ').pop()}
-          </div>
-          <div className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider mt-2 ${
-            exp.type === 'full-time' ? 'bg-primary/20 text-primary' :
-            exp.type === 'part-time' ? 'bg-blue-500/20 text-blue-600' :
-            'bg-purple-500/20 text-purple-600'
-          }`}>
-            {exp.type}
+          </motion.div>
+          <div className="mt-3">
+            <span className={`inline-block text-[11px] px-4 py-1.5 rounded-full font-extrabold uppercase tracking-wider ${TYPE_STYLE[exp.type].badge}`}>
+              {exp.type}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Content Card */}
       <div className={`md:w-1/2 pl-8 md:pl-0 ${index % 2 === 0 ? 'md:pl-12' : 'md:pr-12'}`}>
-        <div
-          className={`p-6 rounded-3xl border transition-all duration-300 cursor-pointer ${
-            isExpanded
-              ? 'bg-surface border-primary/30 shadow-lg shadow-primary/10'
-              : 'bg-surface border-line hover:border-line'
-          }`}
+        <motion.div
+          whileHover={{ y: -6, scale: 1.012 }}
+          whileTap={{ scale: 0.99 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+          className={`p-6 rounded-3xl border border-l-[6px] shadow-card transition-shadow duration-300 cursor-pointer ${TYPE_STYLE[exp.type].card} ${TYPE_STYLE[exp.type].glow} ${isExpanded ? 'ring-2 ring-primary/30' : ''}`}
           onClick={() => setExpandedId(isExpanded ? null : exp.id)}
         >
           {/* Mobile Type Badge & Year */}
           <div className="md:hidden flex items-center gap-3 mb-3">
-            <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
-              exp.type === 'full-time' ? 'bg-primary/20 text-primary' :
-              exp.type === 'part-time' ? 'bg-blue-500/20 text-blue-600' :
-              'bg-purple-500/20 text-purple-600'
-            }`}>
+            <span className={`text-[10px] px-3 py-1 rounded-full font-extrabold uppercase tracking-wider ${TYPE_STYLE[exp.type].badge}`}>
               {exp.type}
             </span>
-            <span className="text-primary text-xs font-bold">
-              {exp.start_date} - {exp.end_date}
+            <span className={`text-xs font-extrabold text-white px-3 py-1 rounded-full bg-gradient-to-br ${TYPE_STYLE[exp.type].chip}`}>
+              {exp.start_date.split(' ').pop()}
             </span>
           </div>
 
@@ -165,9 +199,9 @@ const ExperienceCard = memo(({ exp, index, expandedId, setExpandedId }: {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 });
 
