@@ -24,9 +24,9 @@ const H = 360; // card height in px (desktop); scaled down on small screens via 
  * shape, so nothing is cropped. Only CSS transforms are animated (no blur or
  * filters, which freeze iPhones) and only the nearest cards load an image.
  */
-export default function GalleryCoverflow({ images, onOpen, wide = false }: { images: CoverflowImage[]; onOpen: (index: number) => void; wide?: boolean }) {
+export default function GalleryCoverflow({ images, onOpen, wide = false, startIndex, hint = true }: { images: CoverflowImage[]; onOpen: (index: number) => void; wide?: boolean; startIndex?: number; hint?: boolean }) {
   const n = images.length;
-  const [active, setActive] = useState(Math.floor(n / 2));
+  const [active, setActive] = useState(startIndex ?? Math.floor(n / 2));
   const [ratios, setRatios] = useState<Record<number, number>>({});
   const drag = useRef<{ x: number; moved: boolean } | null>(null);
   const go = useCallback((d: number) => setActive((a) => (((a + d) % n) + n) % n), [n]);
@@ -136,7 +136,7 @@ export default function GalleryCoverflow({ images, onOpen, wide = false }: { ima
           <ArrowRight className="w-5 h-5" />
         </button>
       </div>
-      <p className="text-center text-xs text-muted mt-3">Tap any image to view it full size</p>
+      {hint && <p className="text-center text-xs text-muted mt-3">Tap any image to view it full size</p>}
     </div>
   );
 }
