@@ -153,7 +153,7 @@ export default function SkillPortfolioPage({ initial }: { initial?: InitialData 
       <section className="pt-32 pb-20 relative overflow-hidden min-h-screen">
         {/* Background */}
         <div className="absolute left-0 top-0 w-1/4 h-full bg-surface"></div>
-        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute top-[30%] right-[10%] w-[400px] h-[400px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.11]"></div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
           {/* Back Link */}

@@ -358,7 +358,7 @@ export default function IPadShowcase({ items }: { items?: PortfolioItem[] } = {}
 
         {/* Enhanced Decorative Elements */}
         <motion.div
-          className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"
+          className="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.22]"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -372,7 +372,7 @@ export default function IPadShowcase({ items }: { items?: PortfolioItem[] } = {}
           }}
         />
         <motion.div
-          className="absolute top-1/3 right-1/4 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none"
+          className="absolute top-1/3 right-1/4 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none np-orb [--c:98_93_245] [--a:0.22]"
           animate={{
             scale: [1, 1.3, 1],
             opacity: [0.2, 0.4, 0.2],
@@ -386,7 +386,7 @@ export default function IPadShowcase({ items }: { items?: PortfolioItem[] } = {}
           }}
         />
         <motion.div
-          className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-72 h-72 bg-primary/5 rounded-full blur-3xl pointer-events-none"
+          className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.11]"
           animate={{
             scale: [1, 1.4, 1],
             opacity: [0.2, 0.35, 0.2],

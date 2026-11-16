@@ -56,11 +56,11 @@ const nextConfig = {
       },
     ],
     // Enable modern image formats
-    formats: ['image/avif', 'image/webp'],
+    formats: ['image/webp'],
     // Optimize images
     // Fewer size buckets = fewer distinct variants to generate and cache.
-    deviceSizes: [640, 828, 1080, 1280, 1920],
-    imageSizes: [32, 64, 128, 256, 384],
+    deviceSizes: [384, 640, 828, 1080, 1280],
+    imageSizes: [32, 64, 128, 256],
     // Keep optimised images cached for 31 days. Supabase serves originals with
     // max-age=3600, so without this every image was re-processed each hour,
     // which is slow for visitors and burns through Vercel's image quota

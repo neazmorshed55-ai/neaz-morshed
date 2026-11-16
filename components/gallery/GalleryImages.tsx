@@ -28,6 +28,7 @@ export function CoverImage({
       src={src}
       alt={alt}
       fill
+      crop
       sizes={sizes}
       priority={priority}
       className={`${className} ${ratio(size) >= 1.3 ? 'object-top' : ''}`}
@@ -58,7 +59,7 @@ export function LightboxImage({ src, alt, frameClassName }: { src: string; alt: 
           alt={alt}
           width={size.width}
           height={size.height}
-          sizes="(max-width: 1100px) 100vw, 1100px"
+          sizes="(max-width: 1100px) 70vw, 1100px"
           className="block h-auto w-full"
         />
       </div>

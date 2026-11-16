@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 import SkillPortfolioPage, { type InitialData } from './Client';
 import { getServerSupabase, publicStorageUrl } from '../../../lib/supabase-server';
+import { pageMeta } from '../../../lib/seo';
 
 // Rendered on the server and cached; refreshed in the background every minute.
 export const revalidate = 60;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Skill Portfolio',
-  alternates: { canonical: '/skills/portfolio' },
-};
+  description: 'Samples of work by skill: video production, graphic design, content writing, web development, WordPress design and social media marketing.',
+  path: '/skills/portfolio',
+});
 
 async function loadSkills(): Promise<InitialData | null> {
   const db = getServerSupabase(60);

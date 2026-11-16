@@ -72,3 +72,19 @@ export function isDirectImageUrl(src?: string | null): boolean {
   if (h === 'drive.google.com') return src.includes('/thumbnail') || src.includes('uc?');
   return !PAGE_LINK_HOSTS.some((re) => re.test(h));
 }
+
+/** Public Supabase storage file (the only thing /api/img will resize). */
+export function isSupabaseStorageUrl(src?: string | null): boolean {
+  if (!src || !src.includes('/storage/v1/object/public/')) return false;
+  const h = host(src);
+  if (!h) return false;
+  if (src.startsWith('https://') && h.endsWith('.supabase.co')) return true;
+  // This project's own Supabase address (also covers local development).
+  const own = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return !!own && src.startsWith(own.replace(/\/+$/, '') + '/');
+}
+
+/** Same-origin URL of the resizer for one width. */
+export function resizerUrl(src: string, width: number, quality = 70, crop = false): string {
+  return `/api/img?u=${encodeURIComponent(src)}&w=${width}&q=${quality}${crop ? '&crop=1' : ''}`;
+}

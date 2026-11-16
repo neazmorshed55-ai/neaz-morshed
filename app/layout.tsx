@@ -8,6 +8,8 @@ import SiteEffects from '../components/motion/SiteEffects';
 import { SITE_URL } from '../lib/site';
 import { SiteChromeProvider } from '../components/SiteChrome';
 import { loadSiteChrome } from '../lib/site-chrome';
+import JsonLd from '../components/JsonLd';
+import { IS_PORTFOLIO_COPY } from '../lib/seo';
 
 // Self-hosted variable font: no request to Google at runtime or build time.
 const urbanist = localFont({
@@ -45,18 +47,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: SITE_URL,
+    // No url here: it would be inherited by every page and claim they are the homepage.
     title: 'Neaz Md. Morshed | Virtual Assistant & Outsourcing Expert',
     description: 'Expert Virtual Assistant & Outsourcing Professional. Scaling businesses with Web Design, Video Editing, and Digital Marketing services.',
-    siteName: 'Neaz Md. Morshed Portfolio',
-    images: [
-      {
-        url: '/og-image.jpg', // Ensure this exists or use a generic one
-        width: 1200,
-        height: 630,
-        alt: 'Neaz Md. Morshed Portfolio',
-      },
-    ],
+    siteName: 'Neaz Md. Morshed',
+    // Preview image comes from app/opengraph-image.tsx
   },
   twitter: {
     card: 'summary_large_image',
@@ -77,6 +72,53 @@ export const metadata: Metadata = {
   },
 };
 
+
+const PERSON_ID = `${SITE_URL}/#person`;
+const SITE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: 'Neaz Md. Morshed',
+      inLanguage: 'en',
+      publisher: { '@id': PERSON_ID },
+    },
+    {
+      '@type': 'Person',
+      '@id': PERSON_ID,
+      name: 'Neaz Md. Morshed',
+      jobTitle: 'Virtual Assistant & Outsourcing Expert',
+      url: SITE_URL,
+      image: process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/profile.jpg`
+        : undefined,
+      email: 'contact@neazmdmorshed.com',
+      address: { '@type': 'PostalAddress', addressCountry: 'BD' },
+      knowsAbout: ['Virtual assistance', 'Outsourcing', 'Web design', 'Video editing', 'Social media marketing', 'Admin support'],
+      ...(IS_PORTFOLIO_COPY
+        ? {}
+        : {
+            sameAs: [
+              'https://www.linkedin.com/in/neazmorshed222/',
+              'https://www.facebook.com/neazmorshed001/',
+              'https://www.fiverr.com/neaz222',
+            ],
+          }),
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${SITE_URL}/#service`,
+      name: 'Neaz Md. Morshed - Virtual Assistant & Outsourcing Services',
+      url: SITE_URL,
+      provider: { '@id': PERSON_ID },
+      areaServed: 'Worldwide',
+      serviceType: ['Virtual assistant', 'Web design', 'Video editing', 'Social media marketing', 'Admin support'],
+    },
+  ],
+};
+
 export default async function RootLayout({
   children,
 }: {
@@ -92,6 +134,7 @@ export default async function RootLayout({
         </noscript>
       </head>
       <body className="font-sans bg-page text-ink antialiased overflow-x-hidden">
+        <JsonLd data={SITE_SCHEMA} />
         <Preloader />
         <SiteEffects />
         <VisitorTracker />

@@ -73,7 +73,7 @@ export default function ServicesPage({ initial }: { initial?: InitialData | null
           <VideoBackground type="services" opacity={0.5} />
 
           {/* Softer decorative elements */}
-          <div className="absolute top-[10%] left-[5%] w-[500px] h-[500px] bg-primary/3 rounded-full blur-[150px] pointer-events-none"></div>
+          <div className="absolute top-[10%] left-[5%] w-[500px] h-[500px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.07]"></div>
 
           <div className="container mx-auto px-6 max-w-7xl relative z-10">
             <Link href="/" className="inline-flex items-center gap-2 text-body hover:text-primary transition-all mb-10 group">
@@ -129,7 +129,7 @@ export default function ServicesPage({ initial }: { initial?: InitialData | null
                                 src={service.cover_image}
                                 alt={service.title}
                                 fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                sizes="(max-width: 768px) 60vw, (max-width: 1200px) 40vw, 28vw"
                                 unoptimized={!canOptimizeImage(service.cover_image)}
                                 className="object-cover"
                               />

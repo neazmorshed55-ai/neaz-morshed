@@ -68,7 +68,7 @@ export default function HeroSection({
     <section id="home" className="relative min-h-screen flex items-center pt-28 sm:pt-32 lg:pt-36 pb-12 overflow-hidden hero-backdrop">
       {/* soft decorative shapes */}
       <div className="absolute inset-0 bg-dots opacity-50 [mask-image:radial-gradient(60%_60%_at_30%_40%,#000_0%,transparent_100%)] pointer-events-none" />
-      <div className="absolute top-[12%] -left-24 w-[420px] h-[420px] rounded-full bg-primary/10 blur-[120px] pointer-events-none animate-subtle-pulse" />
+      <div className="absolute top-[12%] -left-24 w-[420px] h-[420px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.22]" />
 
       <Container>
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
@@ -156,8 +156,8 @@ export default function HeroSection({
           <div className="relative order-first lg:order-last mx-auto w-full max-w-[520px]">
             {/* dashed frame + glow behind the photo */}
             <div className="absolute inset-[-6%] rounded-[3.5rem] sm:rounded-[5rem] border-2 border-dashed border-primary/20 pointer-events-none" />
-            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-primary/25 rounded-full blur-3xl -z-10 animate-subtle-pulse" />
-            <div className="absolute -top-8 -left-8 w-40 h-40 bg-accent/20 rounded-full blur-3xl -z-10 animate-subtle-pulse" />
+            <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full -z-10 np-orb [--c:87_119_255] [--a:0.55]" />
+            <div className="absolute -top-8 -left-8 w-40 h-40 rounded-full -z-10 np-orb [--c:98_93_245] [--a:0.44]" />
 
             <ImageReveal onLoad delay={0.15} className="relative z-10 rounded-[3rem] sm:rounded-[4.5rem] overflow-hidden">
               <div className="group relative w-full aspect-[4/5] bg-surface-2 border-[10px] sm:border-[14px] border-white shadow-[0_40px_80px_-30px_rgba(61,91,239,0.45)] rounded-[3rem] sm:rounded-[4.5rem] overflow-hidden">

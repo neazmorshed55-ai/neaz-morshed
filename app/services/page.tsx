@@ -1,14 +1,16 @@
 import type { Metadata } from 'next';
 import ServicesPage, { type InitialData } from './Client';
 import { getServerSupabase } from '../../lib/supabase-server';
+import { pageMeta } from '../../lib/seo';
 
 // Rendered on the server and cached; refreshed in the background every minute.
 export const revalidate = 60;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Services',
-  alternates: { canonical: '/services' },
-};
+  description: 'Virtual assistant, web design, video editing, social media marketing and admin support services by Neaz Md. Morshed, with real project examples.',
+  path: '/services',
+});
 
 async function loadServices(): Promise<InitialData | null> {
   const db = getServerSupabase(60);

@@ -73,8 +73,8 @@ export default function SkillsPage() {
         <VideoBackground type="skills" opacity={0.4} />
 
         {/* Additional decorative elements */}
-        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
-        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+        <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.11]"></div>
+        <div className="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.11]"></div>
 
         <div className="container mx-auto px-6 max-w-4xl relative z-10">
           <motion.div

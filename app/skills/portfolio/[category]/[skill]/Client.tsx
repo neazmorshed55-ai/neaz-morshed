@@ -462,7 +462,7 @@ export default function SkillDetailPage({ initial }: { initial?: InitialData | n
                               <CoverImage
                                 src={item.url}
                                 alt={item.alt_text || `${skill.title} example`}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                sizes="(max-width: 768px) 60vw, (max-width: 1024px) 40vw, 28vw"
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                               />
                             ) : isYouTube ? (
@@ -471,7 +471,7 @@ export default function SkillDetailPage({ initial }: { initial?: InitialData | n
                                   src={getYouTubeThumbnail(item.url) || 'https://via.placeholder.com/640x360?text=YouTube+Video'}
                                   alt={item.alt_text || 'YouTube video'}
                                   fill
-                                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                  sizes="(max-width: 768px) 60vw, (max-width: 1024px) 40vw, 28vw"
                                   className="object-cover"
                                 />
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
