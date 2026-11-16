@@ -218,7 +218,7 @@ export default function SkillsPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {technicalExperience.map((exp, i) => (
               <motion.div
                 key={i}
@@ -227,7 +227,7 @@ export default function SkillsPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 whileHover={{ scale: 1.03, y: -5 }}
-                className="flex items-center justify-between p-8 bg-surface border border-line rounded-3xl hover:border-primary/30 transition-all cursor-pointer group"
+                className="flex flex-wrap items-center justify-between gap-3 p-6 sm:p-8 bg-surface border border-line rounded-3xl hover:border-primary/30 transition-all cursor-pointer group"
               >
                 <div className="flex items-center gap-5">
                   <div className="p-4 bg-primary/10 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all">
