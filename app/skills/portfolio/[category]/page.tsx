@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '../../../../components/SiteImage';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, Loader2, Clock, CheckCircle2,

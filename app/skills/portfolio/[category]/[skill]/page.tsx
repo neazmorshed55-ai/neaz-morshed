@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '../../../../../components/SiteImage';
+import { CoverImage, LightboxImage } from '../../../../../components/gallery/GalleryImages';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, Loader2, Clock, CheckCircle2,
@@ -473,10 +474,9 @@ export default function SkillDetailPage() {
                         >
                           <div className="rounded-2xl overflow-hidden border border-line bg-surface hover:border-primary/50 transition-all relative aspect-video">
                             {isRegularImage ? (
-                              <Image
+                              <CoverImage
                                 src={item.url}
                                 alt={item.alt_text || `${skill.title} example`}
-                                fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                               />
@@ -555,7 +555,7 @@ export default function SkillDetailPage() {
                         viewport={{ once: true }}
                         className="aspect-video rounded-2xl overflow-hidden border border-line relative"
                       >
-                        <Image src={img} alt={`${skill.title} example ${index + 1}`} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover hover:scale-110 transition-transform duration-500" />
+                        <CoverImage src={img} alt={`${skill.title} example ${index + 1}`} sizes="(max-width: 768px) 50vw, 33vw" className="object-cover hover:scale-110 transition-transform duration-500" />
                       </motion.div>
                     ))}
                   </div>
@@ -688,16 +688,12 @@ export default function SkillDetailPage() {
 
                 if (isRegularImage) {
                   return (
-                    <div className="relative w-full h-[80vh] flex items-center justify-center">
-                      <Image
-                        src={item.url}
-                        alt={item.alt_text || 'Gallery image'}
-                        fill
-                        className="object-contain"
-                        sizes="100vw"
-                        priority
-                      />
-                    </div>
+                    <LightboxImage
+                      key={item.url}
+                      src={item.url}
+                      alt={item.alt_text || 'Gallery image'}
+                      frameClassName="relative w-full h-[80vh] flex items-center justify-center"
+                    />
                   );
                 }
 

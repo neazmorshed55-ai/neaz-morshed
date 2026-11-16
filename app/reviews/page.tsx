@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '../../components/SiteImage';
 import {
   Star, Quote, Linkedin, Facebook,
   ExternalLink, ThumbsUp, MessageCircle, Users, User

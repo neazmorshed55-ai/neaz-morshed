@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import NextImage from 'next/image';
+import NextImage from './SiteImage';
 import { ArrowRight } from 'lucide-react';
 import { Reveal, SplitText } from '@/components/motion/Reveal';
 

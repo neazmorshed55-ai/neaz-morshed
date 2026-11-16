@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import NextImage from 'next/image';
+import NextImage from '../SiteImage';
 import { ArrowRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
 import { Button, TypewriterEffect, Container } from '@/components/ui';
 import { ImageReveal, Reveal, SplitText, usePageRevealed } from '@/components/motion/Reveal';

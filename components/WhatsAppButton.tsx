@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 
 // Replace with your actual WhatsApp number (including country code, without + or -)
 // Example: "8801712345678"
@@ -9,6 +10,10 @@ const WHATSAPP_NUMBER = "8801775939996"; // Updated to user's number
 const PREFILLED_MESSAGE = "Hi Neaz, I would like to discuss a project.";
 
 export default function WhatsAppButton() {
+    // Visitor-facing only: it would cover buttons in the admin.
+    const pathname = usePathname();
+    if (pathname?.startsWith('/admin')) return null;
+
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(PREFILLED_MESSAGE)}`;
 
     return (

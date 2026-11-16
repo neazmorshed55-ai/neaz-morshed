@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, Trash2, Loader2, X, Save, Upload } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../lib/image-optimize';
 
 interface SkillCategory {
   id: string;
@@ -113,9 +114,9 @@ export default function StructureManager({ onClose, categories: initialCategorie
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0 || !supabase) return;
     setUploadingImage(true);
-    const file = e.target.files[0];
+    const file = await prepareImageUpload(e.target.files[0]);
     const fileExt = file.name.split('.').pop();
-    const fileName = `skill-cover-${Date.now()}.${fileExt}`;
+    const fileName = `skill-cover-${Date.now()}${sizeSuffix(file)}.${fileExt}`;
     const filePath = `skills/${fileName}`;
 
     try {

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '../../../../components/SiteImage';
+import { CoverImage, LightboxImage } from '../../../../components/gallery/GalleryImages';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, ExternalLink, X,
@@ -485,10 +486,9 @@ export default function PortfolioDetailPage() {
                 </div>
               ) : (portfolio.image_url || portfolio.thumbnail_url) && (
                 <div className="aspect-video relative overflow-hidden rounded-3xl border border-line">
-                  <Image
+                  <CoverImage
                     src={portfolio.image_url || portfolio.thumbnail_url || ''}
                     alt={portfolio.image_alt_text || portfolio.thumbnail_alt_text || portfolio.title}
-                    fill
                     priority
                     sizes="(max-width: 768px) 100vw, 800px"
                     className="object-cover"
@@ -552,10 +552,9 @@ export default function PortfolioDetailPage() {
                         >
                           <div className="relative overflow-hidden rounded-2xl border border-line bg-surface hover:border-primary/50 transition-all aspect-square">
                             {isRegularImage ? (
-                              <Image
+                              <CoverImage
                                 src={item.url}
                                 alt={item.alt_text || `Gallery image`}
-                                fill
                                 sizes="(max-width: 768px) 50vw, 33vw"
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                               />
@@ -799,16 +798,12 @@ export default function PortfolioDetailPage() {
               if (isRegularImage) {
                 return (
                   <div className="flex items-center justify-center w-full h-[85vh]">
-                    <div className="relative aspect-video h-[80vh] bg-black rounded-2xl overflow-hidden border border-line shadow-2xl">
-                      <Image
-                        src={item.url}
-                        alt={item.alt_text || 'Gallery image'}
-                        fill
-                        className="object-contain"
-                        sizes="100vw"
-                        priority
-                      />
-                    </div>
+                    <LightboxImage
+                      key={item.url}
+                      src={item.url}
+                      alt={item.alt_text || 'Gallery image'}
+                      frameClassName="relative aspect-video h-[80vh] bg-black rounded-2xl overflow-hidden border border-line shadow-2xl"
+                    />
                   </div>
                 );
               }

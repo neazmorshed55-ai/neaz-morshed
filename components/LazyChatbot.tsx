@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 
 const AIChatbot = dynamic(() => import('./AIChatbot'), { ssr: false });
 
@@ -11,6 +12,7 @@ const AIChatbot = dynamic(() => import('./AIChatbot'), { ssr: false });
  */
 export default function LazyChatbot() {
   const [ready, setReady] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const w = window as Window & {
@@ -27,5 +29,7 @@ export default function LazyChatbot() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Visitor-facing only: it would cover buttons in the admin.
+  if (pathname?.startsWith('/admin')) return null;
   return ready ? <AIChatbot /> : null;
 }

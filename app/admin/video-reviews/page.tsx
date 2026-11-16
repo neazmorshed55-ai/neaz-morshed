@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 import { countries, getFlagUrl, getFlagEmoji } from '../../../lib/countries';
 import { parseVideoUrl, providerLabel } from '../../../lib/video-embed';
 import { parseCaptions, countCues } from '../../../lib/captions';
@@ -327,13 +328,14 @@ export default function VideoReviewsManagement() {
   };
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !supabase) return;
+    const picked = e.target.files?.[0];
+    if (!picked || !supabase) return;
 
     setUploadingThumb(true);
     try {
+      const file = await prepareImageUpload(picked);
       const fileExt = file.name.split('.').pop();
-      const filePath = `video-reviews/thumb-${Date.now()}.${fileExt}`;
+      const filePath = `video-reviews/thumb-${Date.now()}${sizeSuffix(file)}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('images')
