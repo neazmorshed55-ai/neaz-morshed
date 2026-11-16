@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 
 interface Review {
   id: string;
@@ -263,13 +264,14 @@ export default function ReviewsManagement() {
   const platformOptions = ['Fiverr', 'Upwork', 'LinkedIn', 'Facebook', 'Google', 'Freelancer', 'Direct', 'Other'];
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !supabase) return;
+    const picked = e.target.files?.[0];
+    if (!picked || !supabase) return;
 
     setUploadingImage(true);
     try {
+      const file = await prepareImageUpload(picked);
       const fileExt = file.name.split('.').pop();
-      const fileName = `client-${Date.now()}.${fileExt}`;
+      const fileName = `client-${Date.now()}${sizeSuffix(file)}.${fileExt}`;
       const filePath = `reviews/${fileName}`;
 
       const { error: uploadError } = await supabase.storage

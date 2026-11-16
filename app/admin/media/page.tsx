@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 
 // Extended interface to track source table
 interface MediaAsset {
@@ -483,10 +484,13 @@ export default function MediaLibraryPage() {
     const totalFiles = files.length;
     let uploadedCount = 0;
 
-    for (const file of Array.from(files)) {
+    for (const picked of Array.from(files)) {
       try {
+        // Photos and screenshots are shrunk to WebP in the browser before upload.
+        const file = await prepareImageUpload(picked);
+
         // Sanitize file name (SEO friendly, keeps original keyword)
-        const sanitizedName = sanitizeFileName(file.name);
+        const sanitizedName = sanitizeFileName(file.name).replace(/(\.[^.]+)$/, `${sizeSuffix(file)}$1`);
 
         // Check for duplicates and get unique name (Windows style: filename (1).jpg)
         const uniqueFileName = await getUniqueFileName(sanitizedName, 'media');
@@ -531,7 +535,7 @@ export default function MediaLibraryPage() {
         uploadedCount++;
         setUploadProgress(Math.round((uploadedCount / totalFiles) * 100));
       } catch (error) {
-        console.error('Error uploading file:', file.name, error);
+        console.error('Error uploading file:', picked.name, error);
       }
     }
 

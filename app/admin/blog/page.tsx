@@ -10,6 +10,7 @@ import {
     Loader2, CheckCircle, AlertCircle, Upload
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 import 'react-quill/dist/quill.snow.css';
 
 // Dynamically import ReactQuill to avoid SSR issues
@@ -113,12 +114,13 @@ export default function BlogAdminPage() {
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files || e.target.files.length === 0) return;
 
-        const file = e.target.files[0];
+        const picked = e.target.files[0];
         setUploadingImage(true);
 
         try {
+            const file = await prepareImageUpload(picked);
             const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const fileName = `${Math.random().toString(36).substring(2)}${sizeSuffix(file)}.${fileExt}`;
             const filePath = `media/${fileName}`;
 
             const { error: uploadError } = await supabase.storage

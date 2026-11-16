@@ -35,10 +35,28 @@ function host(src: string): string | null {
   }
 }
 
+/** Vercel only resizes source images up to 8,192 px on each side. */
+export const MAX_OPTIMIZABLE_SIDE = 8192;
+
+/** Optimised uploads carry their pixel size in the name: "name-1440x9000.webp". */
+const SIZE_IN_NAME = /-(\d{2,5})x(\d{2,5})\.(?:webp|jpe?g|png|avif)(?=$|[?#])/i;
+
+/** Pixel size encoded in the file name, when there is one. */
+export function imageSizeFromUrl(src?: string | null): { width: number; height: number } | null {
+  if (!src) return null;
+  const m = src.match(SIZE_IN_NAME);
+  if (!m) return null;
+  const width = Number(m[1]);
+  const height = Number(m[2]);
+  return width > 0 && height > 0 ? { width, height } : null;
+}
+
 /** Can next/image resize this URL on Vercel? */
 export function canOptimizeImage(src?: string | null): boolean {
   if (!src) return false;
   if (src.startsWith('/')) return true;
+  const size = imageSizeFromUrl(src);
+  if (size && Math.max(size.width, size.height) > MAX_OPTIMIZABLE_SIDE) return false;
   const h = host(src);
   if (!h || !src.startsWith('https://')) return false;
   if (h.endsWith('.supabase.co') && !src.includes('/storage/')) return false;

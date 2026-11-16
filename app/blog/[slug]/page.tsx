@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '../../../components/SiteImage';
 import {
     ArrowLeft, Calendar, User, Tag, Share2, Facebook, Linkedin, Twitter,
     Clock, Eye, ArrowUp, Copy, Check

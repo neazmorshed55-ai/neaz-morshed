@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import NextImage from 'next/image';
+import NextImage from '../../../components/SiteImage';
 import {
   ArrowLeft, ArrowRight, ChevronRight, ChevronDown, Loader2,
   Video, Palette, PenTool, BookOpen, Briefcase,

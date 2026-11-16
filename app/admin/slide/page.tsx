@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 
 interface SlideItem {
   id: string;
@@ -173,9 +174,11 @@ export default function SlideManagement() {
     setDeleteConfirm(null);
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (picked: File) => {
+    // Photos and screenshots are shrunk to WebP in the browser before upload.
+    const file = await prepareImageUpload(picked);
     const fileExt = file.name.split('.').pop();
-    const fileName = `slide-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const fileName = `slide-${Date.now()}-${Math.random().toString(36).substring(7)}${sizeSuffix(file)}.${fileExt}`;
     const filePath = `slides/${fileName}`;
 
     const { error: uploadError } = await supabase!.storage

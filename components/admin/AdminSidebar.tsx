@@ -20,7 +20,8 @@ import {
   Users,
   FileText,
   Video,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Zap,
 } from 'lucide-react';
 import { useAdminAuth } from '../../lib/admin-auth';
 
@@ -32,6 +33,7 @@ interface AdminSidebarProps {
 const menuItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Media Library', href: '/admin/media', icon: Image },
+  { name: 'Optimize Images', href: '/admin/optimize-images', icon: Zap },
   { name: 'Contacts', href: '/admin/contacts', icon: Mail },
   { name: 'Leads', href: '/admin/leads', icon: Users },
   { name: 'Resume', href: '/admin/resume', icon: FileText },

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from '../../../components/SiteImage';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, ExternalLink, X, Play,

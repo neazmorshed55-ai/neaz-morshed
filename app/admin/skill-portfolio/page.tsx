@@ -10,6 +10,7 @@ import {
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import StructureManager from '../../../components/admin/StructureManager';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 
 interface SkillCategory {
   id: string;
@@ -104,11 +105,13 @@ export default function SkillPortfolioManagement() {
     setShowModal(true);
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (picked: File) => {
     if (!supabase) throw new Error('Supabase not initialized');
 
+    // Photos and screenshots are shrunk to WebP in the browser before upload.
+    const file = await prepareImageUpload(picked);
     const fileExt = file.name.split('.').pop();
-    const fileName = `skill-gallery-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const fileName = `skill-gallery-${Date.now()}-${Math.random().toString(36).substring(7)}${sizeSuffix(file)}.${fileExt}`;
     const filePath = `skills/${fileName}`;
 
     const { error: uploadError } = await supabase.storage

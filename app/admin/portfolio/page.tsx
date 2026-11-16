@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import { supabase } from '../../../lib/supabase';
+import { prepareImageUpload, sizeSuffix } from '../../../lib/image-optimize';
 
 interface PortfolioItem {
   id: string;
@@ -281,9 +282,11 @@ export default function PortfolioManagement() {
     setDeleteConfirm(null);
   };
 
-  const uploadFile = async (file: File, isDocument = false) => {
+  const uploadFile = async (picked: File, isDocument = false) => {
+    // Photos and screenshots are shrunk to WebP in the browser before upload.
+    const file = isDocument ? picked : await prepareImageUpload(picked);
     const fileExt = file.name.split('.').pop();
-    const fileName = `portfolio-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const fileName = `portfolio-${Date.now()}-${Math.random().toString(36).substring(7)}${sizeSuffix(file)}.${fileExt}`;
     const filePath = `portfolio/${fileName}`;
 
     // Use 'documents' bucket for documents, 'images' bucket for media

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import NextImage from 'next/image';
+import NextImage from './SiteImage';
 import { supabase } from '@/lib/supabase';
 import { canOptimizeImage } from '@/lib/image-src';
 import { Reveal, SplitText } from '@/components/motion/Reveal';
