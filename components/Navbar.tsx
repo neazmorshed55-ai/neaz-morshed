@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useSiteChrome } from './SiteChrome';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -52,12 +53,24 @@ let navRequest: Promise<void> | null = null;
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [navItems, setNavItems] = useState<NavItem[]>(navCache?.items ?? defaultNavItems);
-  const [branding, setBranding] = useState<SiteBranding>(navCache?.branding ?? defaultBranding);
+  const chrome = useSiteChrome();
+  // Loaded on the server with the page (root layout); the browser query below is only a fallback.
+  const fromServer = chrome
+    ? {
+        items: (chrome.navItems as unknown as NavItem[] | null) ?? defaultNavItems,
+        branding: (chrome.branding as unknown as SiteBranding | null) ?? defaultBranding,
+      }
+    : null;
+  const [navItems, setNavItems] = useState<NavItem[]>(fromServer?.items ?? navCache?.items ?? defaultNavItems);
+  const [branding, setBranding] = useState<SiteBranding>(fromServer?.branding ?? navCache?.branding ?? defaultBranding);
   const pathname = usePathname();
 
   // Fetch navigation items + branding from Supabase (in parallel, once)
   useEffect(() => {
+    if (fromServer) {
+      navCache = navCache ?? fromServer;
+      return;
+    }
     let active = true;
     const apply = () => {
       if (active && navCache) {

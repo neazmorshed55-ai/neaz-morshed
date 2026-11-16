@@ -1,3 +1,4 @@
+import type { VideoReview } from '../components/VideoReviews';
 import { getServerSupabase, publicStorageUrl } from './supabase-server';
 
 export interface HeroContent {
@@ -50,6 +51,8 @@ export interface HomepageData {
   services: HomeService[];
   experiences: HomeExperience[];
   portfolio: HomePortfolioItem[];
+  /** null when the query failed: the section then loads it in the browser. */
+  videoReviews: VideoReview[] | null;
 }
 
 // Fallback data in case the database is empty or unreachable
@@ -87,10 +90,10 @@ export async function getHomepageData(): Promise<HomepageData> {
   const profileImage = publicStorageUrl('images', 'profile.jpg');
 
   if (!supabase) {
-    return { hero: defaultHero, profileImage, skills: [], services: [], experiences: [], portfolio: [] };
+    return { hero: defaultHero, profileImage, skills: [], services: [], experiences: [], portfolio: [], videoReviews: null };
   }
 
-  const [heroRes, skillsRes, servicesRes, experiencesRes, portfolioRes] = await Promise.allSettled([
+  const [heroRes, skillsRes, servicesRes, experiencesRes, portfolioRes, videoRes] = await Promise.allSettled([
     supabase.from('homepage_content').select('*').limit(1).maybeSingle(),
     supabase.from('skills').select('name, proficiency').order('order_index', { ascending: true }).limit(6),
     supabase.from('services').select('id, title, slug, icon, description').order('order_index', { ascending: true }).limit(4),
@@ -100,6 +103,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       .select('id, title, description, image_url, thumbnail_url, video_url, order_index')
       .order('order_index', { ascending: true })
       .limit(12),
+    supabase.from('video_reviews').select('*').eq('is_active', true).order('order_index', { ascending: true }),
   ]);
 
   const value = <T,>(res: PromiseSettledResult<{ data: T | null; error: unknown }>): T | null =>
@@ -135,5 +139,8 @@ export async function getHomepageData(): Promise<HomepageData> {
 
   const portfolio = asArray<HomePortfolioItem>(value(portfolioRes));
 
-  return { hero, profileImage, skills, services, experiences, portfolio };
+  const videoRows = value(videoRes);
+  const videoReviews = Array.isArray(videoRows) ? (videoRows as VideoReview[]) : null;
+
+  return { hero, profileImage, skills, services, experiences, portfolio, videoReviews };
 }

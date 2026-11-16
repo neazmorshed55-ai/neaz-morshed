@@ -270,7 +270,7 @@ html.np-exit .np-preloader__bar {
   inset: 0;
   background: linear-gradient(90deg, var(--primary), var(--accent));
   transform-origin: left;
-  animation: np-bar 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation: np-bar 0.75s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 @keyframes np-bar {
   from { transform: scaleX(0); }
@@ -279,6 +279,55 @@ html.np-exit .np-preloader__bar {
 html.np-loading,
 html.np-loading body {
   overflow: hidden;
+}
+
+/* ------------------------------------------------------------------
+   Entrance reveals (components/motion/Reveal.tsx)
+   The server sends everything visible. The inline head script adds
+   html.np-motion before the first paint (only when it can animate) and
+   sets [data-in] on each [data-reveal] element once it is in view and the
+   intro has lifted — no waiting for React or the JS bundles.
+   ------------------------------------------------------------------ */
+:root {
+  --rv-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rv-wipe: cubic-bezier(0.77, 0, 0.175, 1);
+}
+[data-reveal='fade'] {
+  transition: opacity 0.9s var(--rv-ease) var(--rv-delay, 0s), transform 0.9s var(--rv-ease) var(--rv-delay, 0s);
+}
+html.np-motion [data-reveal='fade']:not([data-in]) {
+  opacity: 0;
+  transform: translate3d(var(--rv-x, 0px), var(--rv-y, 40px), 0);
+}
+.np-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.np-word {
+  display: inline-block;
+}
+[data-reveal='words'] .np-word {
+  transition: transform 0.9s var(--rv-ease) calc(var(--rv-delay, 0s) + var(--i, 0) * var(--rv-stagger, 0.07s));
+}
+html.np-motion [data-reveal='words']:not([data-in]) .np-word {
+  transform: translateY(115%) rotate(4deg);
+}
+[data-reveal='wipe'] {
+  transition: clip-path 1.3s var(--rv-wipe) var(--rv-delay, 0s), transform 1.3s var(--rv-wipe) var(--rv-delay, 0s);
+}
+html.np-motion [data-reveal='wipe']:not([data-in]) {
+  clip-path: inset(0 100% 0 0);
+  transform: scale(1.06);
+}
+[data-reveal='pop'] {
+  transition: opacity 0.8s var(--rv-ease) var(--rv-delay, 0s), transform 0.8s var(--rv-ease) var(--rv-delay, 0s);
+}
+html.np-motion [data-reveal='pop']:not([data-in]) {
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
 }
 
 /* ------------------------------------------------------------------
@@ -351,5 +400,9 @@ html.np-cursor-down .np-cursor--ring {
   .animate-marquee,
   .animate-subtle-pulse {
     animation: none;
+  }
+  [data-reveal],
+  [data-reveal] .np-word {
+    transition: none !important;
   }
 }

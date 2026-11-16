@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const { hero, profileImage, skills, services, experiences, portfolio } = await getHomepageData();
+  const { hero, profileImage, skills, services, experiences, portfolio, videoReviews } = await getHomepageData();
 
   return (
     <div className="bg-page text-ink min-h-screen">
@@ -39,7 +39,7 @@ export default async function HomePage() {
         />
 
         {/* Featured video testimonial — the full list lives on /reviews */}
-        <VideoReviews limit={1} className="mt-16 sm:mt-24" />
+        <VideoReviews limit={1} initialReviews={videoReviews} className="mt-16 sm:mt-24" />
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
 

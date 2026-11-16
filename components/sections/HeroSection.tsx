@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import NextImage from '../SiteImage';
 import { ArrowRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
 import { Button, TypewriterEffect, Container } from '@/components/ui';
-import { ImageReveal, Reveal, SplitText, usePageRevealed } from '@/components/motion/Reveal';
+import { ImageReveal, Reveal, SplitText } from '@/components/motion/Reveal';
 
 interface HeroSectionProps {
   name: string;
@@ -31,14 +31,12 @@ function FloatingBadge({
   delay: number;
 }) {
   const reduce = useReducedMotion();
-  const revealed = usePageRevealed();
 
   return (
-    <motion.div
+    <div
       className={`absolute z-20 ${className}`}
-      initial={reduce ? false : { opacity: 0, scale: 0.8, y: 20 }}
-      animate={revealed ? { opacity: 1, scale: 1, y: 0 } : undefined}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      data-reveal="pop"
+      style={{ '--rv-delay': `${delay}s` } as React.CSSProperties}
     >
       <motion.div
         animate={reduce ? undefined : { y: [0, -10, 0] }}
@@ -47,7 +45,7 @@ function FloatingBadge({
       >
         {children}
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 

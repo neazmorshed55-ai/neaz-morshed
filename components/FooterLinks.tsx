@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useSiteChrome } from './SiteChrome';
 
 interface FooterLink {
   id: string;
@@ -20,11 +21,18 @@ const defaultLinks = [
   { name: 'Facebook', url: 'https://www.facebook.com/neazmorshed001/' },
 ];
 
+const defaultLinkRows = (): FooterLink[] =>
+  defaultLinks.map((link, index) => ({ id: `default-${index}`, ...link, order_index: index + 1, is_active: true }));
+
 export default function FooterLinks() {
-  const [links, setLinks] = useState<FooterLink[]>([]);
-  const [loading, setLoading] = useState(true);
+  const chrome = useSiteChrome();
+  // Loaded on the server with the page (root layout); the browser query below is only a fallback.
+  const fromServer = chrome ? ((chrome.footerLinks as unknown as FooterLink[] | null) ?? defaultLinkRows()) : null;
+  const [links, setLinks] = useState<FooterLink[]>(fromServer ?? []);
+  const [loading, setLoading] = useState(!fromServer);
 
   useEffect(() => {
+    if (fromServer) return;
     async function fetchLinks() {
       if (!supabase) {
         // Use default links if Supabase is not configured
