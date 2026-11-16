@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
-import PortfolioShowcase from '@/components/PortfolioShowcase';
+import PhoneCoverflow from '@/components/PhoneCoverflow';
+import PhoneSplit from '@/components/PhoneSplit';
 import VideoReviews from '@/components/VideoReviews';
 import {
   HeroSection,
@@ -44,9 +45,11 @@ export default async function HomePage() {
         {skills.length > 0 && <SkillsSection skills={skills} />}
 
         {/* Portfolio Grid Showcase */}
-        <PortfolioShowcase items={portfolio} />
+        <PhoneCoverflow items={portfolio} />
 
         {services.length > 0 && <ServicesSection services={services} />}
+
+        <PhoneSplit items={portfolio} primaryHref="#contact" primaryLabel="Let's Collaborate" secondaryHref="/services" secondaryLabel="View Services" />
 
         {experiences.length > 0 && <ExperienceSection experiences={experiences} />}
 
