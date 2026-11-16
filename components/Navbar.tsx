@@ -48,7 +48,7 @@ const defaultBranding: SiteBranding = {
 // Portfolio variant (shared on freelance marketplaces): internal pages only —
 // no contact page, no external, mail or phone links.
 const isAllowedNavItem = (item: NavItem) =>
-  item.href.startsWith('/') && !item.href.startsWith('//') && item.href !== '/contact';
+  item.href.startsWith('/') && !item.href.startsWith('//') && !/contact/i.test(item.href) && !/contact/i.test(item.label ?? '');
 
 // Navigation rarely changes: fetch it once per visit and reuse it on every
 // page instead of re-querying (and flickering) on each client-side navigation.
@@ -62,7 +62,7 @@ export default function Navbar() {
   // Loaded on the server with the page (root layout); the browser query below is only a fallback.
   const fromServer = chrome
     ? {
-        items: (chrome.navItems as unknown as NavItem[] | null) ?? defaultNavItems,
+        items: ((chrome.navItems as unknown as NavItem[] | null) ?? defaultNavItems).filter(isAllowedNavItem),
         branding: (chrome.branding as unknown as SiteBranding | null) ?? defaultBranding,
       }
     : null;
