@@ -348,7 +348,7 @@ export default function ReviewsPage({ initial }: { initial?: Review[] | null }) 
         {/* Social Links Section removed */}
 
         {/* World Map Section */}
-        <WorldMap />
+        <WorldMap reviews={reviews} />
 
         {/* CTA Section */}
         {/* CTA Section removed */}
