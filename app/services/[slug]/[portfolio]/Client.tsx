@@ -382,7 +382,7 @@ export default function PortfolioDetailPage({ initial }: { initial?: InitialData
 
       {/* Hero Section */}
       <section className="pt-32 pb-12 relative overflow-hidden">
-        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[180px] pointer-events-none"></div>
+        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.11]"></div>
 
         <div className="container mx-auto px-6 max-w-6xl relative z-10">
           {/* Breadcrumb */}

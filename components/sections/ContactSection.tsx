@@ -9,8 +9,8 @@ export default function ContactSection() {
     <section id="contact" className="py-8 sm:py-12 lg:py-16 bg-page">
       <Container>
         <div className="bg-surface rounded-[3rem] sm:rounded-[4rem] lg:rounded-[6rem] p-6 sm:p-12 lg:p-24 border border-line relative overflow-hidden shadow-2xl text-center">
-          <div className="absolute top-0 right-0 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-primary/5 rounded-full blur-[200px] -z-10 animate-subtle-pulse" />
-          <div className="absolute bottom-0 left-0 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] bg-primary/5 rounded-full blur-[200px] -z-10 animate-subtle-pulse" />
+          <div className="absolute top-0 right-0 w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] rounded-full -z-10 np-orb [--c:87_119_255] [--a:0.11]" />
+          <div className="absolute bottom-0 left-0 w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] rounded-full -z-10 np-orb [--c:87_119_255] [--a:0.11]" />
 
           <SectionHeader
             subtitle="Get In Touch"

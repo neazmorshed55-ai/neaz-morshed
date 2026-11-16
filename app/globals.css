@@ -406,3 +406,22 @@ html.np-cursor-down .np-cursor--ring {
     transition: none !important;
   }
 }
+
+/* ---- Phone-friendly effects -------------------------------------------
+ * Large CSS blur filters and backdrop blurs are very expensive on iPhone
+ * Safari (seconds-long freezes while scrolling). Glows are drawn as plain
+ * radial gradients instead, and backdrop blur is skipped on touch screens
+ * (those surfaces already have a near-opaque white background).
+ */
+.np-orb {
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgb(var(--c) / var(--a)), rgb(var(--c) / 0));
+  scale: 1.35;
+  pointer-events: none;
+}
+@media (hover: none), (max-width: 1023px) {
+  [class*='backdrop-blur'] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

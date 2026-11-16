@@ -1306,7 +1306,7 @@ export default function PortfolioCollectionPage({ initial }: { initial?: Initial
 
       {/* Hero Section */}
       <section className="pt-40 pb-20 relative overflow-hidden">
-        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[180px] pointer-events-none"></div>
+        <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] rounded-full pointer-events-none np-orb [--c:87_119_255] [--a:0.11]"></div>
 
         <div className="container mx-auto px-6 max-w-7xl relative z-10">
           {/* Breadcrumb */}
@@ -1389,7 +1389,7 @@ export default function PortfolioCollectionPage({ initial }: { initial?: Initial
                           src={item.thumbnail_url || item.image_url || ''}
                           alt={item.thumbnail_alt_text || item.image_alt_text || item.title}
                           fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          sizes="(max-width: 768px) 60vw, (max-width: 1200px) 40vw, 28vw"
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                       ) : (
@@ -1659,7 +1659,7 @@ export default function PortfolioCollectionPage({ initial }: { initial?: Initial
             viewport={{ once: true }}
             className="text-center p-12 bg-surface border border-line rounded-[3rem] relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/10 rounded-full blur-[80px] -z-10"></div>
+            <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full -z-10 np-orb [--c:87_119_255] [--a:0.22]"></div>
 
             <div className="text-primary p-5 bg-surface-2/70 rounded-2xl border border-line inline-flex mb-6">
               {iconMap[service.icon] || <Briefcase className="w-10 h-10" />}

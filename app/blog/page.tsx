@@ -77,7 +77,7 @@ export default function BlogPage() {
                     <div className="absolute inset-0 bg-page">
                         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 to-page opacity-30"></div>
                         {/* Abstract Shapes */}
-                        <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px] animate-pulse"></div>
+                        <div className="absolute top-[20%] right-[10%] w-[500px] h-[500px] rounded-full np-orb [--c:87_119_255] [--a:0.11]"></div>
                     </div>
 
                     <div className="container mx-auto px-6 max-w-7xl relative z-10 text-center">
@@ -165,7 +165,7 @@ export default function BlogPage() {
                                                 src={blog.cover_image}
                                                 alt={blog.cover_image_alt_text || blog.title}
                                                 fill
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                sizes="(max-width: 768px) 60vw, (max-width: 1200px) 40vw, 28vw"
                                                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                                             />
                                         )}

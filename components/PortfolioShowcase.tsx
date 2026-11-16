@@ -61,7 +61,7 @@ export default function PortfolioShowcase({ items }: { items: PortfolioShowcaseI
                       src={src}
                       alt={item.title}
                       fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 55vw, (max-width: 1024px) 34vw, (max-width: 1280px) 25vw, 20vw"
                       quality={70}
                       unoptimized={!OPTIMIZABLE.test(src)}
                       className="object-cover transition-transform duration-700 group-hover:scale-110"

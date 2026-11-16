@@ -721,7 +721,7 @@ export default function ResumePage() {
             className="relative bg-gradient-to-r from-primary/20 via-primary/10 to-transparent p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl md:rounded-[3rem] border border-line mb-8 sm:mb-10 md:mb-12 overflow-hidden"
           >
             {/* Animated Background */}
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full -z-10 np-orb [--c:87_119_255] [--a:0.22]"></div>
 
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
               <div>
@@ -1018,7 +1018,7 @@ export default function ResumePage() {
               whileHover={{ scale: 1.01 }}
               className="p-8 bg-gradient-to-br from-surface-2 to-surface-2 rounded-3xl border border-line hover:border-primary/30 transition-all relative overflow-hidden group"
             >
-              <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-primary/5 rounded-full blur-[80px] group-hover:bg-primary/10 transition-all"></div>
+              <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full np-orb [--c:87_119_255] [--a:0.11]"></div>
 
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-4">

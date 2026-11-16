@@ -273,9 +273,9 @@ export default function ContactPage() {
           </div>
 
           {/* Animated Gradient Orbs */}
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[150px] animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-          <div className="absolute top-1/2 left-0 w-[300px] h-[300px] bg-primary-dark/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full np-orb [--c:87_119_255] [--a:0.22]" />
+          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full np-orb [--c:98_93_245] [--a:0.22]" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-0 w-[300px] h-[300px] rounded-full np-orb [--c:61_91_239] [--a:0.22]" style={{ animationDelay: '2s' }} />
 
           {/* Decorative Border with Glow */}
           <div className="absolute inset-0 rounded-[3rem] border border-primary/30 shadow-[0_0_50px_rgba(87,119,255,0.1),inset_0_0_50px_rgba(87,119,255,0.05)]" />

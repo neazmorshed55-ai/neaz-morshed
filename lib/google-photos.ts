@@ -57,7 +57,7 @@ function readOpenGraph(html: string, property: string): string | null {
  * full-width poster.
  */
 function upscalePoster(imageUrl: string): string {
-  return imageUrl.replace(/=[\w-]+$/, '=w1280-h720-no');
+  return imageUrl.replace(/=[\w-]+$/, '=w800-h450-no');
 }
 
 export class GooglePhotosError extends Error {
