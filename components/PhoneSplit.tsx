@@ -13,8 +13,8 @@ export default function PhoneSplit({
   items,
   primaryHref = '/services',
   primaryLabel = 'View Services',
-  secondaryHref = '/skills/portfolio',
-  secondaryLabel = 'See My Work',
+  secondaryHref = '/services',
+  secondaryLabel = 'Our Services',
 }: {
   items: PhoneItem[];
   primaryHref?: string;
