@@ -8,12 +8,12 @@ function useCountUp(end: number, duration: number = 2000, startOnView: boolean =
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
-  const hasStarted = useRef(false);
 
   useEffect(() => {
     if (startOnView && !isInView) return;
-    if (hasStarted.current) return;
-    hasStarted.current = true;
+    // Re-runs whenever `end` changes, so numbers that arrive after the
+    // section is already in view still count up instead of staying at 0.
+    if (end <= 0) { setCount(0); return; }
 
     const startTime = Date.now();
     const timer = setInterval(() => {
@@ -105,8 +105,24 @@ interface TooltipState {
   visible: boolean;
 }
 
-export default function WorldMap() {
-  const [countryStats, setCountryStats] = useState<CountryStats[]>([]);
+// Count reviews per country (each review = one sale from that country)
+function aggregateByCountry(rows: { country_code?: string | null; country_name?: string | null }[]): CountryStats[] {
+  const acc: Record<string, CountryStats> = {};
+  for (const r of rows) {
+    const code = r.country_code?.trim().toUpperCase();
+    if (!code) continue;
+    if (!acc[code]) acc[code] = { country_code: code, country_name: r.country_name || code, count: 0 };
+    acc[code].count++;
+  }
+  return Object.values(acc);
+}
+
+export default function WorldMap({
+  reviews,
+}: {
+  reviews?: { country_code?: string | null; country_name?: string | null }[];
+}) {
+  const [countryStats, setCountryStats] = useState<CountryStats[]>(() => aggregateByCountry(reviews ?? []));
   const [tooltip, setTooltip] = useState<TooltipState>({
     x: 0, y: 0, countryName: '', salesCount: 0, visible: false
   });
@@ -114,6 +130,13 @@ export default function WorldMap() {
 
   // Fetch and aggregate review data by country
   useEffect(() => {
+    // Reviews already loaded with the page: use them, no extra browser query.
+    const fromPage = aggregateByCountry(reviews ?? []);
+    if (fromPage.length > 0) {
+      setCountryStats(fromPage);
+      setIsLoading(false);
+      return;
+    }
     const fetchCountryStats = async () => {
       if (!supabase) {
         setIsLoading(false);
@@ -153,7 +176,7 @@ export default function WorldMap() {
     };
 
     fetchCountryStats();
-  }, []);
+  }, [reviews]);
 
   // Create a map of Alpha-2 codes to stats for O(1) lookup
   const statsMap = useMemo(() => {

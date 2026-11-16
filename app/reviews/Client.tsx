@@ -419,7 +419,7 @@ export default function ReviewsPage({ initial }: { initial?: Review[] | null }) 
         </section>
 
         {/* World Map Section */}
-        <WorldMap />
+        <WorldMap reviews={reviews} />
 
         {/* CTA Section */}
         <section className="container mx-auto px-6 max-w-7xl mt-20">
