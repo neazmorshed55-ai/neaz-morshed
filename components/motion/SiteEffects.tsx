@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
-import { PRELOADER_SEEN_KEY } from './Preloader';
 
 declare global {
   interface Window {
@@ -12,54 +11,8 @@ declare global {
   }
 }
 
-// Minimum time the intro stays up, measured from navigation start, so the
-// letter animation can be read even when the page is already cached.
-const PRELOADER_MIN_MS = 1350;
-const PRELOADER_EXIT_MS = 1000;
-
 const INTERACTIVE =
   'a, button, [role="button"], input, textarea, select, label, summary, [data-cursor="hover"]';
-
-function revealPage() {
-  window.__npRevealed = true;
-  window.dispatchEvent(new Event('np:reveal'));
-}
-
-/** Plays the preloader exit, then unlocks scrolling and the page animations. */
-function usePreloaderExit() {
-  useEffect(() => {
-    const root = document.documentElement;
-    const el = document.getElementById('np-preloader');
-
-    if (!el || root.classList.contains('np-seen') || root.classList.contains('np-done')) {
-      root.classList.remove('np-loading');
-      revealPage();
-      return;
-    }
-
-    let exitTimer: ReturnType<typeof setTimeout>;
-    const wait = Math.max(0, PRELOADER_MIN_MS - performance.now());
-
-    const startTimer = setTimeout(() => {
-      root.classList.add('np-exit');
-      revealPage();
-      exitTimer = setTimeout(() => {
-        root.classList.add('np-done');
-        root.classList.remove('np-loading', 'np-exit');
-        try {
-          sessionStorage.setItem(PRELOADER_SEEN_KEY, '1');
-        } catch {
-          /* private mode — the intro will simply show again next time */
-        }
-      }, PRELOADER_EXIT_MS);
-    }, wait);
-
-    return () => {
-      clearTimeout(startTimer);
-      clearTimeout(exitTimer);
-    };
-  }, []);
-}
 
 /** Lenis smooth scrolling for mouse/trackpad. Touch keeps native scrolling. */
 function useSmoothScroll(enabled: boolean) {
@@ -82,10 +35,12 @@ function useSmoothScroll(enabled: boolean) {
     });
     window.__lenis = lenis;
 
-    const root = document.documentElement;
-    if (root.classList.contains('np-loading')) lenis.stop();
+    // The intro (inline head script) may lift before or after this runs.
     const onReveal = () => lenis.start();
-    window.addEventListener('np:reveal', onReveal);
+    if (!window.__npRevealed) {
+      lenis.stop();
+      window.addEventListener('np:reveal', onReveal);
+    }
 
     return () => {
       window.removeEventListener('np:reveal', onReveal);
@@ -173,7 +128,6 @@ export default function SiteEffects() {
   const pathname = usePathname() || '';
   const isAdmin = pathname.startsWith('/admin');
 
-  usePreloaderExit();
   useSmoothScroll(!isAdmin);
 
   return isAdmin ? null : <CustomCursor />;

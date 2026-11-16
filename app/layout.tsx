@@ -6,6 +6,8 @@ import VisitorTracker from '../components/VisitorTracker';
 import Preloader, { PRELOADER_HEAD_SCRIPT } from '../components/motion/Preloader';
 import SiteEffects from '../components/motion/SiteEffects';
 import { SITE_URL } from '../lib/site';
+import { SiteChromeProvider } from '../components/SiteChrome';
+import { loadSiteChrome } from '../lib/site-chrome';
 
 // Self-hosted variable font: no request to Google at runtime or build time.
 const urbanist = localFont({
@@ -75,7 +77,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children?: React.ReactNode;
@@ -93,7 +95,7 @@ export default function RootLayout({
         <Preloader />
         <SiteEffects />
         <VisitorTracker />
-        {children}
+        <SiteChromeProvider value={await loadSiteChrome()}>{children}</SiteChromeProvider>
         {/* Portfolio variant: no WhatsApp button, chatbot or external scripts */}
       </body>
     </html>

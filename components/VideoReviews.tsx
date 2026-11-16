@@ -227,13 +227,16 @@ interface VideoReviewsProps {
   limit?: number;
   /** Extra classes for per-page spacing (e.g. a top margin on the homepage). */
   className?: string;
+  /** Loaded on the server with the page; when given, the browser does not query again. */
+  initialReviews?: VideoReview[] | null;
 }
 
-export default function VideoReviews({ limit, className = '' }: VideoReviewsProps = {}) {
-  const [videoReviews, setVideoReviews] = useState<VideoReview[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function VideoReviews({ limit, className = '', initialReviews }: VideoReviewsProps = {}) {
+  const [videoReviews, setVideoReviews] = useState<VideoReview[]>(initialReviews ?? []);
+  const [loading, setLoading] = useState(!initialReviews);
 
   useEffect(() => {
+    if (initialReviews) return;
     const fetchVideoReviews = async () => {
       if (!supabase) {
         setLoading(false);

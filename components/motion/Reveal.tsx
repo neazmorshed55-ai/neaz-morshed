@@ -8,8 +8,6 @@ import {
   useSpring,
 } from 'framer-motion';
 
-const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
 /**
  * True once the preloader starts lifting (or straight away when it was
  * skipped). Hero animations wait for this so they play in view.
@@ -36,14 +34,14 @@ export function usePageRevealed() {
 
 type RevealTag = 'div' | 'section' | 'li' | 'span' | 'article' | 'p';
 
-const MOTION_TAGS = {
-  div: motion.div,
-  section: motion.section,
-  li: motion.li,
-  span: motion.span,
-  article: motion.article,
-  p: motion.p,
-} as const;
+/*
+ * Entrance animations are plain HTML + CSS: the server sends the content
+ * visible, an inline script (REVEAL_RUNTIME in Preloader.tsx) hides it before
+ * the first paint only when it can animate, then sets [data-in] on each
+ * element as it scrolls into view. Nothing waits for React to load, and the
+ * page stays readable with JavaScript off. See "Entrance reveals" in globals.css.
+ */
+const vars = (v: Record<string, string | number>) => v as React.CSSProperties;
 
 interface RevealProps {
   children: React.ReactNode;
@@ -53,63 +51,22 @@ interface RevealProps {
   /** Starting offset in px (positive = from below). */
   y?: number;
   x?: number;
-  /** Play when the page is revealed instead of when scrolled into view. */
+  /** Kept for compatibility: everything above the fold plays when the intro lifts. */
   onLoad?: boolean;
   amount?: number;
 }
 
 /** Fade + slide in when the element scrolls into view (once). */
-export function Reveal({
-  children,
-  as = 'div',
-  className,
-  delay = 0,
-  y = 40,
-  x = 0,
-  onLoad = false,
-  amount = 0.15,
-}: RevealProps) {
-  const reduce = useReducedMotion();
-  const revealed = usePageRevealed();
-  const Tag = MOTION_TAGS[as];
-
-  if (reduce) {
-    const Plain = as;
-    return <Plain className={className}>{children}</Plain>;
-  }
-
-  const hidden = { opacity: 0, y, x };
-  const shown = { opacity: 1, y: 0, x: 0 };
-  const transition = { duration: 0.9, ease: EASE_OUT, delay };
-
-  return onLoad ? (
-    <Tag className={className} initial={hidden} animate={revealed ? shown : hidden} transition={transition}>
-      {children}
-    </Tag>
-  ) : (
-    <Tag
-      className={className}
-      initial={hidden}
-      whileInView={shown}
-      viewport={{ once: true, amount }}
-      transition={transition}
-    >
+export function Reveal({ children, as = 'div', className, delay = 0, y = 40, x = 0 }: RevealProps) {
+  const Tag = as;
+  return (
+    <Tag className={className} data-reveal="fade" style={vars({ '--rv-x': `${x}px`, '--rv-y': `${y}px`, '--rv-delay': `${delay}s` })}>
       {children}
     </Tag>
   );
 }
 
 type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div';
-
-const MOTION_TEXT_TAGS = {
-  h1: motion.h1,
-  h2: motion.h2,
-  h3: motion.h3,
-  h4: motion.h4,
-  p: motion.p,
-  span: motion.span,
-  div: motion.div,
-} as const;
 
 interface SplitTextProps {
   text: string;
@@ -123,57 +80,28 @@ interface SplitTextProps {
 }
 
 /**
- * Devix-style heading reveal: every word slides up from behind a mask.
- * The whole heading is observed (a masked word is never "in view" on its
- * own), and the words follow with a stagger. The full text stays in the
- * DOM, so SEO and screen readers are unaffected.
+ * Devix-style heading reveal: every word slides up from behind a mask, with
+ * a stagger. The full text stays in the DOM, so SEO and screen readers are
+ * unaffected.
  */
-export function SplitText({
-  text,
-  as = 'span',
-  className,
-  wordClassName = '',
-  delay = 0,
-  stagger = 0.07,
-  onLoad = false,
-}: SplitTextProps) {
-  const reduce = useReducedMotion();
-  const revealed = usePageRevealed();
+export function SplitText({ text, as = 'span', className, wordClassName = '', delay = 0, stagger = 0.07 }: SplitTextProps) {
+  const Tag = as;
   const words = (text || '').trim().split(/\s+/).filter(Boolean);
-
-  if (reduce || words.length === 0) {
-    const Plain = as;
-    return <Plain className={className}>{text}</Plain>;
-  }
-
-  const Tag = MOTION_TEXT_TAGS[as];
-  const word = {
-    hidden: { y: '115%', rotate: 4 },
-    show: (i: number) => ({
-      y: '0%',
-      rotate: 0,
-      transition: { duration: 0.9, ease: EASE_OUT, delay: delay + i * stagger },
-    }),
-  };
-  const trigger = onLoad
-    ? { initial: 'hidden', animate: revealed ? 'show' : 'hidden' }
-    : { initial: 'hidden', whileInView: 'show', viewport: { once: true, amount: 0.3 } };
+  if (words.length === 0) return <Tag className={className}>{text}</Tag>;
 
   return (
-    <Tag className={className} aria-label={text} {...trigger}>
+    <Tag
+      className={className}
+      aria-label={text}
+      data-reveal="words"
+      style={vars({ '--rv-delay': `${delay}s`, '--rv-stagger': `${stagger}s` })}
+    >
       {words.map((w, i) => (
         <React.Fragment key={`${w}-${i}`}>
-          <span
-            aria-hidden="true"
-            className="inline-block overflow-hidden align-bottom pb-[0.12em] -mb-[0.12em]"
-          >
-            <motion.span
-              className={`inline-block will-change-transform ${wordClassName}`}
-              variants={word}
-              custom={i}
-            >
+          <span aria-hidden="true" className="np-mask">
+            <span className={`np-word ${wordClassName}`} style={vars({ '--i': i })}>
               {w}
-            </motion.span>
+            </span>
           </span>
           {i < words.length - 1 ? ' ' : null}
         </React.Fragment>
@@ -190,30 +118,11 @@ interface ImageRevealProps {
 }
 
 /** Wipes media in from the left (Devix "img-custom-anim-left"). */
-export function ImageReveal({ children, className, delay = 0, onLoad = false }: ImageRevealProps) {
-  const reduce = useReducedMotion();
-  const revealed = usePageRevealed();
-
-  if (reduce) return <div className={className}>{children}</div>;
-
-  const hidden = { clipPath: 'inset(0% 100% 0% 0%)', scale: 1.06 };
-  const shown = { clipPath: 'inset(0% 0% 0% 0%)', scale: 1 };
-  const transition = { duration: 1.3, ease: [0.77, 0, 0.175, 1] as [number, number, number, number], delay };
-
-  return onLoad ? (
-    <motion.div className={className} initial={hidden} animate={revealed ? shown : hidden} transition={transition}>
+export function ImageReveal({ children, className, delay = 0 }: ImageRevealProps) {
+  return (
+    <div className={className} data-reveal="wipe" style={vars({ '--rv-delay': `${delay}s` })}>
       {children}
-    </motion.div>
-  ) : (
-    <motion.div
-      className={className}
-      initial={hidden}
-      whileInView={shown}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={transition}
-    >
-      {children}
-    </motion.div>
+    </div>
   );
 }
 

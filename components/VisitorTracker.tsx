@@ -52,6 +52,7 @@ export default function VisitorTracker() {
 
         await fetch('/api/visitors', {
           method: 'POST',
+          keepalive: true,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             sessionId,
@@ -66,9 +67,25 @@ export default function VisitorTracker() {
       }
     };
 
-    // Small delay to not block page rendering
-    const timer = setTimeout(trackVisit, 100);
-    return () => clearTimeout(timer);
+    // Wait until the page has finished loading and the browser is idle, so
+    // tracking never competes with the page's own images and scripts.
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    let idleId: number | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      if (w.requestIdleCallback) idleId = w.requestIdleCallback(() => void trackVisit(), { timeout: 5000 });
+      else timer = setTimeout(trackVisit, 2000);
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+    return () => {
+      window.removeEventListener('load', schedule);
+      if (idleId !== undefined) w.cancelIdleCallback?.(idleId);
+      if (timer) clearTimeout(timer);
+    };
   }, [pathname]);
 
   // This component doesn't render anything
