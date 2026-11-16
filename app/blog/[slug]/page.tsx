@@ -36,6 +36,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     image: post.cover_image || null,
     type: 'article',
     extra: {
+      title: { absolute: `${post.title} | ${SITE_NAME}` },
       authors: [{ name: post.author || SITE_NAME }],
       keywords: post.tags?.length ? post.tags : undefined,
       openGraph: {
