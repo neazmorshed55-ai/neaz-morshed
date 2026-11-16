@@ -429,3 +429,12 @@ html.np-cursor-down .np-cursor--ring {
     backdrop-filter: none !important;
   }
 }
+
+/* Keep footer text clear of the floating WhatsApp / chat buttons
+   (two 64px buttons pinned bottom-right). */
+@media (min-width: 768px) {
+  footer[class] { padding-right: 11rem; }
+}
+@media (max-width: 767px) {
+  footer[class] { padding-bottom: 6.5rem; }
+}
