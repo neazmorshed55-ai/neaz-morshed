@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import GalleryCoverflow from './gallery/GalleryCoverflow';
+import { LightboxImage } from './gallery/GalleryImages';
 import NextImage from './SiteImage';
 import { Reveal, SplitText } from '@/components/motion/Reveal';
 
@@ -41,9 +43,9 @@ export function PhoneFrame({ src, alt, sizes = '280px', className = '' }: { src:
 }
 
 /**
- * 3D coverflow of phone-shaped cards. Pure CSS transforms (no blur or
- * backdrop filters, which freeze iPhones); only the cards near the centre
- * render an image, and every image is lazy-loaded and resized.
+ * Homepage project showcase: a 3D coverflow where every card keeps its
+ * picture's own shape (nothing is cropped). Tapping a picture opens it
+ * full size. Same engine as the project gallery (CSS transforms only).
  */
 export default function PhoneCoverflow({
   items,
@@ -56,28 +58,23 @@ export default function PhoneCoverflow({
   eyebrow?: string;
   allHref?: string;
 }) {
-  const list = (items || []).slice(0, 12);
-  const [active, setActive] = useState(Math.min(2, Math.max(0, list.length - 1)));
-  const drag = useRef<{ x: number; moved: boolean } | null>(null);
+  const list = (items || []).filter((it) => it.thumbnail_url || it.image_url).slice(0, 14);
+  const [open, setOpen] = useState<number | null>(null);
   const n = list.length;
 
-  const loop = n >= 5;
-  const go = useCallback((d: number) => setActive((a) => (loop ? (((a + d) % n) + n) % n : Math.max(0, Math.min(n - 1, a + d)))), [n, loop]);
-  const wrap = (d: number) => { if (!loop) return d; let x = ((d % n) + n) % n; if (x > n / 2) x -= n; return x; };
-
   useEffect(() => {
+    if (open === null) return;
     const onKey = (e: KeyboardEvent) => {
-      const el = document.activeElement;
-      if (el && el.getAttribute('data-coverflow') === '1') {
-        if (e.key === 'ArrowLeft') go(-1);
-        if (e.key === 'ArrowRight') go(1);
-      }
+      if (e.key === 'Escape') setOpen(null);
+      if (e.key === 'ArrowLeft') setOpen((o) => (o === null ? o : (o - 1 + n) % n));
+      if (e.key === 'ArrowRight') setOpen((o) => (o === null ? o : (o + 1) % n));
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [go]);
+  }, [open, n]);
 
   if (n === 0) return null;
+  const srcOf = (it: PhoneItem) => (it.image_url || it.thumbnail_url) as string;
 
   return (
     <section className="py-16 sm:py-24 bg-surface relative overflow-hidden">
@@ -96,66 +93,37 @@ export default function PhoneCoverflow({
           </h2>
         </div>
 
-        <div
-          tabIndex={0}
-          data-coverflow="1"
-          aria-roledescription="carousel"
-          aria-label="Project gallery"
-          className="relative mx-auto h-[420px] sm:h-[520px] outline-none select-none touch-pan-y"
-          style={{ perspective: '1400px' }}
-          onPointerDown={(e) => { drag.current = { x: e.clientX, moved: false }; }}
-          onPointerMove={(e) => { if (drag.current && Math.abs(e.clientX - drag.current.x) > 6) drag.current.moved = true; }}
-          onPointerUp={(e) => {
-            const d = drag.current; drag.current = null;
-            if (d && Math.abs(e.clientX - d.x) > 40) go(e.clientX < d.x ? 1 : -1);
-          }}
-          onPointerCancel={() => { drag.current = null; }}
-        >
-          {list.map((item, i) => {
-            const off = wrap(i - active);
-            const abs = Math.abs(off);
-            const show = abs <= 3;
-            const src = item.thumbnail_url || item.image_url;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                aria-label={item.title}
-                tabIndex={-1}
-                onClick={() => { if (!drag.current?.moved) setActive(i); }}
-                className="absolute left-1/2 top-1/2 w-[190px] sm:w-[240px] text-left transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                style={{
-                  transform: `translate(-50%, -50%) translateX(${off * 58}%) translateZ(${-abs * 130}px) rotateY(${off === 0 ? 0 : off > 0 ? -38 : 38}deg) scale(${off === 0 ? 1.12 : 1})`,
-                  opacity: show ? 1 - abs * 0.18 : 0,
-                  zIndex: 10 - abs,
-                  pointerEvents: show ? 'auto' : 'none',
-                  transformStyle: 'preserve-3d',
-                }}
-              >
-                <PhoneFrame src={show ? src : null} alt={item.title} sizes="(max-width: 640px) 190px, 240px" />
-              </button>
-            );
-          })}
-        </div>
+        <GalleryCoverflow
+          images={list.map((it) => ({ src: srcOf(it), alt: it.title }))}
+          onOpen={(i) => setOpen(i)}
+          wide
+        />
 
-        <div className="mt-6 text-center min-h-[64px]">
-          <h3 className="text-lg sm:text-xl font-black text-ink line-clamp-1">{list[active].title}</h3>
-          {list[active].description && <p className="text-body text-sm mt-1 max-w-xl mx-auto line-clamp-2">{list[active].description}</p>}
-        </div>
-
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <button type="button" onClick={() => go(-1)} aria-label="Previous" className="h-12 w-12 rounded-full border border-line bg-surface text-ink flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 transition">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+        <div className="flex justify-center mt-8">
           <Link href={allHref} className="group px-7 py-3.5 bg-primary text-white font-extrabold uppercase tracking-widest text-xs rounded-2xl hover:bg-primary-dark transition active:scale-95 shadow-glow flex items-center gap-2">
             View All Projects
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <button type="button" onClick={() => go(1)} aria-label="Next" className="h-12 w-12 rounded-full border border-line bg-surface text-ink flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 transition">
-            <ArrowRight className="w-5 h-5" />
-          </button>
         </div>
       </div>
+
+      {open !== null && list[open] && (
+        <div className="fixed inset-0 z-[99999] bg-black/90 flex items-center justify-center p-3 sm:p-8" onClick={() => setOpen(null)} role="dialog" aria-modal="true">
+          <button type="button" aria-label="Close" onClick={() => setOpen(null)} className="absolute top-4 right-4 h-11 w-11 rounded-full bg-white/15 text-white flex items-center justify-center">
+            <X className="w-6 h-6" />
+          </button>
+          <button type="button" aria-label="Previous" onClick={(e) => { e.stopPropagation(); setOpen((open - 1 + n) % n); }} className="absolute left-2 sm:left-6 h-11 w-11 rounded-full bg-white/15 text-white flex items-center justify-center">
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div className="w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
+            <LightboxImage key={srcOf(list[open])} src={srcOf(list[open])} alt={list[open].title} frameClassName="relative mx-auto h-[82vh] w-full" />
+            <p className="text-white/90 text-center text-sm font-bold mt-3">{list[open].title} <span className="text-white/50">· {open + 1} / {n}</span></p>
+          </div>
+          <button type="button" aria-label="Next" onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % n); }} className="absolute right-2 sm:right-6 h-11 w-11 rounded-full bg-white/15 text-white flex items-center justify-center">
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+      )}
     </section>
   );
 }

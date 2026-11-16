@@ -24,7 +24,7 @@ const H = 360; // card height in px (desktop); scaled down on small screens via 
  * shape, so nothing is cropped. Only CSS transforms are animated (no blur or
  * filters, which freeze iPhones) and only the nearest cards load an image.
  */
-export default function GalleryCoverflow({ images, onOpen }: { images: CoverflowImage[]; onOpen: (index: number) => void }) {
+export default function GalleryCoverflow({ images, onOpen, wide = false }: { images: CoverflowImage[]; onOpen: (index: number) => void; wide?: boolean }) {
   const n = images.length;
   const [active, setActive] = useState(Math.floor(n / 2));
   const [ratios, setRatios] = useState<Record<number, number>>({});
@@ -55,8 +55,8 @@ export default function GalleryCoverflow({ images, onOpen }: { images: Coverflow
         data-gcf="1"
         aria-roledescription="carousel"
         aria-label="Project gallery"
-        className="relative mx-auto h-[330px] sm:h-[430px] outline-none touch-pan-y overflow-hidden"
-        style={{ perspective: '1300px', ['--cw' as string]: `min(calc(min(300px, 62vw) * ${ratioOf(active)}), 64vw)` }}
+        className={`relative mx-auto outline-none touch-pan-y overflow-hidden ${wide ? 'h-[360px] sm:h-[520px]' : 'h-[330px] sm:h-[430px]'}`}
+        style={{ perspective: '1300px', ['--cw' as string]: `min(calc(min(${wide ? 400 : 300}px, 62vw) * ${ratioOf(active)}), 64vw)` }}
         onPointerDown={(e) => { drag.current = { x: e.clientX, moved: false }; }}
         onPointerMove={(e) => { if (drag.current && Math.abs(e.clientX - drag.current.x) > 6) drag.current.moved = true; }}
         onPointerUp={(e) => {
@@ -84,7 +84,7 @@ export default function GalleryCoverflow({ images, onOpen }: { images: Coverflow
               }}
               className="absolute left-1/2 top-1/2 block overflow-hidden rounded-2xl border border-line bg-white shadow-card transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
               style={{
-                width: `min(calc(min(300px, 62vw) * ${r}), 64vw)`,
+                width: `min(calc(min(${wide ? 400 : 300}px, 62vw) * ${r}), 64vw)`,
                 aspectRatio: String(r),
                 transform: `translate(-50%, -50%) translateX(${off === 0 ? '0px' : `calc(${off > 0 ? 1 : -1} * (var(--cw) * 0.56 + ${24 + (abs - 1) * 52}px))`}) translateZ(${-abs * 90}px) rotateY(${isCenter ? 0 : off > 0 ? -32 : 32}deg) scale(${isCenter ? 1.08 : 0.94})`,
                 opacity: show ? 1 - abs * 0.2 : 0,
@@ -98,7 +98,7 @@ export default function GalleryCoverflow({ images, onOpen }: { images: Coverflow
                   src={img.src}
                   alt={img.alt}
                   fill
-                  sizes="(max-width: 640px) 80vw, 520px"
+                  sizes="(max-width: 640px) 90vw, 760px"
                   className="object-contain"
                   onLoad={(e) => {
                     const el = e.currentTarget;
