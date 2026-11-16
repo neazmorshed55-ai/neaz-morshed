@@ -61,7 +61,9 @@ export default function PhoneCoverflow({
   const drag = useRef<{ x: number; moved: boolean } | null>(null);
   const n = list.length;
 
-  const go = useCallback((d: number) => setActive((a) => Math.max(0, Math.min(n - 1, a + d))), [n]);
+  const loop = n >= 5;
+  const go = useCallback((d: number) => setActive((a) => (loop ? (((a + d) % n) + n) % n : Math.max(0, Math.min(n - 1, a + d)))), [n, loop]);
+  const wrap = (d: number) => { if (!loop) return d; let x = ((d % n) + n) % n; if (x > n / 2) x -= n; return x; };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -110,7 +112,7 @@ export default function PhoneCoverflow({
           onPointerCancel={() => { drag.current = null; }}
         >
           {list.map((item, i) => {
-            const off = i - active;
+            const off = wrap(i - active);
             const abs = Math.abs(off);
             const show = abs <= 3;
             const src = item.thumbnail_url || item.image_url;
@@ -142,14 +144,14 @@ export default function PhoneCoverflow({
         </div>
 
         <div className="flex items-center justify-center gap-4 mt-4">
-          <button type="button" onClick={() => go(-1)} disabled={active === 0} aria-label="Previous" className="h-12 w-12 rounded-full border border-line bg-surface text-ink flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 transition">
+          <button type="button" onClick={() => go(-1)} aria-label="Previous" className="h-12 w-12 rounded-full border border-line bg-surface text-ink flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 transition">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <Link href={allHref} className="group px-7 py-3.5 bg-primary text-white font-extrabold uppercase tracking-widest text-xs rounded-2xl hover:bg-primary-dark transition active:scale-95 shadow-glow flex items-center gap-2">
             View All Projects
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <button type="button" onClick={() => go(1)} disabled={active === n - 1} aria-label="Next" className="h-12 w-12 rounded-full border border-line bg-surface text-ink flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 transition">
+          <button type="button" onClick={() => go(1)} aria-label="Next" className="h-12 w-12 rounded-full border border-line bg-surface text-ink flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 transition">
             <ArrowRight className="w-5 h-5" />
           </button>
         </div>

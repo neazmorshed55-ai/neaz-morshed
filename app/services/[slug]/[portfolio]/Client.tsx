@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from '../../../../components/SiteImage';
 import { CoverImage, LightboxImage } from '../../../../components/gallery/GalleryImages';
+import GalleryCoverflow, { isPlainImageUrl } from '../../../../components/gallery/GalleryCoverflow';
 import { useParams } from 'next/navigation';
 import {
   ArrowLeft, ArrowRight, ExternalLink, X,
@@ -513,6 +514,12 @@ export default function PortfolioDetailPage({ initial }: { initial?: InitialData
               {galleryItems.length > 0 && (
                 <div>
                   <h2 className="text-2xl font-black uppercase tracking-tight mb-6">Project Gallery</h2>
+                  {galleryItems.length > 6 && galleryItems.every((g) => isPlainImageUrl(g.url)) ? (
+                    <GalleryCoverflow
+                      images={galleryItems.map((g) => ({ src: g.url, alt: g.alt_text || 'Gallery image' }))}
+                      onOpen={(i) => setSelectedGalleryIndex(i)}
+                    />
+                  ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {galleryItems.map((item, index) => {
                       // Check if URL is a direct image (including CDN images from Facebook, etc.)
@@ -666,6 +673,7 @@ export default function PortfolioDetailPage({ initial }: { initial?: InitialData
                       );
                     })}
                   </div>
+                  )}
                 </div>
               )}
             </div>
