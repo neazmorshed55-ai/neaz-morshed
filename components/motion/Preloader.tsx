@@ -44,7 +44,7 @@ export default function Preloader() {
               <span
                 key={i}
                 className="np-preloader__letter"
-                style={{ animationDelay: `${i * 0.07}s` }}
+                style={{ animationDelay: `${i * 0.022}s` }}
               >
                 {char}
               </span>
