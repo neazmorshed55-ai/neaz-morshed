@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import FooterLinks from '@/components/FooterLinks';
-import IPadShowcase from '@/components/IPadShowcase';
+import PhoneCoverflow from '@/components/PhoneCoverflow';
+import PhoneSplit from '@/components/PhoneSplit';
 import VideoReviews from '@/components/VideoReviews';
 import {
   HeroSection,
@@ -45,10 +46,11 @@ export default async function HomePage() {
 
         {skills.length > 0 && <SkillsSection skills={skills} />}
 
-        {/* iPad Portfolio Showcase */}
-        <IPadShowcase items={portfolio} />
+        <PhoneCoverflow items={portfolio} />
 
         {services.length > 0 && <ServicesSection services={services} />}
+
+        <PhoneSplit items={portfolio} />
 
         {experiences.length > 0 && <ExperienceSection experiences={experiences} />}
       </main>
